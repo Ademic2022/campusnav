@@ -1,0 +1,57 @@
+PODS:
+  - Flutter (1.0.0)
+  - geolocator_apple (1.2.0):
+    - Flutter
+    - FlutterMacOS
+  - mapbox_maps_flutter (2.22.0):
+    - Flutter
+    - MapboxMaps (= 11.22.0)
+    - Turf (= 4.0.0)
+  - MapboxCommon (24.22.0):
+    - Turf (= 4.0.0)
+  - MapboxCoreMaps (11.22.0):
+    - MapboxCommon (= 24.22.0)
+  - MapboxMaps (11.22.0):
+    - MapboxCommon (= 24.22.0)
+    - MapboxCoreMaps (= 11.22.0)
+    - Turf (= 4.0.0)
+  - package_info_plus (0.4.5):
+    - Flutter
+  - Turf (4.0.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
+  - mapbox_maps_flutter (from `.symlinks/plugins/mapbox_maps_flutter/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MapboxCommon
+    - MapboxCoreMaps
+    - MapboxMaps
+    - Turf
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/darwin"
+  mapbox_maps_flutter:
+    :path: ".symlinks/plugins/mapbox_maps_flutter/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
+  mapbox_maps_flutter: ba3a26107949fa8a17f06983d6dca823d5187eed
+  MapboxCommon: 6289d93c415c56767eccf00054f967387dead18d
+  MapboxCoreMaps: 0890befe3a181edbc6b65a418437157929c25271
+  MapboxMaps: 892b9a4c38213096104531df0e50f3f54863b8d3
+  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
+  Turf: c9eb11a65d96af58cac523460fd40fec5061b081
+
+PODFILE CHECKSUM: 271b5671517d42ebb7c370d2c5c3d031264c301b
+
+COCOAPODS: 1.16.2

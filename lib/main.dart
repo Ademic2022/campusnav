@@ -8,8 +8,7 @@ import 'app.dart';
 
 /// ⚠️  Replace this with your actual Mapbox public token.
 /// Get one free at https://account.mapbox.com
-const String _mapboxToken =
-    'pk.YOUR_MAPBOX_PUBLIC_TOKEN_HERE';
+const String _mapboxToken = '';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
