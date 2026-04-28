@@ -30,6 +30,14 @@ class RouteResult {
   }
 }
 
+class RoutingException implements Exception {
+  final String message;
+  const RoutingException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class RoutingService {
   RoutingService._();
   static final RoutingService instance = RoutingService._();
@@ -50,8 +58,7 @@ class RoutingService {
     required String accessToken,
     RouteProfile profile = RouteProfile.walking,
   }) async {
-    final profileStr =
-        profile == RouteProfile.walking ? 'walking' : 'driving';
+    final profileStr = profile == RouteProfile.walking ? 'walking' : 'driving';
     final coords = '$fromLng,$fromLat;$toLng,$toLat';
 
     try {
@@ -67,7 +74,9 @@ class RoutingService {
 
       final data = response.data as Map<String, dynamic>;
       final routes = data['routes'] as List<dynamic>;
-      if (routes.isEmpty) return null;
+      if (routes.isEmpty) {
+        throw const RoutingException('No route found for this destination.');
+      }
 
       final route = routes.first as Map<String, dynamic>;
       final geometry = route['geometry'] as Map<String, dynamic>;
@@ -82,7 +91,8 @@ class RoutingService {
       final legs = route['legs'] as List<dynamic>;
       final steps = <String>[];
       for (final leg in legs) {
-        final legSteps = (leg as Map<String, dynamic>)['steps'] as List<dynamic>;
+        final legSteps =
+            (leg as Map<String, dynamic>)['steps'] as List<dynamic>;
         for (final step in legSteps) {
           final maneuver = (step as Map<String, dynamic>)['maneuver']
               as Map<String, dynamic>;
@@ -98,8 +108,23 @@ class RoutingService {
         steps: steps,
       );
     } on DioException catch (e) {
-      // Return null on network errors — caller handles gracefully
-      return null;
+      final data = e.response?.data;
+      if (data is Map<String, dynamic>) {
+        final message = data['message'] as String?;
+        if (message != null && message.isNotEmpty) {
+          throw RoutingException(message);
+        }
+      }
+
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.connectionError:
+          throw const RoutingException('Network error. Check connection.');
+        default:
+          throw const RoutingException('Route request failed.');
+      }
     }
   }
 }

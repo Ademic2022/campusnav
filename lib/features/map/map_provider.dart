@@ -66,21 +66,22 @@ class MapProvider extends ChangeNotifier {
     routeError = null;
     notifyListeners();
 
-    final result = await RoutingService.instance.getRoute(
-      fromLat: userPosition!.latitude,
-      fromLng: userPosition!.longitude,
-      toLat: selectedLandmark!.lat,
-      toLng: selectedLandmark!.lng,
-      accessToken: mapboxToken,
-      profile: routeProfile,
-    );
+    try {
+      final result = await RoutingService.instance.getRoute(
+        fromLat: userPosition!.latitude,
+        fromLng: userPosition!.longitude,
+        toLat: selectedLandmark!.lat,
+        toLng: selectedLandmark!.lng,
+        accessToken: mapboxToken,
+        profile: routeProfile,
+      );
+
+      activeRoute = result;
+    } on RoutingException catch (e) {
+      routeError = e.message;
+    }
 
     isLoadingRoute = false;
-    if (result == null) {
-      routeError = 'No route found. Check connection.';
-    } else {
-      activeRoute = result;
-    }
     notifyListeners();
   }
 

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'core/models/saved_location.dart';
 import 'core/services/storage_service.dart';
 import 'app.dart';
 
-/// ⚠️  Replace this with your actual Mapbox public token.
-/// Get one free at https://account.mapbox.com
-const String _mapboxToken = '';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: '.env');
 
   // Lock to portrait mode
   await SystemChrome.setPreferredOrientations([
@@ -32,8 +31,11 @@ Future<void> main() async {
   Hive.registerAdapter(SavedLocationAdapter());
   await StorageService.instance.init();
 
-  // Set Mapbox access token
-  MapboxOptions.setAccessToken(_mapboxToken);
+  final mapboxToken =
+      dotenv.env['MAPBOX_PUBLIC_TOKEN'] ?? dotenv.env['MAPBOX_TOKEN'] ?? '';
 
-  runApp(OauNavigatorApp(mapboxToken: _mapboxToken));
+  // Set Mapbox access token
+  MapboxOptions.setAccessToken(mapboxToken);
+
+  runApp(OauNavigatorApp(mapboxToken: mapboxToken));
 }
