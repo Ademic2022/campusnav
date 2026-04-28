@@ -340,7 +340,7 @@ class _MapScreenState extends State<MapScreen> {
                   Positioned(
                     left: 16,
                     right: 16,
-                    bottom: 76,
+                    bottom: 10,
                     child: SafeArea(
                       top: false,
                       child: Center(
