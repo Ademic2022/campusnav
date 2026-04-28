@@ -1,0 +1,659 @@
+[
+  {
+    "id": 1,
+    "name": "Main Gate",
+    "category": "gate",
+    "lat": 7.5076,
+    "lng": 4.5173,
+    "description": "Primary entrance to OAU campus from Ile-Ife town",
+    "icon": "gate"
+  },
+  {
+    "id": 2,
+    "name": "Back Gate (Mayfair)",
+    "category": "gate",
+    "lat": 7.5280,
+    "lng": 4.5175,
+    "description": "Mayfair area back entrance to campus",
+    "icon": "gate"
+  },
+  {
+    "id": 3,
+    "name": "Parakin Gate",
+    "category": "gate",
+    "lat": 7.5190,
+    "lng": 4.5370,
+    "description": "Parakin area campus entrance",
+    "icon": "gate"
+  },
+  {
+    "id": 4,
+    "name": "Senate Building",
+    "category": "admin",
+    "lat": 7.5196,
+    "lng": 4.5228,
+    "description": "Main administrative building of OAU. Houses the Vice-Chancellor's office.",
+    "icon": "admin"
+  },
+  {
+    "id": 5,
+    "name": "Registry",
+    "category": "admin",
+    "lat": 7.5200,
+    "lng": 4.5218,
+    "description": "University Registry — student records and admissions",
+    "icon": "admin"
+  },
+  {
+    "id": 6,
+    "name": "Bursary",
+    "category": "admin",
+    "lat": 7.5192,
+    "lng": 4.5235,
+    "description": "University Bursary — fees payment and financial services",
+    "icon": "admin"
+  },
+  {
+    "id": 7,
+    "name": "Vice-Chancellor's Office",
+    "category": "admin",
+    "lat": 7.5198,
+    "lng": 4.5222,
+    "description": "Office of the Vice-Chancellor of OAU",
+    "icon": "admin"
+  },
+  {
+    "id": 8,
+    "name": "Exams and Records",
+    "category": "admin",
+    "lat": 7.5194,
+    "lng": 4.5230,
+    "description": "Examination and student records office",
+    "icon": "admin"
+  },
+  {
+    "id": 9,
+    "name": "Angola Hall",
+    "category": "hostel",
+    "lat": 7.5183,
+    "lng": 4.5261,
+    "description": "Male student hostel — one of the oldest on campus",
+    "icon": "hostel"
+  },
+  {
+    "id": 10,
+    "name": "Fajuyi Hall",
+    "category": "hostel",
+    "lat": 7.5175,
+    "lng": 4.5270,
+    "description": "Male student hostel named after Colonel Fajuyi",
+    "icon": "hostel"
+  },
+  {
+    "id": 11,
+    "name": "Awolowo Hall",
+    "category": "hostel",
+    "lat": 7.5190,
+    "lng": 4.5255,
+    "description": "Male student hostel — named after Obafemi Awolowo",
+    "icon": "hostel"
+  },
+  {
+    "id": 12,
+    "name": "Moremi Hall",
+    "category": "hostel",
+    "lat": 7.5165,
+    "lng": 4.5248,
+    "description": "Female student hostel — named after Queen Moremi",
+    "icon": "hostel"
+  },
+  {
+    "id": 13,
+    "name": "ETF Hall",
+    "category": "hostel",
+    "lat": 7.5210,
+    "lng": 4.5265,
+    "description": "Male student hostel — ETF block",
+    "icon": "hostel"
+  },
+  {
+    "id": 14,
+    "name": "Mozambique Hall",
+    "category": "hostel",
+    "lat": 7.5178,
+    "lng": 4.5272,
+    "description": "Male student hostel",
+    "icon": "hostel"
+  },
+  {
+    "id": 15,
+    "name": "Alumni Hall",
+    "category": "hostel",
+    "lat": 7.5220,
+    "lng": 4.5258,
+    "description": "Student hostel — Alumni block",
+    "icon": "hostel"
+  },
+  {
+    "id": 16,
+    "name": "Caroline Davies Hall",
+    "category": "hostel",
+    "lat": 7.5160,
+    "lng": 4.5255,
+    "description": "Female student hostel",
+    "icon": "hostel"
+  },
+  {
+    "id": 17,
+    "name": "Faculty of Technology",
+    "category": "faculty",
+    "lat": 7.5201,
+    "lng": 4.5189,
+    "description": "Covers Engineering, Computer Science, Food Technology and more",
+    "icon": "faculty"
+  },
+  {
+    "id": 18,
+    "name": "Faculty of Science",
+    "category": "faculty",
+    "lat": 7.5215,
+    "lng": 4.5205,
+    "description": "Pure and applied sciences — Chemistry, Physics, Biology, Maths",
+    "icon": "faculty"
+  },
+  {
+    "id": 19,
+    "name": "Faculty of Administration",
+    "category": "faculty",
+    "lat": 7.5188,
+    "lng": 4.5220,
+    "description": "Business Administration, Accounting, Public Administration",
+    "icon": "faculty"
+  },
+  {
+    "id": 20,
+    "name": "Faculty of Law",
+    "category": "faculty",
+    "lat": 7.5182,
+    "lng": 4.5210,
+    "description": "Faculty of Law — LLB and BL programmes",
+    "icon": "faculty"
+  },
+  {
+    "id": 21,
+    "name": "Faculty of Arts",
+    "category": "faculty",
+    "lat": 7.5195,
+    "lng": 4.5215,
+    "description": "English, History, Linguistics, Religious Studies and more",
+    "icon": "faculty"
+  },
+  {
+    "id": 22,
+    "name": "Faculty of Education",
+    "category": "faculty",
+    "lat": 7.5185,
+    "lng": 4.5200,
+    "description": "Teacher education and educational foundations",
+    "icon": "faculty"
+  },
+  {
+    "id": 23,
+    "name": "Faculty of Social Sciences",
+    "category": "faculty",
+    "lat": 7.5192,
+    "lng": 4.5208,
+    "description": "Economics, Sociology, Political Science, Psychology",
+    "icon": "faculty"
+  },
+  {
+    "id": 24,
+    "name": "Faculty of Agriculture",
+    "category": "faculty",
+    "lat": 7.5240,
+    "lng": 4.5240,
+    "description": "Agricultural sciences, forestry and food science",
+    "icon": "faculty"
+  },
+  {
+    "id": 25,
+    "name": "Faculty of Pharmacy",
+    "category": "faculty",
+    "lat": 7.5130,
+    "lng": 4.5195,
+    "description": "Pharmacy and pharmaceutical sciences",
+    "icon": "faculty"
+  },
+  {
+    "id": 26,
+    "name": "Faculty of Dentistry",
+    "category": "faculty",
+    "lat": 7.5115,
+    "lng": 4.5188,
+    "description": "Dentistry — affiliated with OAUTHC",
+    "icon": "faculty"
+  },
+  {
+    "id": 27,
+    "name": "Faculty of Medicine",
+    "category": "faculty",
+    "lat": 7.5120,
+    "lng": 4.5193,
+    "description": "College of Health Sciences — MBBS programme",
+    "icon": "faculty"
+  },
+  {
+    "id": 28,
+    "name": "Department of Computer Science",
+    "category": "department",
+    "lat": 7.5204,
+    "lng": 4.5185,
+    "description": "Department of Computer Science and Engineering — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 29,
+    "name": "Department of Civil Engineering",
+    "category": "department",
+    "lat": 7.5198,
+    "lng": 4.5183,
+    "description": "Civil Engineering Department — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 30,
+    "name": "Department of Electrical Engineering",
+    "category": "department",
+    "lat": 7.5202,
+    "lng": 4.5180,
+    "description": "Electrical and Electronics Engineering — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 31,
+    "name": "Department of Chemistry",
+    "category": "department",
+    "lat": 7.5218,
+    "lng": 4.5200,
+    "description": "Chemistry Department — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 32,
+    "name": "Department of Physics",
+    "category": "department",
+    "lat": 7.5212,
+    "lng": 4.5203,
+    "description": "Physics Department — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 33,
+    "name": "Oduduwa Hall (Auditorium)",
+    "category": "lecture",
+    "lat": 7.5196,
+    "lng": 4.5225,
+    "description": "Main auditorium and large lecture hall — seats thousands",
+    "icon": "lecture"
+  },
+  {
+    "id": 34,
+    "name": "Lecture Theatre 1 (LT1)",
+    "category": "lecture",
+    "lat": 7.5205,
+    "lng": 4.5210,
+    "description": "Large lecture theatre — Faculty of Science area",
+    "icon": "lecture"
+  },
+  {
+    "id": 35,
+    "name": "Lecture Theatre 2 (LT2)",
+    "category": "lecture",
+    "lat": 7.5207,
+    "lng": 4.5207,
+    "description": "Large lecture theatre — central campus",
+    "icon": "lecture"
+  },
+  {
+    "id": 36,
+    "name": "LT Technology 1",
+    "category": "lecture",
+    "lat": 7.5200,
+    "lng": 4.5186,
+    "description": "Lecture theatre — Faculty of Technology",
+    "icon": "lecture"
+  },
+  {
+    "id": 37,
+    "name": "OAU Health Centre",
+    "category": "health",
+    "lat": 7.5170,
+    "lng": 4.5215,
+    "description": "On-campus clinic for students and staff — 24hr emergency",
+    "icon": "health"
+  },
+  {
+    "id": 38,
+    "name": "OAUTHC (Teaching Hospital)",
+    "category": "health",
+    "lat": 7.5118,
+    "lng": 4.5190,
+    "description": "Obafemi Awolowo University Teaching Hospital Complex — full hospital",
+    "icon": "health"
+  },
+  {
+    "id": 39,
+    "name": "OAUTHC Pharmacy",
+    "category": "health",
+    "lat": 7.5120,
+    "lng": 4.5194,
+    "description": "Hospital pharmacy — open to students at subsidised rates",
+    "icon": "health"
+  },
+  {
+    "id": 40,
+    "name": "OAU Central Library",
+    "category": "admin",
+    "lat": 7.5195,
+    "lng": 4.5232,
+    "description": "Hezekiah Oluwasanmi Library — main university library",
+    "icon": "admin"
+  },
+  {
+    "id": 41,
+    "name": "ICT Centre",
+    "category": "admin",
+    "lat": 7.5193,
+    "lng": 4.5217,
+    "description": "Information and Communication Technology Centre — computer labs and internet access",
+    "icon": "admin"
+  },
+  {
+    "id": 42,
+    "name": "Sports Complex",
+    "category": "sports",
+    "lat": 7.5230,
+    "lng": 4.5175,
+    "description": "Main sports complex — tennis, squash, gym, swimming pool",
+    "icon": "sports"
+  },
+  {
+    "id": 43,
+    "name": "OAU Stadium",
+    "category": "sports",
+    "lat": 7.5245,
+    "lng": 4.5170,
+    "description": "Obafemi Awolowo University stadium — football and athletics",
+    "icon": "sports"
+  },
+  {
+    "id": 44,
+    "name": "Staff Club",
+    "category": "food",
+    "lat": 7.5188,
+    "lng": 4.5243,
+    "description": "Staff Social Club — restaurant open to all campus members",
+    "icon": "food"
+  },
+  {
+    "id": 45,
+    "name": "Student Union Cafeteria",
+    "category": "food",
+    "lat": 7.5186,
+    "lng": 4.5237,
+    "description": "Main student cafeteria — affordable meals all day",
+    "icon": "food"
+  },
+  {
+    "id": 46,
+    "name": "Angola Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5181,
+    "lng": 4.5258,
+    "description": "Cafeteria inside Angola Hall — open to all students",
+    "icon": "food"
+  },
+  {
+    "id": 47,
+    "name": "Moremi Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5163,
+    "lng": 4.5246,
+    "description": "Cafeteria inside Moremi Hall",
+    "icon": "food"
+  },
+  {
+    "id": 48,
+    "name": "Tech Faculty Canteen",
+    "category": "food",
+    "lat": 7.5199,
+    "lng": 4.5192,
+    "description": "Canteen serving Faculty of Technology area",
+    "icon": "food"
+  },
+  {
+    "id": 49,
+    "name": "Science Faculty Canteen",
+    "category": "food",
+    "lat": 7.5213,
+    "lng": 4.5208,
+    "description": "Canteen serving Faculty of Science area",
+    "icon": "food"
+  },
+  {
+    "id": 50,
+    "name": "Buka Junction (Fajuyi Road)",
+    "category": "food",
+    "lat": 7.5174,
+    "lng": 4.5268,
+    "description": "Popular local food spot along Fajuyi road",
+    "icon": "food"
+  },
+  {
+    "id": 51,
+    "name": "Zenith Bank ATM",
+    "category": "atm",
+    "lat": 7.5188,
+    "lng": 4.5232,
+    "description": "Zenith Bank ATM — near Senate Building",
+    "icon": "atm"
+  },
+  {
+    "id": 52,
+    "name": "GTBank ATM",
+    "category": "atm",
+    "lat": 7.5180,
+    "lng": 4.5228,
+    "description": "GTBank ATM on campus",
+    "icon": "atm"
+  },
+  {
+    "id": 53,
+    "name": "First Bank ATM",
+    "category": "atm",
+    "lat": 7.5182,
+    "lng": 4.5224,
+    "description": "First Bank ATM — near Bursary",
+    "icon": "atm"
+  },
+  {
+    "id": 54,
+    "name": "UBA ATM",
+    "category": "atm",
+    "lat": 7.5176,
+    "lng": 4.5220,
+    "description": "United Bank for Africa ATM on campus",
+    "icon": "atm"
+  },
+  {
+    "id": 55,
+    "name": "Access Bank ATM",
+    "category": "atm",
+    "lat": 7.5170,
+    "lng": 4.5218,
+    "description": "Access Bank ATM near student area",
+    "icon": "atm"
+  },
+  {
+    "id": 56,
+    "name": "Student Union Building (SUB)",
+    "category": "admin",
+    "lat": 7.5186,
+    "lng": 4.5234,
+    "description": "Student Union Building — student government offices and activities",
+    "icon": "admin"
+  },
+  {
+    "id": 57,
+    "name": "Chapel of Resurrection",
+    "category": "admin",
+    "lat": 7.5200,
+    "lng": 4.5245,
+    "description": "Interdenominational chapel on OAU campus",
+    "icon": "admin"
+  },
+  {
+    "id": 58,
+    "name": "OAU Mosque",
+    "category": "admin",
+    "lat": 7.5194,
+    "lng": 4.5241,
+    "description": "Main mosque on OAU campus",
+    "icon": "admin"
+  },
+  {
+    "id": 59,
+    "name": "Post Office",
+    "category": "admin",
+    "lat": 7.5183,
+    "lng": 4.5230,
+    "description": "NIPOST campus post office",
+    "icon": "admin"
+  },
+  {
+    "id": 60,
+    "name": "OAU Bookshop",
+    "category": "admin",
+    "lat": 7.5190,
+    "lng": 4.5228,
+    "description": "University bookshop — textbooks, stationery and more",
+    "icon": "admin"
+  },
+  {
+    "id": 61,
+    "name": "Institute of Ecology and Environmental Studies",
+    "category": "department",
+    "lat": 7.5250,
+    "lng": 4.5255,
+    "description": "Environmental and ecological research institute",
+    "icon": "department"
+  },
+  {
+    "id": 62,
+    "name": "OAU Printing Press",
+    "category": "admin",
+    "lat": 7.5178,
+    "lng": 4.5210,
+    "description": "University printing press — documents and publications",
+    "icon": "admin"
+  },
+  {
+    "id": 63,
+    "name": "Swimming Pool",
+    "category": "sports",
+    "lat": 7.5232,
+    "lng": 4.5178,
+    "description": "Olympic-size swimming pool — Faculty of Sports sciences",
+    "icon": "sports"
+  },
+  {
+    "id": 64,
+    "name": "OAU Staff Quarters Gate",
+    "category": "gate",
+    "lat": 7.5255,
+    "lng": 4.5220,
+    "description": "Gate leading to OAU staff residential quarters",
+    "icon": "gate"
+  },
+  {
+    "id": 65,
+    "name": "Food Technology Building",
+    "category": "department",
+    "lat": 7.5206,
+    "lng": 4.5183,
+    "description": "Department of Food Science and Technology — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 66,
+    "name": "Architecture Building",
+    "category": "department",
+    "lat": 7.5196,
+    "lng": 4.5181,
+    "description": "Department of Architecture — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 67,
+    "name": "Biochemistry Building",
+    "category": "department",
+    "lat": 7.5218,
+    "lng": 4.5207,
+    "description": "Department of Biochemistry — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 68,
+    "name": "Mathematics Building",
+    "category": "department",
+    "lat": 7.5210,
+    "lng": 4.5210,
+    "description": "Department of Mathematics — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 69,
+    "name": "Botanical Garden",
+    "category": "sports",
+    "lat": 7.5260,
+    "lng": 4.5260,
+    "description": "OAU Botanical Garden — nature walk and research area",
+    "icon": "sports"
+  },
+  {
+    "id": 70,
+    "name": "Guest House",
+    "category": "hostel",
+    "lat": 7.5210,
+    "lng": 4.5240,
+    "description": "OAU official guest house — for visiting academics and guests",
+    "icon": "hostel"
+  },
+  {
+    "id": 71,
+    "name": "Engineering Workshop",
+    "category": "department",
+    "lat": 7.5196,
+    "lng": 4.5179,
+    "description": "Mechanical Engineering workshop — Faculty of Technology",
+    "icon": "department"
+  },
+  {
+    "id": 72,
+    "name": "SSANU Secretariat",
+    "category": "admin",
+    "lat": 7.5185,
+    "lng": 4.5215,
+    "description": "Senior Staff Association of Nigerian Universities secretariat",
+    "icon": "admin"
+  },
+  {
+    "id": 73,
+    "name": "NASU Secretariat",
+    "category": "admin",
+    "lat": 7.5184,
+    "lng": 4.5213,
+    "description": "Non-Academic Staff Union secretariat",
+    "icon": "admin"
+  }
+]
