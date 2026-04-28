@@ -231,14 +231,161 @@ Dark navy + amber accent design system. Custom `ThemeData` with Google Fonts (In
 
 ---
 
-## Open Questions
+### Phase 5 — Project Bootstrap Commands
+
+Run these commands in order from project root (`/Users/ademic/Downloads/campusnav`):
+
+```bash
+# 1) Confirm Flutter is available
+flutter --version
+flutter doctor
+
+# 2) Create project only if not already initialized
+flutter create --org com.oaunavigator --project-name oau_navigator .
+
+# 3) Resolve packages
+flutter pub get
+
+# 4) Verify baseline app starts
+flutter run
+```
+
+Milestone gate:
+- `flutter doctor` has no blocking issues.
+- `flutter pub get` completes with no dependency conflicts.
+
+---
+
+### Phase 6 — Config & Secrets
+
+#### Token strategy (default)
+Use runtime injection with `--dart-define` so no token is committed:
+
+```bash
+flutter run --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
+```
+
+Implementation notes:
+- Read token in `lib/main.dart` (or `lib/app.dart`) from `const String.fromEnvironment('MAPBOX_ACCESS_TOKEN')`.
+- Pass token into map initialization used by `lib/features/map/map_screen.dart`.
+- Never hardcode token in source or commit it into `android/local.properties`.
+
+Expected behavior when token is missing:
+- Show a blocking in-app error state: "Mapbox token missing. Run with --dart-define=MAPBOX_ACCESS_TOKEN=...".
+- Disable map/routing actions until token is provided.
+
+Profile/debug run examples:
+
+```bash
+flutter run --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
+flutter run --profile --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
+```
+
+---
+
+### Phase 7 — Incremental Delivery Order
+
+Build in strict dependency order:
+
+1. **Core models + services**
+   - `lib/core/models/landmark.dart`
+   - `lib/core/models/saved_location.dart`
+   - `lib/core/services/landmark_service.dart`
+   - `lib/core/services/location_service.dart`
+   - `lib/core/services/routing_service.dart`
+   - `lib/core/services/storage_service.dart`
+   - `assets/data/landmarks.json`
+2. **Map shell**
+   - `lib/features/map/map_provider.dart`
+   - `lib/features/map/map_screen.dart`
+3. **Search feature**
+   - `lib/features/search/search_provider.dart`
+   - `lib/features/search/search_screen.dart`
+4. **Navigation/routing feature**
+   - `lib/features/navigation/navigation_provider.dart`
+   - `lib/features/navigation/navigation_screen.dart`
+5. **Nearby feature**
+   - `lib/features/nearby/nearby_provider.dart`
+   - `lib/features/nearby/nearby_screen.dart`
+6. **Saved/bookmarks feature**
+   - `lib/features/saved/saved_provider.dart`
+   - `lib/features/saved/saved_screen.dart`
+7. **Shared UI and app shell integration**
+   - `lib/widgets/landmark_card.dart`
+   - `lib/widgets/category_chip.dart`
+   - `lib/widgets/route_info_panel.dart`
+   - `lib/app.dart`
+
+---
+
+### Phase 8 — Test Strategy
+
+#### Service and model tests
+- `test/core/landmark_service_test.dart`
+  - loads and parses `assets/data/landmarks.json`
+  - validates category filtering and query matching
+- `test/core/storage_service_test.dart`
+  - add/remove/getAll/contains for saved locations
+- `test/core/routing_service_test.dart`
+  - handles success and API error responses cleanly
+
+#### Widget/feature smoke tests
+- `test/features/search/search_screen_test.dart` for render + filter behavior
+- `test/features/saved/saved_screen_test.dart` for empty and populated states
+- `test/features/map/map_screen_smoke_test.dart` for safe token-missing fallback state
+
+#### Manual acceptance checks
+- map renders centered on OAU after token injection
+- search returns relevant landmarks with category filters
+- route polyline displays with distance and ETA
+- saved locations persist after restart
+- off-campus simulation disables campus-specific affordances
+
+---
+
+### Phase 9 — Packaging & Release Readiness (Android)
+
+#### Android identity and permissions
+- Confirm package/application id in `android/app/build.gradle`.
+- Add runtime permissions:
+  - `ACCESS_FINE_LOCATION`
+  - `ACCESS_COARSE_LOCATION`
+  - internet/network permissions required by map and directions APIs.
+
+#### Branding and startup polish
+- app icon + splash setup for Android resources.
+- production app name and launcher metadata.
+
+#### Build outputs
+
+```bash
+flutter analyze
+flutter test
+flutter build apk --debug --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
+flutter build apk --release --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
+```
+
+#### Install validation
+- install debug APK on physical Android device.
+- launch app and validate map, search, routing, nearby, and saved flows.
+
+---
+
+## Assumptions and Defaults (Execution)
+
+- Token handling defaults to `--dart-define=MAPBOX_ACCESS_TOKEN=...`.
+- Delivery target is Android-first for MVP; iOS is deferred until Android gates pass.
+
+---
+
+## Open Questions (Optional)
 
 > [!IMPORTANT]
 > **Do you have a Mapbox Access Token?**
 > Without it, the map cannot render and routes cannot be fetched. If you don't have one, register for free at [mapbox.com](https://account.mapbox.com) — the free tier is generous and sufficient for MVP.
 
 > [!NOTE]
-> **Target platform priority**: Should I configure both Android and iOS, or focus on Android first? (iOS requires Xcode to be installed and configured.)
+> Android-first is assumed for MVP. iOS enablement can be scheduled as a follow-up phase after Android release readiness.
 
 ---
 
@@ -246,6 +393,7 @@ Dark navy + amber accent design system. Custom `ThemeData` with Google Fonts (In
 
 ### Automated
 - `flutter analyze` — zero lint errors
+- `flutter test` — all tests pass
 - `flutter build apk --debug` — successful APK build
 
 ### Manual (Browser Preview)
@@ -262,4 +410,24 @@ Dark navy + amber accent design system. Custom `ThemeData` with Google Fonts (In
 | Flutter setup | `flutter doctor` | No critical errors |
 | Dependencies resolve | `flutter pub get` | Zero conflicts |
 | Code analysis | `flutter analyze` | Zero issues |
+| Tests | `flutter test` | All tests pass |
 | Debug build | `flutter build apk --debug` | Exit code 0 |
+
+---
+
+## Risk Controls
+
+- **Token misconfiguration fallback:** fail fast with in-app instruction when `MAPBOX_ACCESS_TOKEN` is empty or invalid.
+- **Network resilience:** show retry state and user-friendly error messaging when Mapbox Directions requests fail on poor/offline networks.
+- **JSON schema integrity:** validate required fields (`id`, `name`, `category`, `latitude`, `longitude`) during asset load and skip/report malformed entries.
+
+---
+
+## Definition of Done
+
+- Flutter environment healthy (`flutter doctor` has no critical blockers).
+- Dependencies resolved (`flutter pub get` with zero conflicts).
+- Static analysis clean (`flutter analyze` with zero issues).
+- Test suite green (`flutter test` passes).
+- Android debug build succeeds (`flutter build apk --debug` exits 0).
+- Core user journeys verified manually: map render, search, route, nearby, saved persistence.

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import '../models/landmark.dart';
-import '../services/location_service.dart';
-import '../services/routing_service.dart';
+import '../../core/models/landmark.dart';
+import '../../core/services/location_service.dart';
+import '../../core/services/routing_service.dart';
 
 class MapProvider extends ChangeNotifier {
   // Mapbox token — set before using routing

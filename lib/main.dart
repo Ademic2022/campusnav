@@ -29,7 +29,7 @@ Future<void> main() async {
   ));
 
   // Initialise Hive CE
-  await HiveFlutter.initFlutter();
+  await Hive.initFlutter();
   Hive.registerAdapter(SavedLocationAdapter());
   await StorageService.instance.init();
 
