@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../core/models/landmark.dart';
+import '../../core/services/landmark_service.dart';
 import '../../core/services/location_service.dart';
 import '../../core/services/routing_service.dart';
+import '../../core/constants/oau_bounds.dart';
 
 class MapProvider extends ChangeNotifier {
   // Mapbox token — set before using routing
@@ -16,6 +18,7 @@ class MapProvider extends ChangeNotifier {
 
   // Active route
   RouteResult? activeRoute;
+  Landmark? routeDestination;
   RouteProfile routeProfile = RouteProfile.walking;
   bool isLoadingRoute = false;
   String? routeError;
@@ -23,12 +26,27 @@ class MapProvider extends ChangeNotifier {
   // Bottom nav index
   int navIndex = 0;
 
+  // Use campus main gate as start point
+  bool useCampusAsStart = false;
+
   bool _isLocating = false;
   bool get isLocating => _isLocating;
+  double? _mainGateLatFromData;
+  double? _mainGateLngFromData;
+
+  bool get canRouteFromCurrentStart => useCampusAsStart || userPosition != null;
+
+  double get routeStartLat => useCampusAsStart
+      ? (_mainGateLatFromData ?? OauBounds.fallbackLat)
+      : (userPosition?.latitude ?? OauBounds.fallbackLat);
+  double get routeStartLng => useCampusAsStart
+      ? (_mainGateLngFromData ?? OauBounds.fallbackLng)
+      : (userPosition?.longitude ?? OauBounds.fallbackLng);
 
   Future<void> initLocation() async {
     _isLocating = true;
     notifyListeners();
+    await _loadMainGateFromLandmarks();
     userPosition = await LocationService.instance.getCurrentPosition();
     _isLocating = false;
     notifyListeners();
@@ -40,22 +58,48 @@ class MapProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> _loadMainGateFromLandmarks() async {
+    if (_mainGateLatFromData != null && _mainGateLngFromData != null) return;
+    try {
+      final all = await LandmarkService.instance.getAll();
+      final gate = all.firstWhere(
+        (l) => l.id == 1,
+        orElse: () => all.firstWhere(
+          (l) => l.name.toLowerCase() == 'main gate',
+          orElse: () => all.first,
+        ),
+      );
+      _mainGateLatFromData = gate.lat;
+      _mainGateLngFromData = gate.lng;
+    } catch (_) {
+      // Keep fallback center if landmarks fail to load.
+    }
+  }
+
   void selectLandmark(Landmark landmark) {
     selectedLandmark = landmark;
     activeRoute = null;
+    routeDestination = null;
     routeError = null;
     notifyListeners();
   }
 
   void clearSelectedLandmark() {
     selectedLandmark = null;
-    activeRoute = null;
     routeError = null;
     notifyListeners();
   }
 
   Future<void> fetchRoute() async {
-    if (selectedLandmark == null || userPosition == null) return;
+    if (selectedLandmark == null) return;
+    if (useCampusAsStart) {
+      await _loadMainGateFromLandmarks();
+    }
+    if (!canRouteFromCurrentStart) {
+      routeError = 'Enable location or use campus as start';
+      notifyListeners();
+      return;
+    }
     if (mapboxToken.isEmpty) {
       routeError = 'Mapbox token not set';
       notifyListeners();
@@ -68,8 +112,8 @@ class MapProvider extends ChangeNotifier {
 
     try {
       final result = await RoutingService.instance.getRoute(
-        fromLat: userPosition!.latitude,
-        fromLng: userPosition!.longitude,
+        fromLat: routeStartLat,
+        fromLng: routeStartLng,
         toLat: selectedLandmark!.lat,
         toLng: selectedLandmark!.lng,
         accessToken: mapboxToken,
@@ -77,6 +121,7 @@ class MapProvider extends ChangeNotifier {
       );
 
       activeRoute = result;
+      routeDestination = selectedLandmark;
     } on RoutingException catch (e) {
       routeError = e.message;
     }
@@ -86,13 +131,17 @@ class MapProvider extends ChangeNotifier {
   }
 
   void setRouteProfile(RouteProfile profile) {
+    if (routeProfile == profile) return;
     routeProfile = profile;
     notifyListeners();
-    fetchRoute();
+    if (selectedLandmark != null && canRouteFromCurrentStart) {
+      fetchRoute();
+    }
   }
 
   void clearRoute() {
     activeRoute = null;
+    routeDestination = null;
     routeError = null;
     notifyListeners();
   }
@@ -100,5 +149,23 @@ class MapProvider extends ChangeNotifier {
   void setNavIndex(int index) {
     navIndex = index;
     notifyListeners();
+  }
+
+  void setUseCampusAsStart(bool value) {
+    if (useCampusAsStart == value) return;
+    useCampusAsStart = value;
+    notifyListeners();
+    if (!useCampusAsStart) {
+      if (selectedLandmark != null && canRouteFromCurrentStart) {
+        fetchRoute();
+      }
+      return;
+    }
+    _loadMainGateFromLandmarks().then((_) {
+      notifyListeners();
+      if (selectedLandmark != null && canRouteFromCurrentStart) {
+        fetchRoute();
+      }
+    });
   }
 }

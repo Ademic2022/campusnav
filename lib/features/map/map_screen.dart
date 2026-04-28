@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -8,9 +10,6 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/oau_bounds.dart';
 import '../../core/models/landmark.dart';
 import '../../core/services/routing_service.dart';
-import '../../widgets/category_chip.dart';
-import '../nearby/nearby_provider.dart';
-import '../saved/saved_provider.dart';
 import 'map_provider.dart';
 
 class MapScreen extends StatefulWidget {
@@ -22,8 +21,13 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   MapboxMap? _mapboxMap;
-  PointAnnotationManager? _annotationManager;
   PolylineAnnotationManager? _polylineManager;
+  PointAnnotationManager? _pointAnnotationManager;
+  String? _activeRouteKey;
+  String? _activeMarkerKey;
+  Uint8List? _startMarkerImage;
+  Uint8List? _destMarkerImage;
+  String? _lastTappedCoordinateLabel;
 
   @override
   void initState() {
@@ -35,11 +39,23 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
-    _annotationManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
     _polylineManager =
         await mapboxMap.annotations.createPolylineAnnotationManager();
+    _pointAnnotationManager =
+        await mapboxMap.annotations.createPointAnnotationManager();
 
+    await _pointAnnotationManager!.setIconAllowOverlap(true);
+    await _pointAnnotationManager!.setIconIgnorePlacement(true);
+
+    await mapboxMap.gestures.updateSettings(GesturesSettings(
+      rotateEnabled: true,
+      pinchToZoomEnabled: true,
+      scrollEnabled: true,
+      doubleTapToZoomInEnabled: true,
+      doubleTouchToZoomOutEnabled: true,
+      quickZoomEnabled: true,
+      pitchEnabled: true,
+    ));
     // Disable compass and attribution for cleaner look
     await mapboxMap.compass.updateSettings(CompassSettings(enabled: false));
     await mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
@@ -62,12 +78,187 @@ class _MapScreenState extends State<MapScreen> {
     if (_mapboxMap == null) return;
     await _mapboxMap!.flyTo(
       CameraOptions(
-        center: Point(
-            coordinates: Position(landmark.lng, landmark.lat)),
+        center: Point(coordinates: Position(landmark.lng, landmark.lat)),
         zoom: OauBounds.searchZoom,
       ),
       MapAnimationOptions(duration: 800),
     );
+  }
+
+  Future<void> _drawRoute(RouteResult route) async {
+    if (_mapboxMap == null || _polylineManager == null) return;
+
+    final routeKey = '${route.coordinates.length}-${route.distanceMetres}';
+    if (_activeRouteKey == routeKey) return;
+    _activeRouteKey = routeKey;
+
+    await _polylineManager!.deleteAll();
+
+    final line = LineString(
+      coordinates: route.coordinates.map((c) => Position(c[0], c[1])).toList(),
+    );
+
+    await _polylineManager!.create(
+      PolylineAnnotationOptions(
+        geometry: line,
+        lineColor: AppColors.primary.value,
+        lineWidth: 4.0,
+        lineOpacity: 0.9,
+      ),
+    );
+
+    final lats = route.coordinates.map((c) => c[1]);
+    final lngs = route.coordinates.map((c) => c[0]);
+    final minLat = lats.reduce((a, b) => a < b ? a : b);
+    final maxLat = lats.reduce((a, b) => a > b ? a : b);
+    final minLng = lngs.reduce((a, b) => a < b ? a : b);
+    final maxLng = lngs.reduce((a, b) => a > b ? a : b);
+
+    await _mapboxMap!.flyTo(
+      CameraOptions(
+        center: Point(
+          coordinates: Position(
+            (minLng + maxLng) / 2,
+            (minLat + maxLat) / 2,
+          ),
+        ),
+        zoom: OauBounds.overviewZoom,
+      ),
+      MapAnimationOptions(duration: 800),
+    );
+  }
+
+  void _onMapTapped(MapContentGestureContext context) {
+    final lat = context.point.coordinates.lat.toDouble();
+    final lng = context.point.coordinates.lng.toDouble();
+    setState(() {
+      _lastTappedCoordinateLabel =
+          'Lat: ${lat.toStringAsFixed(6)}  Lng: ${lng.toStringAsFixed(6)}';
+    });
+  }
+
+  Future<Uint8List> _createStartLocationMarker() async {
+    const size = 64.0;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const center = Offset(size / 2, size / 2);
+
+    canvas.drawCircle(
+      center,
+      14,
+      Paint()
+        ..color = Colors.black.withOpacity(0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+    );
+    canvas.drawCircle(center, 14, Paint()..color = Colors.white);
+    canvas.drawCircle(center, 10, Paint()..color = AppColors.primary);
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
+  }
+
+  Future<Uint8List> _createDestLocationMarker() async {
+    const iconSize = 72.0;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    const icon = Icons.location_on;
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+
+    // Draw shadow
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        color: Colors.black.withOpacity(0.4),
+        fontSize: iconSize,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, const Offset(0, 4));
+
+    // Draw icon
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        color: AppColors.error,
+        fontSize: iconSize,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset.zero);
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(iconSize.toInt(), iconSize.toInt());
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
+  }
+
+  Future<void> _ensureMarkerImages() async {
+    _startMarkerImage ??= await _createStartLocationMarker();
+    _destMarkerImage ??= await _createDestLocationMarker();
+  }
+
+  Future<void> _updateMarkers(MapProvider mapProvider) async {
+    if (_pointAnnotationManager == null) return;
+    await _ensureMarkerImages();
+
+    final isRouting = mapProvider.activeRoute != null;
+
+    final hasStart = isRouting ||
+        mapProvider.useCampusAsStart ||
+        mapProvider.userPosition != null;
+
+    final targetDest = isRouting
+        ? mapProvider.routeDestination ?? mapProvider.selectedLandmark
+        : mapProvider.selectedLandmark;
+    final hasDestination = targetDest != null;
+
+    final markerKey = [
+      hasStart ? mapProvider.routeStartLat : 'none',
+      hasStart ? mapProvider.routeStartLng : 'none',
+      hasDestination ? targetDest.id : 'none',
+    ].join('-');
+
+    if (_activeMarkerKey == markerKey) return;
+    _activeMarkerKey = markerKey;
+
+    await _pointAnnotationManager!.deleteAll();
+
+    if (hasStart) {
+      await _pointAnnotationManager!.create(
+        PointAnnotationOptions(
+          geometry: Point(
+            coordinates: Position(
+              mapProvider.routeStartLng,
+              mapProvider.routeStartLat,
+            ),
+          ),
+          image: _startMarkerImage,
+          iconSize: 1.0,
+          iconAnchor: IconAnchor.CENTER,
+        ),
+      );
+    }
+
+    if (hasDestination) {
+      await _pointAnnotationManager!.create(
+        PointAnnotationOptions(
+          geometry: Point(
+            coordinates: Position(targetDest.lng, targetDest.lat),
+          ),
+          image: _destMarkerImage,
+          iconSize: 1.0,
+          iconAnchor: IconAnchor.BOTTOM,
+          iconOffset: [0.0, 0.0],
+        ),
+      );
+    }
   }
 
   @override
@@ -101,6 +292,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   styleUri: MapboxStyles.DARK,
                   onMapCreated: _onMapCreated,
+                  onTapListener: _onMapTapped,
                 ),
 
                 // ── Top search bar ──
@@ -135,12 +327,66 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
 
+                // ── Route markers (start + destination) ──
+                Builder(
+                  builder: (_) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _updateMarkers(mapProvider);
+                    });
+                    return const SizedBox.shrink();
+                  },
+                ),
+
+                // ── Render active route ──
+                if (mapProvider.activeRoute != null)
+                  Builder(
+                    builder: (_) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _drawRoute(mapProvider.activeRoute!);
+                      });
+                      return const SizedBox.shrink();
+                    },
+                  )
+                else
+                  Builder(
+                    builder: (_) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        _activeRouteKey = null;
+                        await _polylineManager?.deleteAll();
+                      });
+                      return const SizedBox.shrink();
+                    },
+                  ),
+
                 // ── Loading overlay ──
                 if (mapProvider.isLocating)
                   const Positioned(
                     top: 0,
                     right: 16,
                     child: SafeArea(child: _LocatingIndicator()),
+                  ),
+
+                if (_lastTappedCoordinateLabel != null)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    top: 84,
+                    child: SafeArea(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.75),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Text(
+                          _lastTappedCoordinateLabel!,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.bodySmall,
+                        ),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -266,6 +512,8 @@ class _LandmarkBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userPos = mapProvider.userPosition;
+    final startLat = mapProvider.routeStartLat;
+    final startLng = mapProvider.routeStartLng;
     final catColor = AppColors.categoryColor(landmark.category);
 
     return Container(
@@ -332,25 +580,60 @@ class _LandmarkBottomSheet extends StatelessWidget {
                   ),
                 ],
               ),
-              if (userPos != null) ...[
+              if (userPos != null || mapProvider.useCampusAsStart) ...[
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     _InfoChip(
                       icon: Icons.directions_walk,
-                      label: landmark.friendlyDistance(
-                          userPos.latitude, userPos.longitude),
+                      label: landmark.friendlyDistance(startLat, startLng),
                     ),
                     const SizedBox(width: 8),
                     _InfoChip(
                       icon: Icons.access_time_rounded,
                       label:
-                          '~${landmark.walkingMinutes(userPos.latitude, userPos.longitude)} min walk',
+                          '~${landmark.walkingMinutes(startLat, startLng)} min walk',
                     ),
                   ],
                 ),
               ],
               const SizedBox(height: 16),
+
+              // Use campus as start toggle
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceHigh,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Use campus as start',
+                              style: AppTextStyles.titleMedium),
+                          const SizedBox(height: 2),
+                          Text(
+                              mapProvider.useCampusAsStart
+                                  ? 'Route from OAU Main Gate'
+                                  : 'Route from your current location',
+                              style: AppTextStyles.bodySmall),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: mapProvider.useCampusAsStart,
+                      onChanged: mapProvider.setUseCampusAsStart,
+                      activeColor: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
 
               // Route profile selector + Get Directions
               Row(
@@ -399,8 +682,8 @@ class _LandmarkBottomSheet extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: AppColors.primary.withOpacity(0.3)),
+                    border:
+                        Border.all(color: AppColors.primary.withOpacity(0.3)),
                   ),
                   child: Row(
                     children: [
@@ -456,17 +739,28 @@ class _LandmarkBottomSheet extends StatelessWidget {
 
   String _emoji(String category) {
     switch (category) {
-      case 'hostel': return '🏠';
-      case 'faculty': return '🏛️';
-      case 'department': return '📚';
-      case 'admin': return '🏢';
-      case 'food': return '🍽️';
-      case 'atm': return '💳';
-      case 'health': return '🏥';
-      case 'gate': return '🚪';
-      case 'sports': return '⚽';
-      case 'lecture': return '🎓';
-      default: return '📍';
+      case 'hostel':
+        return '🏠';
+      case 'faculty':
+        return '🏛️';
+      case 'department':
+        return '📚';
+      case 'admin':
+        return '🏢';
+      case 'food':
+        return '🍽️';
+      case 'atm':
+        return '💳';
+      case 'health':
+        return '🏥';
+      case 'gate':
+        return '🚪';
+      case 'sports':
+        return '⚽';
+      case 'lecture':
+        return '🎓';
+      default:
+        return '📍';
     }
   }
 }
@@ -517,7 +811,9 @@ class _RouteProfileBtn extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         height: 44,
         decoration: BoxDecoration(
-          color: isActive ? AppColors.accent.withOpacity(0.15) : AppColors.surfaceHigh,
+          color: isActive
+              ? AppColors.accent.withOpacity(0.15)
+              : AppColors.surfaceHigh,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isActive ? AppColors.accent : AppColors.border,

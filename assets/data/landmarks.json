@@ -3,8 +3,8 @@
     "id": 1,
     "name": "Main Gate",
     "category": "gate",
-    "lat": 7.5076,
-    "lng": 4.5173,
+    "lat": 7.497644,
+    "lng": 4.522536,
     "description": "Primary entrance to OAU campus from Ile-Ife town",
     "icon": "gate"
   },
@@ -84,8 +84,8 @@
     "id": 10,
     "name": "Fajuyi Hall",
     "category": "hostel",
-    "lat": 7.5175,
-    "lng": 4.5270,
+    "lat": 7.5176770,
+    "lng": 4.5176115,
     "description": "Male student hostel named after Colonel Fajuyi",
     "icon": "hostel"
   },
@@ -327,8 +327,8 @@
     "id": 37,
     "name": "OAU Health Centre",
     "category": "health",
-    "lat": 7.5170,
-    "lng": 4.5215,
+    "lat": 7.52027,
+    "lng": 4.51636,
     "description": "On-campus clinic for students and staff — 24hr emergency",
     "icon": "health"
   },

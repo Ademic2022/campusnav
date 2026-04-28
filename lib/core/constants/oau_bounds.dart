@@ -16,10 +16,7 @@ class OauBounds {
 
   /// Bounds check for geofencing
   static bool isOnCampus(double lat, double lng) {
-    return lat >= swLat &&
-        lat <= neLat &&
-        lng >= swLng &&
-        lng <= neLng;
+    return lat >= swLat && lat <= neLat && lng >= swLng && lng <= neLng;
   }
 
   /// Fallback coordinates if GPS is outside campus (center of OAU)
