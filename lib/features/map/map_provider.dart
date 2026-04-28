@@ -15,6 +15,7 @@ class MapProvider extends ChangeNotifier {
 
   // Selected landmark (tapped from search / map)
   Landmark? selectedLandmark;
+  bool isLandmarkSheetVisible = false;
 
   // Active route
   RouteResult? activeRoute;
@@ -78,14 +79,30 @@ class MapProvider extends ChangeNotifier {
 
   void selectLandmark(Landmark landmark) {
     selectedLandmark = landmark;
+    isLandmarkSheetVisible = true;
     activeRoute = null;
     routeDestination = null;
     routeError = null;
     notifyListeners();
   }
 
+  void hideLandmarkSheet() {
+    if (selectedLandmark == null) return;
+    if (!isLandmarkSheetVisible) return;
+    isLandmarkSheetVisible = false;
+    notifyListeners();
+  }
+
+  void showLandmarkSheet() {
+    if (selectedLandmark == null) return;
+    if (isLandmarkSheetVisible) return;
+    isLandmarkSheetVisible = true;
+    notifyListeners();
+  }
+
   void clearSelectedLandmark() {
     selectedLandmark = null;
+    isLandmarkSheetVisible = false;
     routeError = null;
     notifyListeners();
   }

@@ -28,6 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   Uint8List? _startMarkerImage;
   Uint8List? _destMarkerImage;
   String? _lastTappedCoordinateLabel;
+  int? _lastFlownLandmarkId;
 
   @override
   void initState() {
@@ -50,6 +51,9 @@ class _MapScreenState extends State<MapScreen> {
     await mapboxMap.gestures.updateSettings(GesturesSettings(
       rotateEnabled: true,
       pinchToZoomEnabled: true,
+      simultaneousRotateAndPinchToZoomEnabled: true,
+      increaseRotateThresholdWhenPinchingToZoom: false,
+      increasePinchToZoomThresholdWhenRotating: false,
       scrollEnabled: true,
       doubleTapToZoomInEnabled: true,
       doubleTouchToZoomOutEnabled: true,
@@ -265,8 +269,11 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Consumer<MapProvider>(
       builder: (context, mapProvider, _) {
-        // Fly to landmark when selected
-        if (mapProvider.selectedLandmark != null) {
+        // Fly only when the selected landmark changes.
+        if (mapProvider.selectedLandmark == null) {
+          _lastFlownLandmarkId = null;
+        } else if (_lastFlownLandmarkId != mapProvider.selectedLandmark!.id) {
+          _lastFlownLandmarkId = mapProvider.selectedLandmark!.id;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _flyToLandmark(mapProvider.selectedLandmark!);
           });
@@ -316,7 +323,8 @@ class _MapScreenState extends State<MapScreen> {
                 ),
 
                 // ── Selected landmark bottom sheet ──
-                if (mapProvider.selectedLandmark != null)
+                if (mapProvider.selectedLandmark != null &&
+                    mapProvider.isLandmarkSheetVisible)
                   Positioned(
                     left: 0,
                     right: 0,
@@ -324,6 +332,22 @@ class _MapScreenState extends State<MapScreen> {
                     child: _LandmarkBottomSheet(
                       landmark: mapProvider.selectedLandmark!,
                       mapProvider: mapProvider,
+                    ),
+                  ),
+
+                if (mapProvider.selectedLandmark != null &&
+                    !mapProvider.isLandmarkSheetVisible)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 76,
+                    child: SafeArea(
+                      top: false,
+                      child: Center(
+                        child: _ReopenSheetButton(
+                          onTap: mapProvider.showLandmarkSheet,
+                        ),
+                      ),
                     ),
                   ),
 
@@ -500,6 +524,42 @@ class _MapFab extends StatelessWidget {
   }
 }
 
+class _ReopenSheetButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _ReopenSheetButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.keyboard_arrow_up_rounded,
+                color: AppColors.textPrimary, size: 18),
+            const SizedBox(width: 6),
+            Text('Show details', style: AppTextStyles.labelMedium),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ─────────────────────────────────────────────
 // Landmark bottom sheet
 // ─────────────────────────────────────────────
@@ -574,7 +634,7 @@ class _LandmarkBottomSheet extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => mapProvider.clearSelectedLandmark(),
+                    onPressed: () => mapProvider.hideLandmarkSheet(),
                     icon: const Icon(Icons.close_rounded,
                         color: AppColors.textSecondary),
                   ),
