@@ -88,6 +88,20 @@ class RoutingService {
               ])
           .toList();
 
+      // Directions geometry is road-snapped and may start/end near the input
+      // points. Ensure rendered polyline touches exact requested coordinates.
+      final exactStart = [fromLng, fromLat];
+      final exactEnd = [toLng, toLat];
+      if (coordinates.isEmpty ||
+          coordinates.first[0] != exactStart[0] ||
+          coordinates.first[1] != exactStart[1]) {
+        coordinates.insert(0, exactStart);
+      }
+      if (coordinates.last[0] != exactEnd[0] ||
+          coordinates.last[1] != exactEnd[1]) {
+        coordinates.add(exactEnd);
+      }
+
       final legs = route['legs'] as List<dynamic>;
       final steps = <String>[];
       for (final leg in legs) {
