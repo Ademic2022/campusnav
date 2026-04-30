@@ -102,10 +102,17 @@ class _MapScreenState extends State<MapScreen> {
       coordinates: route.coordinates.map((c) => Position(c[0], c[1])).toList(),
     );
 
+    if (!mounted) return;
     await _polylineManager!.create(
       PolylineAnnotationOptions(
         geometry: line,
-        lineColor: AppColors.primary.value,
+        // ignore: deprecated_member_use
+        lineColor:
+            context.read<MapProvider>().routeProfile == RouteProfile.driving
+                // ignore: deprecated_member_use
+                ? AppColors.routeDriving.value
+                // ignore: deprecated_member_use
+                : AppColors.routeWalking.value,
         lineWidth: 4.0,
         lineOpacity: 0.9,
       ),

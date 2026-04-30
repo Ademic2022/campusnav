@@ -58,7 +58,8 @@ class RoutingService {
     required String accessToken,
     RouteProfile profile = RouteProfile.walking,
   }) async {
-    final profileStr = profile == RouteProfile.walking ? 'walking' : 'driving';
+    final profileStr =
+        profile == RouteProfile.walking ? 'walking' : 'driving-traffic';
     final coords = '$fromLng,$fromLat;$toLng,$toLat';
 
     try {
