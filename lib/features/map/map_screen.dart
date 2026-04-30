@@ -660,40 +660,40 @@ class _LandmarkBottomSheet extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Use campus as start toggle
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Use campus as start',
-                              style: AppTextStyles.titleMedium),
-                          const SizedBox(height: 2),
-                          Text(
-                              mapProvider.useCampusAsStart
-                                  ? 'Route from OAU Main Gate'
-                                  : 'Route from your current location',
-                              style: AppTextStyles.bodySmall),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: mapProvider.useCampusAsStart,
-                      onChanged: mapProvider.setUseCampusAsStart,
-                      activeColor: AppColors.primary,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
+              // Container(
+              //   padding:
+              //       const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              //   decoration: BoxDecoration(
+              //     color: AppColors.surfaceHigh,
+              //     borderRadius: BorderRadius.circular(12),
+              //     border: Border.all(color: AppColors.border),
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             Text('Use campus as start',
+              //                 style: AppTextStyles.titleMedium),
+              //             const SizedBox(height: 2),
+              //             Text(
+              //                 mapProvider.useCampusAsStart
+              //                     ? 'Route from OAU Main Gate'
+              //                     : 'Route from your current location',
+              //                 style: AppTextStyles.bodySmall),
+              //           ],
+              //         ),
+              //       ),
+              //       Switch(
+              //         value: mapProvider.useCampusAsStart,
+              //         onChanged: mapProvider.setUseCampusAsStart,
+              //         activeColor: AppColors.primary,
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 12),
 
               // Route profile selector + Get Directions
               Row(
