@@ -1,17 +1,56 @@
-# oau_navigator
+# OAU Campus Navigator 🗺️
 
-A new Flutter project.
+A comprehensive Flutter application designed to help students, staff, and visitors navigate the Obafemi Awolowo University (OAU) campus seamlessly.
 
-## Getting Started
+## ✨ Features
 
-This project is a starting point for a Flutter application.
+* **Interactive Campus Map**: High-quality Mapbox map complete with custom pins and overlays uniquely tailored for OAU campus locations.
+* **Smart Routing**: Get accurate point-to-point directions around campus with support for both walking and driving-traffic profiles.
+* **Categorized Discovery**: Easily find what you're looking for by filtering through carefully curated categories: Hostels, Faculties, Lecture Halls, Banks, Food spots, and more.
+* **Fast Offline Search**: Instant search functionality relying on bundled local data to quickly find specific campus buildings and departments without high data usage.
+* **Save Favorites**: Bookmark frequently visited locations (like your department or hostel) for quick access.
+* **Nearby Places**: Discover important landmarks dynamically based on your current physical location on campus.
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Technologies Used
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+* **Framework**: [Flutter](https://flutter.dev)
+* **Mapping & Routing**: Mapbox Maps SDK & Mapbox Directions API
+* **State Management**: Provider
+* **Navigation**: GoRouter
+* **Location Handling**: Geolocator
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🚀 Getting Started
+
+### Prerequisites
+
+* [Flutter SDK](https://docs.flutter.dev/get-started/install)
+* A valid [Mapbox Access Token](https://account.mapbox.com/) 
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Ademic2022/campusnav.git
+   cd campusnav
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Configure Mapbox Token**
+   Configure your Mapbox public/secret tokens according to the standard Mapbox Maps SDK setup guidelines for iOS (`.netrc`) and Android (`gradle.properties`). You must supply your token inside the app to fetch routes properly.
+
+4. **Run the App**
+   ```bash
+   flutter run
+   ```
+
+## 📱 Screenshots
+
+*(Feel free to add your app's screenshots here!)*
+
+## 📄 License & Notes
+
+Developed as an aid for OAU campus navigation. Landmark coordinate data is pre-bundled for offline support.
