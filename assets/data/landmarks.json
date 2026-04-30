@@ -30,8 +30,8 @@
     "id": 4,
     "name": "Senate Building",
     "category": "admin",
-    "lat": 7.5185,
-    "lng": 4.5242,
+    "lat": 7.51865,
+    "lng": 4.52349,
     "description": "Main administrative building of OAU. Houses the Vice-Chancellor's office.",
     "icon": "admin"
   },
@@ -93,8 +93,8 @@
     "id": 11,
     "name": "Awolowo Hall",
     "category": "hostel",
-    "lat": 7.5065,
-    "lng": 4.5007,
+    "lat": 7.52058,
+    "lng": 4.51472,
     "description": "Male student hostel — named after Obafemi Awolowo, primarily for final year students",
     "icon": "hostel"
   },
@@ -111,10 +111,19 @@
     "id": 13,
     "name": "ETF Hall",
     "category": "hostel",
-    "lat": 7.5180,
-    "lng": 4.5146,
+    "lat": 7.51828,
+    "lng": 4.51466,
     "description": "Male student hostel — ETF block, known for quiet and serene environment",
     "icon": "hostel"
+  },
+  {
+    "id": 13,
+    "name": "ETF Hall Mosque",
+    "category": "admin",
+    "lat": 7.51878,
+    "lng": 4.51469,
+    "description": "ETF Hall Mosque — located inside ETF Hall",
+    "icon": "admin"
   },
   {
     "id": 14,
@@ -129,8 +138,8 @@
     "id": 15,
     "name": "Alumni Hall",
     "category": "hostel",
-    "lat": 7.5217,
-    "lng": 4.5172,
+    "lat": 7.52161,
+    "lng": 4.51718,
     "description": "Female student hostel — Alumni block",
     "icon": "hostel"
   },
@@ -153,7 +162,16 @@
     "icon": "hostel"
   },
   {
-    "id": 18,
+    "id": 19,
+    "name": "Postgraduate Hall",
+    "category": "hostel",
+    "lat": 7.52271,
+    "lng": 4.51647,
+    "description": "Postgraduate Hall — for postgraduate students",
+    "icon": "hostel"
+  },
+  {
+    "id": 20,
     "name": "Faculty of Technology",
     "category": "faculty",
     "lat": 7.5178,
@@ -162,7 +180,7 @@
     "icon": "faculty"
   },
   {
-    "id": 19,
+    "id": 21,
     "name": "Faculty of Science",
     "category": "faculty",
     "lat": 7.5188,
@@ -171,43 +189,61 @@
     "icon": "faculty"
   },
   {
-    "id": 20,
+    "id": 22,
     "name": "Faculty of Administration",
     "category": "faculty",
-    "lat": 7.5204,
-    "lng": 4.5226,
+    "lat": 7.52053,
+    "lng": 4.52231,
     "description": "Business Administration, Accounting, Public Administration",
     "icon": "faculty"
   },
   {
-    "id": 21,
+    "id": 23,
     "name": "Faculty of Law",
     "category": "faculty",
-    "lat": 7.5182,
-    "lng": 4.5210,
+    "lat": 7.52094,
+    "lng": 4.52237,
     "description": "Faculty of Law — LLB and BL programmes",
     "icon": "faculty"
   },
   {
-    "id": 22,
-    "name": "Faculty of Arts",
+    "id": 24,
+    "name": "Faculty of Arts (Block 1)",
     "category": "faculty",
-    "lat": 7.5195,
-    "lng": 4.5215,
-    "description": "English, History, Linguistics, Religious Studies and more",
+    "lat": 7.52032,
+    "lng": 4.5242,
+    "description": "Faculty of Arts (Block 1) — English, History, Linguistics, Religious Studies and more",
     "icon": "faculty"
   },
   {
-    "id": 23,
+    "id": 25,
+    "name": "Faculty of Arts (Block 2)",
+    "category": "faculty",
+    "lat": 7.51974,
+    "lng": 4.52411,
+    "description": "Faculty of Law — LLB and BL programmes",
+    "icon": "faculty"
+  },
+  {
+    "id": 26,
+    "name": "Faculty of Arts (Block 3)",
+    "category": "faculty",
+    "lat": 7.51917,
+    "lng": 4.52402,
+    "description": "Faculty of Arts (Block 3) — English, History, Linguistics, Religious Studies and more",
+    "icon": "faculty"
+  },
+  {
+    "id": 27,
     "name": "Faculty of Education",
     "category": "faculty",
-    "lat": 7.5185,
-    "lng": 4.5200,
+    "lat": 7.52074,
+    "lng": 4.5236,
     "description": "Teacher education and educational foundations",
     "icon": "faculty"
   },
   {
-    "id": 24,
+    "id": 28,
     "name": "Faculty of Social Sciences",
     "category": "faculty",
     "lat": 7.5212,
@@ -216,7 +252,7 @@
     "icon": "faculty"
   },
   {
-    "id": 25,
+    "id": 29,
     "name": "Faculty of Agriculture",
     "category": "faculty",
     "lat": 7.5220,
@@ -225,7 +261,7 @@
     "icon": "faculty"
   },
   {
-    "id": 26,
+    "id": 30,
     "name": "Faculty of Pharmacy",
     "category": "faculty",
     "lat": 7.5130,
@@ -234,7 +270,7 @@
     "icon": "faculty"
   },
   {
-    "id": 27,
+    "id": 31,
     "name": "Faculty of Dentistry",
     "category": "faculty",
     "lat": 7.5115,
@@ -243,7 +279,7 @@
     "icon": "faculty"
   },
   {
-    "id": 28,
+    "id": 32,
     "name": "Faculty of Medicine",
     "category": "faculty",
     "lat": 7.5120,
@@ -252,7 +288,7 @@
     "icon": "faculty"
   },
   {
-    "id": 29,
+    "id": 33,
     "name": "Department of Computer Science",
     "category": "department",
     "lat": 7.5178,
@@ -261,7 +297,7 @@
     "icon": "department"
   },
   {
-    "id": 30,
+    "id": 34,
     "name": "Department of Civil Engineering",
     "category": "department",
     "lat": 7.5231,
@@ -270,7 +306,7 @@
     "icon": "department"
   },
   {
-    "id": 31,
+    "id": 35,
     "name": "Department of Electrical Engineering",
     "category": "department",
     "lat": 7.5178,
@@ -279,7 +315,7 @@
     "icon": "department"
   },
   {
-    "id": 32,
+    "id": 36,
     "name": "Department of Chemistry",
     "category": "department",
     "lat": 7.5188,
@@ -288,7 +324,7 @@
     "icon": "department"
   },
   {
-    "id": 33,
+    "id": 37,
     "name": "Department of Physics",
     "category": "department",
     "lat": 7.5188,
@@ -297,34 +333,34 @@
     "icon": "department"
   },
   {
-    "id": 34,
+    "id": 38,
     "name": "Oduduwa Hall (Auditorium)",
     "category": "lecture",
-    "lat": 7.5187,
-    "lng": 4.5220,
+    "lat": 7.5188,
+    "lng": 4.52203,
     "description": "Main auditorium — seats thousands, also houses ODLT1 and ODLT2 lecture theatres",
     "icon": "lecture"
   },
   {
-    "id": 35,
+    "id": 39,
     "name": "Amphitheatre",
     "category": "lecture",
-    "lat": 7.5190,
-    "lng": 4.5222,
+    "lat": 7.51924,
+    "lng": 4.52213,
     "description": "Iconic Greek-style open amphitheatre — seats ~5,000, built by architect Arieh Sharon (1972–1976)",
     "icon": "lecture"
   },
   {
-    "id": 36,
+    "id": 40,
     "name": "1000 Seater Lecture Theatre",
     "category": "lecture",
-    "lat": 7.5208,
-    "lng": 4.5196,
+    "lat": 7.52084,
+    "lng": 4.51965,
     "description": "Large Faculty of Science lecture theatre — seats 1,000 students, located behind Moremi Hall",
     "icon": "lecture"
   },
   {
-    "id": 37,
+    "id": 41,
     "name": "Ajose Lecture Theatre",
     "category": "lecture",
     "lat": 7.5214,
@@ -333,7 +369,7 @@
     "icon": "lecture"
   },
   {
-    "id": 38,
+    "id": 42,
     "name": "First Bank Lecture Theatre",
     "category": "lecture",
     "lat": 7.5218,
@@ -342,7 +378,7 @@
     "icon": "lecture"
   },
   {
-    "id": 39,
+    "id": 43,
     "name": "Pit Theatre",
     "category": "lecture",
     "lat": 7.5217,
@@ -351,7 +387,7 @@
     "icon": "lecture"
   },
   {
-    "id": 40,
+    "id": 44,
     "name": "LT Technology 1",
     "category": "lecture",
     "lat": 7.5178,
@@ -360,16 +396,16 @@
     "icon": "lecture"
   },
   {
-    "id": 41,
+    "id": 45,
     "name": "OAU Health Centre",
     "category": "health",
-    "lat": 7.5157,
-    "lng": 4.5443,
+    "lat": 7.52027,
+    "lng": 4.51636,
     "description": "On-campus clinic for students and staff — 24hr emergency",
     "icon": "health"
   },
   {
-    "id": 42,
+    "id": 46,
     "name": "OAUTHC (Teaching Hospital)",
     "category": "health",
     "lat": 7.4905,
@@ -378,7 +414,7 @@
     "icon": "health"
   },
   {
-    "id": 43,
+    "id": 47,
     "name": "OAUTHC Pharmacy",
     "category": "health",
     "lat": 7.4905,
@@ -387,7 +423,7 @@
     "icon": "health"
   },
   {
-    "id": 44,
+    "id": 48,
     "name": "OAU Central Library",
     "category": "admin",
     "lat": 7.51984,
@@ -396,7 +432,7 @@
     "icon": "admin"
   },
   {
-    "id": 45,
+    "id": 49,
     "name": "ICT Centre",
     "category": "admin",
     "lat": 7.5193,
@@ -405,7 +441,7 @@
     "icon": "admin"
   },
   {
-    "id": 46,
+    "id": 50,
     "name": "Sports Complex",
     "category": "sports",
     "lat": 7.5163,
@@ -414,7 +450,7 @@
     "icon": "sports"
   },
   {
-    "id": 47,
+    "id": 51,
     "name": "OAU Stadium",
     "category": "sports",
     "lat": 7.5163,
@@ -423,7 +459,7 @@
     "icon": "sports"
   },
   {
-    "id": 48,
+    "id": 52,
     "name": "Staff Club Swimming Pool",
     "category": "sports",
     "lat": 7.5260,
@@ -432,7 +468,7 @@
     "icon": "sports"
   },
   {
-    "id": 49,
+    "id": 53,
     "name": "Staff Club",
     "category": "food",
     "lat": 7.5188,
@@ -441,7 +477,7 @@
     "icon": "food"
   },
   {
-    "id": 50,
+    "id": 54,
     "name": "Student Union Cafeteria",
     "category": "food",
     "lat": 7.5178,
@@ -450,16 +486,16 @@
     "icon": "food"
   },
   {
-    "id": 51,
+    "id": 55,
     "name": "Angola Hall Cafeteria",
     "category": "food",
-    "lat": 7.5217,
-    "lng": 4.5123,
+    "lat": 7.5218,
+    "lng": 4.51247,
     "description": "Cafeteria inside Angola Hall — open to all students",
     "icon": "food"
   },
   {
-    "id": 52,
+    "id": 56,
     "name": "Moremi Hall Cafeteria",
     "category": "food",
     "lat": 7.5202,
@@ -468,7 +504,7 @@
     "icon": "food"
   },
   {
-    "id": 53,
+    "id": 57,
     "name": "Tech Faculty Canteen",
     "category": "food",
     "lat": 7.5178,
@@ -477,7 +513,7 @@
     "icon": "food"
   },
   {
-    "id": 54,
+    "id": 58,
     "name": "Science Faculty Canteen",
     "category": "food",
     "lat": 7.5188,
@@ -486,7 +522,7 @@
     "icon": "food"
   },
   {
-    "id": 55,
+    "id": 59,
     "name": "Buka Junction (Fajuyi Road)",
     "category": "food",
     "lat": 7.5174,
@@ -495,7 +531,7 @@
     "icon": "food"
   },
   {
-    "id": 56,
+    "id": 60,
     "name": "Zenith Bank ATM",
     "category": "atm",
     "lat": 7.5188,
@@ -504,7 +540,7 @@
     "icon": "atm"
   },
   {
-    "id": 57,
+    "id": 61,
     "name": "GTBank ATM",
     "category": "atm",
     "lat": 7.5180,
@@ -513,7 +549,7 @@
     "icon": "atm"
   },
   {
-    "id": 58,
+    "id": 62,
     "name": "First Bank ATM",
     "category": "atm",
     "lat": 7.5182,
@@ -522,7 +558,7 @@
     "icon": "atm"
   },
   {
-    "id": 59,
+    "id": 63,
     "name": "UBA ATM",
     "category": "atm",
     "lat": 7.5176,
@@ -531,7 +567,7 @@
     "icon": "atm"
   },
   {
-    "id": 60,
+    "id": 64,
     "name": "Access Bank ATM",
     "category": "atm",
     "lat": 7.5170,
@@ -540,7 +576,7 @@
     "icon": "atm"
   },
   {
-    "id": 61,
+    "id": 65,
     "name": "Wema Bank",
     "category": "atm",
     "lat": 7.5155,
@@ -549,7 +585,7 @@
     "icon": "atm"
   },
   {
-    "id": 62,
+    "id": 66,
     "name": "Student Union Building (SUB)",
     "category": "admin",
     "lat": 7.5178,
@@ -558,7 +594,7 @@
     "icon": "admin"
   },
   {
-    "id": 63,
+    "id": 67,
     "name": "Chapel of Resurrection",
     "category": "admin",
     "lat": 7.5200,
@@ -567,7 +603,7 @@
     "icon": "admin"
   },
   {
-    "id": 64,
+    "id": 68,
     "name": "All Souls Chapel",
     "category": "admin",
     "lat": 7.5121,
@@ -576,7 +612,7 @@
     "icon": "admin"
   },
   {
-    "id": 65,
+    "id": 69,
     "name": "OAU Central Mosque (Unity Mosque)",
     "category": "admin",
     "lat": 7.5113,
@@ -585,7 +621,7 @@
     "icon": "admin"
   },
   {
-    "id": 66,
+    "id": 70,
     "name": "Post Office",
     "category": "admin",
     "lat": 7.5183,
@@ -594,7 +630,7 @@
     "icon": "admin"
   },
   {
-    "id": 67,
+    "id": 71,
     "name": "OAU Bookshop",
     "category": "admin",
     "lat": 7.5190,
@@ -603,7 +639,7 @@
     "icon": "admin"
   },
   {
-    "id": 68,
+    "id": 72,
     "name": "Institute of Ecology and Environmental Studies",
     "category": "department",
     "lat": 7.5250,
@@ -612,7 +648,7 @@
     "icon": "department"
   },
   {
-    "id": 69,
+    "id": 73,
     "name": "OAU Printing Press",
     "category": "admin",
     "lat": 7.5178,
@@ -621,7 +657,7 @@
     "icon": "admin"
   },
   {
-    "id": 70,
+    "id": 74,
     "name": "Swimming Pool (Sports Complex)",
     "category": "sports",
     "lat": 7.5163,
@@ -630,7 +666,7 @@
     "icon": "sports"
   },
   {
-    "id": 71,
+    "id": 75,
     "name": "OAU Staff Quarters Gate",
     "category": "gate",
     "lat": 7.5255,
@@ -639,7 +675,7 @@
     "icon": "gate"
   },
   {
-    "id": 72,
+    "id": 76,
     "name": "Food Technology Building",
     "category": "department",
     "lat": 7.5178,
@@ -648,7 +684,7 @@
     "icon": "department"
   },
   {
-    "id": 73,
+    "id": 77,
     "name": "Architecture Building",
     "category": "department",
     "lat": 7.521235,
@@ -657,7 +693,7 @@
     "icon": "department"
   },
   {
-    "id": 74,
+    "id": 78,
     "name": "Biochemistry Building",
     "category": "department",
     "lat": 7.5188,
@@ -666,7 +702,7 @@
     "icon": "department"
   },
   {
-    "id": 75,
+    "id": 79,
     "name": "Mathematics Building",
     "category": "department",
     "lat": 7.5188,
@@ -675,7 +711,7 @@
     "icon": "department"
   },
   {
-    "id": 76,
+    "id": 80,
     "name": "Botanical Garden",
     "category": "sports",
     "lat": 7.5260,
@@ -684,7 +720,7 @@
     "icon": "sports"
   },
   {
-    "id": 77,
+    "id": 81,
     "name": "OAU Conference Centre",
     "category": "hostel",
     "lat": 7.5242,
@@ -693,7 +729,7 @@
     "icon": "hostel"
   },
   {
-    "id": 78,
+    "id": 82,
     "name": "Engineering Workshop",
     "category": "department",
     "lat": 7.5178,
@@ -702,7 +738,7 @@
     "icon": "department"
   },
   {
-    "id": 79,
+    "id": 83,
     "name": "SSANU Secretariat",
     "category": "admin",
     "lat": 7.5185,
@@ -711,7 +747,7 @@
     "icon": "admin"
   },
   {
-    "id": 80,
+    "id": 84,
     "name": "NASU Secretariat",
     "category": "admin",
     "lat": 7.5184,
@@ -720,7 +756,7 @@
     "icon": "admin"
   },
   {
-    "id": 81,
+    "id": 85,
     "name": "OAU New Market",
     "category": "food",
     "lat": 7.5160,
@@ -729,12 +765,84 @@
     "icon": "food"
   },
   {
-    "id": 82,
+    "id": 86,
     "name": "A.G. Leventis Museum of Natural History",
     "category": "admin",
     "lat": 7.5167,
     "lng": 4.5286,
     "description": "Natural history museum on campus — fossils, stuffed animals, cultural artifacts. Open Mon–Sat",
     "icon": "admin"
+  },
+  {
+    "id": 87,
+    "name": "Main Bowl",
+    "category": "sports",
+    "lat": 7.5162,
+    "lng": 4.52175,
+    "description": "Main bowl on campus — used for football and athletics",
+    "icon": "sports"
+  },
+  {
+    "id": 88,
+    "name": "HSLT A Lecture Theatre",
+    "category": "hall",
+    "lat": 7.51682,
+    "lng": 4.52509,
+    "description": "Health Science Lecture Theatre A on campus — used for lectures",
+    "icon": "hall"
+  },
+  {
+    "id": 89,
+    "name": "HSLT B Lecture Theatre",
+    "category": "hall",
+    "lat": 7.51672,
+    "lng": 4.52491,
+    "description": "Health Science Lecture Theatre B on campus — used for lectures",
+    "icon": "hall"
+  },
+  {
+    "id": 90,
+    "name": "HSLT C Lecture Theatre",
+    "category": "hall",
+    "lat": 7.51653,
+    "lng": 4.52501,
+    "description": "Health Science Lecture Theatre C on campus — used for lectures",
+    "icon": "hall"
+  },
+  {
+    "id": 91,
+    "name": "Geology Department",
+    "category": "department",
+    "lat": 7.52063,
+    "lng": 4.52122,
+    "description": "Geology Department — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 92,
+    "name": "BOOA",
+    "category": "department",
+    "lat": 7.51911,
+    "lng": 4.52529,
+    "description": "BOOA Building — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 93,
+    "name": "BOOB",
+    "category": "department",
+    "lat": 7.51909,
+    "lng": 4.52545,
+    "description": "BOOB Building — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 94,
+    "name": "BOOC",
+    "category": "department",
+    "lat": 7.51888,
+    "lng": 4.5254,
+    "description": "BOOC Building — Faculty of Science",
+    "icon": "department"
   }
 ]

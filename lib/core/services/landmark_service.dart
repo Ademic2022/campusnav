@@ -13,9 +13,11 @@ class LandmarkService {
     if (_cache != null) return _cache!;
     final jsonStr = await rootBundle.loadString('assets/data/landmarks.json');
     final jsonList = jsonDecode(jsonStr) as List<dynamic>;
-    _cache = jsonList
+    final list = jsonList
         .map((e) => Landmark.fromJson(e as Map<String, dynamic>))
         .toList();
+    list.sort((a, b) => a.name.compareTo(b.name));
+    _cache = list;
     return _cache!;
   }
 
@@ -48,8 +50,9 @@ class LandmarkService {
   }) async {
     final landmarks = await getByCategory(category);
     final sorted = List<Landmark>.from(landmarks)
-      ..sort((a, b) =>
-          a.distanceTo(userLat, userLng).compareTo(b.distanceTo(userLat, userLng)));
+      ..sort((a, b) => a
+          .distanceTo(userLat, userLng)
+          .compareTo(b.distanceTo(userLat, userLng)));
     return sorted.take(limit).toList();
   }
 }
