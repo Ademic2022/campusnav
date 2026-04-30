@@ -21,7 +21,7 @@ class SearchProvider extends ChangeNotifier {
     'lecture',
     'admin',
     'food',
-    'atm',
+    'banks',
     'health',
     'gate',
     'sports',

@@ -12,7 +12,7 @@
     "id": 2,
     "name": "Back Gate (Mayfair)",
     "category": "gate",
-    "lat": 7.5280,
+    "lat": 7.528,
     "lng": 4.5175,
     "description": "Mayfair area back entrance to campus",
     "icon": "gate"
@@ -21,8 +21,8 @@
     "id": 3,
     "name": "Parakin Gate",
     "category": "gate",
-    "lat": 7.5190,
-    "lng": 4.5370,
+    "lat": 7.519,
+    "lng": 4.537,
     "description": "Parakin area campus entrance",
     "icon": "gate"
   },
@@ -39,7 +39,7 @@
     "id": 5,
     "name": "Registry",
     "category": "admin",
-    "lat": 7.5200,
+    "lat": 7.52,
     "lng": 4.5218,
     "description": "University Registry — student records and admissions",
     "icon": "admin"
@@ -67,7 +67,7 @@
     "name": "Exams and Records",
     "category": "admin",
     "lat": 7.5194,
-    "lng": 4.5230,
+    "lng": 4.523,
     "description": "Examination and student records office",
     "icon": "admin"
   },
@@ -103,7 +103,7 @@
     "name": "Moremi Hall",
     "category": "hostel",
     "lat": 7.5202,
-    "lng": 4.5190,
+    "lng": 4.519,
     "description": "Female student hostel — named after Queen Moremi, largest female hall on campus",
     "icon": "hostel"
   },
@@ -117,7 +117,7 @@
     "icon": "hostel"
   },
   {
-    "id": 13,
+    "id": 14,
     "name": "ETF Hall Mosque",
     "category": "admin",
     "lat": 7.51878,
@@ -126,7 +126,7 @@
     "icon": "admin"
   },
   {
-    "id": 14,
+    "id": 15,
     "name": "Mozambique Hall",
     "category": "hostel",
     "lat": 7.5229,
@@ -135,7 +135,7 @@
     "icon": "hostel"
   },
   {
-    "id": 15,
+    "id": 16,
     "name": "Alumni Hall",
     "category": "hostel",
     "lat": 7.52161,
@@ -144,19 +144,19 @@
     "icon": "hostel"
   },
   {
-    "id": 16,
+    "id": 17,
     "name": "Ladoke Akintola Hall",
     "category": "hostel",
-    "lat": 7.5210,
-    "lng": 4.5180,
+    "lat": 7.521,
+    "lng": 4.518,
     "description": "Female student hostel — named after Samuel Ladoke Akintola",
     "icon": "hostel"
   },
   {
-    "id": 17,
+    "id": 18,
     "name": "Murtala Muhammed Hall",
     "category": "hostel",
-    "lat": 7.5220,
+    "lat": 7.522,
     "lng": 4.5166,
     "description": "Postgraduate mixed hall — named after General Murtala Muhammed",
     "icon": "hostel"
@@ -255,7 +255,7 @@
     "id": 29,
     "name": "Faculty of Agriculture",
     "category": "faculty",
-    "lat": 7.5220,
+    "lat": 7.522,
     "lng": 4.5263,
     "description": "Agricultural sciences, forestry and food science",
     "icon": "faculty"
@@ -264,7 +264,7 @@
     "id": 30,
     "name": "Faculty of Pharmacy",
     "category": "faculty",
-    "lat": 7.5130,
+    "lat": 7.513,
     "lng": 4.5195,
     "description": "Pharmacy and pharmaceutical sciences",
     "icon": "faculty"
@@ -282,7 +282,7 @@
     "id": 32,
     "name": "Faculty of Medicine",
     "category": "faculty",
-    "lat": 7.5120,
+    "lat": 7.512,
     "lng": 4.5193,
     "description": "College of Health Sciences — MBBS programme",
     "icon": "faculty"
@@ -373,7 +373,7 @@
     "name": "First Bank Lecture Theatre",
     "category": "lecture",
     "lat": 7.5218,
-    "lng": 4.5240,
+    "lng": 4.524,
     "description": "Large lecture theatre sponsored by First Bank — popular reading spot",
     "icon": "lecture"
   },
@@ -445,7 +445,7 @@
     "name": "Sports Complex",
     "category": "sports",
     "lat": 7.5163,
-    "lng": 4.5210,
+    "lng": 4.521,
     "description": "Main sports complex — tennis, squash, gym, basketball, volleyball, track and field",
     "icon": "sports"
   },
@@ -462,7 +462,7 @@
     "id": 52,
     "name": "Staff Club Swimming Pool",
     "category": "sports",
-    "lat": 7.5260,
+    "lat": 7.526,
     "lng": 4.5319,
     "description": "Staff Club swimming pool — open to all campus members, 12pm–6pm daily (closed Wed)",
     "icon": "sports"
@@ -499,7 +499,7 @@
     "name": "Moremi Hall Cafeteria",
     "category": "food",
     "lat": 7.5202,
-    "lng": 4.5190,
+    "lng": 4.519,
     "description": "Cafeteria inside Moremi Hall",
     "icon": "food"
   },
@@ -532,60 +532,78 @@
   },
   {
     "id": 60,
-    "name": "Zenith Bank ATM",
-    "category": "atm",
-    "lat": 7.5188,
-    "lng": 4.5232,
+    "name": "Zenith Bank",
+    "category": "banks",
+    "lat": 7.51403,
+    "lng": 4.52324,
     "description": "Zenith Bank ATM — near Senate Building",
-    "icon": "atm"
+    "icon": "bank"
   },
   {
     "id": 61,
-    "name": "GTBank ATM",
-    "category": "atm",
-    "lat": 7.5180,
-    "lng": 4.5228,
-    "description": "GTBank ATM on campus",
-    "icon": "atm"
+    "name": "GTBank",
+    "category": "banks",
+    "lat": 7.51419,
+    "lng": 4.52326,
+    "description": "GTBank branch and ATM on campus — along Adesoji Aderemi Road",
+    "icon": "bank"
   },
   {
     "id": 62,
-    "name": "First Bank ATM",
-    "category": "atm",
-    "lat": 7.5182,
-    "lng": 4.5224,
+    "name": "First Bank",
+    "category": "banks",
+    "lat": 7.51528,
+    "lng": 4.52343,
     "description": "First Bank ATM — near Bursary",
-    "icon": "atm"
+    "icon": "bank"
   },
   {
     "id": 63,
-    "name": "UBA ATM",
-    "category": "atm",
-    "lat": 7.5176,
-    "lng": 4.5220,
-    "description": "United Bank for Africa ATM on campus",
-    "icon": "atm"
+    "name": "OAU Microfinance Bank",
+    "category": "banks",
+    "lat": 7.51462,
+    "lng": 4.52335,
+    "description": "OAU Microfinance Bank",
+    "icon": "bank"
   },
   {
     "id": 64,
-    "name": "Access Bank ATM",
-    "category": "atm",
-    "lat": 7.5170,
-    "lng": 4.5218,
-    "description": "Access Bank ATM near student area",
-    "icon": "atm"
+    "name": "UBA",
+    "category": "banks",
+    "lat": 7.51439,
+    "lng": 4.5233,
+    "description": "United Bank for Africa ATM on campus",
+    "icon": "bank"
   },
   {
     "id": 65,
     "name": "Wema Bank",
-    "category": "atm",
-    "lat": 7.5155,
-    "lng": 4.5231,
+    "category": "banks",
+    "lat": 7.51555,
+    "lng": 4.52315,
     "description": "Wema Bank branch and ATM on campus — along Adesoji Aderemi Road",
-    "icon": "atm"
+    "icon": "bank"
   },
   {
     "id": 66,
+    "name": "Access Bank",
+    "category": "banks",
+    "lat": 7.51356,
+    "lng": 4.52329,
+    "description": "Access Bank branch and ATM on campus — along Adesoji Aderemi Road",
+    "icon": "bank"
+  },
+  {
+    "id": 67,
+    "name": "Polaris Bank",
+    "category": "banks",
+    "lat": 7.51483,
+    "lng": 4.52336,
+    "description": "Polaris Bank branch and ATM on campus — along Adesoji Aderemi Road",
+    "icon": "bank"
+  },
+  {
+    "id": 68,
     "name": "Student Union Building (SUB)",
     "category": "admin",
     "lat": 7.5178,
@@ -594,16 +612,16 @@
     "icon": "admin"
   },
   {
-    "id": 67,
+    "id": 69,
     "name": "Chapel of Resurrection",
     "category": "admin",
-    "lat": 7.5200,
+    "lat": 7.52,
     "lng": 4.5245,
     "description": "Interdenominational chapel on OAU campus",
     "icon": "admin"
   },
   {
-    "id": 68,
+    "id": 70,
     "name": "All Souls Chapel",
     "category": "admin",
     "lat": 7.5121,
@@ -612,7 +630,7 @@
     "icon": "admin"
   },
   {
-    "id": 69,
+    "id": 71,
     "name": "OAU Central Mosque (Unity Mosque)",
     "category": "admin",
     "lat": 7.5113,
@@ -621,61 +639,61 @@
     "icon": "admin"
   },
   {
-    "id": 70,
+    "id": 72,
     "name": "Post Office",
     "category": "admin",
     "lat": 7.5183,
-    "lng": 4.5230,
+    "lng": 4.523,
     "description": "NIPOST campus post office",
     "icon": "admin"
   },
   {
-    "id": 71,
+    "id": 73,
     "name": "OAU Bookshop",
     "category": "admin",
-    "lat": 7.5190,
+    "lat": 7.519,
     "lng": 4.5228,
     "description": "University bookshop — textbooks, stationery and more",
     "icon": "admin"
   },
   {
-    "id": 72,
+    "id": 74,
     "name": "Institute of Ecology and Environmental Studies",
     "category": "department",
-    "lat": 7.5250,
+    "lat": 7.525,
     "lng": 4.5255,
     "description": "Environmental and ecological research institute",
     "icon": "department"
   },
   {
-    "id": 73,
+    "id": 75,
     "name": "OAU Printing Press",
     "category": "admin",
     "lat": 7.5178,
-    "lng": 4.5210,
+    "lng": 4.521,
     "description": "University printing press — documents and publications",
     "icon": "admin"
   },
   {
-    "id": 74,
+    "id": 76,
     "name": "Swimming Pool (Sports Complex)",
     "category": "sports",
     "lat": 7.5163,
-    "lng": 4.5210,
+    "lng": 4.521,
     "description": "Olympic-size swimming pool — part of OAU Sports Complex",
     "icon": "sports"
   },
   {
-    "id": 75,
+    "id": 77,
     "name": "OAU Staff Quarters Gate",
     "category": "gate",
     "lat": 7.5255,
-    "lng": 4.5220,
+    "lng": 4.522,
     "description": "Gate leading to OAU staff residential quarters",
     "icon": "gate"
   },
   {
-    "id": 76,
+    "id": 78,
     "name": "Food Technology Building",
     "category": "department",
     "lat": 7.5178,
@@ -684,7 +702,7 @@
     "icon": "department"
   },
   {
-    "id": 77,
+    "id": 79,
     "name": "Architecture Building",
     "category": "department",
     "lat": 7.521235,
@@ -693,7 +711,7 @@
     "icon": "department"
   },
   {
-    "id": 78,
+    "id": 80,
     "name": "Biochemistry Building",
     "category": "department",
     "lat": 7.5188,
@@ -702,7 +720,7 @@
     "icon": "department"
   },
   {
-    "id": 79,
+    "id": 81,
     "name": "Mathematics Building",
     "category": "department",
     "lat": 7.5188,
@@ -711,16 +729,16 @@
     "icon": "department"
   },
   {
-    "id": 80,
+    "id": 82,
     "name": "Botanical Garden",
     "category": "sports",
-    "lat": 7.5260,
-    "lng": 4.5260,
+    "lat": 7.526,
+    "lng": 4.526,
     "description": "OAU Botanical Garden — nature walk and research area",
     "icon": "sports"
   },
   {
-    "id": 81,
+    "id": 83,
     "name": "OAU Conference Centre",
     "category": "hostel",
     "lat": 7.5242,
@@ -729,7 +747,7 @@
     "icon": "hostel"
   },
   {
-    "id": 82,
+    "id": 84,
     "name": "Engineering Workshop",
     "category": "department",
     "lat": 7.5178,
@@ -738,7 +756,7 @@
     "icon": "department"
   },
   {
-    "id": 83,
+    "id": 85,
     "name": "SSANU Secretariat",
     "category": "admin",
     "lat": 7.5185,
@@ -747,7 +765,7 @@
     "icon": "admin"
   },
   {
-    "id": 84,
+    "id": 86,
     "name": "NASU Secretariat",
     "category": "admin",
     "lat": 7.5184,
@@ -756,16 +774,16 @@
     "icon": "admin"
   },
   {
-    "id": 85,
+    "id": 87,
     "name": "OAU New Market",
     "category": "food",
-    "lat": 7.5160,
+    "lat": 7.516,
     "lng": 4.5122,
     "description": "Main campus market — food, clothing, stationery, pharmacy, barbers and more. Located behind ETF Hall",
     "icon": "food"
   },
   {
-    "id": 86,
+    "id": 88,
     "name": "A.G. Leventis Museum of Natural History",
     "category": "admin",
     "lat": 7.5167,
@@ -774,7 +792,7 @@
     "icon": "admin"
   },
   {
-    "id": 87,
+    "id": 89,
     "name": "Main Bowl",
     "category": "sports",
     "lat": 7.5162,
@@ -783,7 +801,7 @@
     "icon": "sports"
   },
   {
-    "id": 88,
+    "id": 90,
     "name": "HSLT A Lecture Theatre",
     "category": "hall",
     "lat": 7.51682,
@@ -792,7 +810,7 @@
     "icon": "hall"
   },
   {
-    "id": 89,
+    "id": 91,
     "name": "HSLT B Lecture Theatre",
     "category": "hall",
     "lat": 7.51672,
@@ -801,7 +819,7 @@
     "icon": "hall"
   },
   {
-    "id": 90,
+    "id": 92,
     "name": "HSLT C Lecture Theatre",
     "category": "hall",
     "lat": 7.51653,
@@ -810,7 +828,7 @@
     "icon": "hall"
   },
   {
-    "id": 91,
+    "id": 93,
     "name": "Geology Department",
     "category": "department",
     "lat": 7.52063,
@@ -819,7 +837,7 @@
     "icon": "department"
   },
   {
-    "id": 92,
+    "id": 94,
     "name": "BOOA",
     "category": "department",
     "lat": 7.51911,
@@ -828,7 +846,7 @@
     "icon": "department"
   },
   {
-    "id": 93,
+    "id": 95,
     "name": "BOOB",
     "category": "department",
     "lat": 7.51909,
@@ -837,7 +855,7 @@
     "icon": "department"
   },
   {
-    "id": 94,
+    "id": 96,
     "name": "BOOC",
     "category": "department",
     "lat": 7.51888,

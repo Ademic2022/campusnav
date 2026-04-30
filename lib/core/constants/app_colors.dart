@@ -38,7 +38,7 @@ class AppColors {
   static const Color catFaculty = Color(0xFF3B82F6);
   static const Color catAdmin = Color(0xFF06B6D4);
   static const Color catFood = Color(0xFFF97316);
-  static const Color catAtm = Color(0xFF22C55E);
+  static const Color catBank = Color(0xFF22C55E);
   static const Color catHealth = Color(0xFFEF4444);
   static const Color catGate = Color(0xFF94A3B8);
   static const Color catSports = Color(0xFFFBBF24);
@@ -51,7 +51,7 @@ class AppColors {
       case 'faculty': return catFaculty;
       case 'admin': return catAdmin;
       case 'food': return catFood;
-      case 'atm': return catAtm;
+      case 'banks': return catBank;
       case 'health': return catHealth;
       case 'gate': return catGate;
       case 'sports': return catSports;

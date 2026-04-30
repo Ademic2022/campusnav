@@ -106,7 +106,7 @@ assets/
 
 ### 4. Nearby Screen (Bottom Sheet)
 - Opens as sliding bottom sheet from Map Screen
-- Tabs: All | Food | ATMs | Hostels | Health | Halls
+- Tabs: All | Food | Banks | Hostels | Health | Halls
 - Cards sorted by distance from current GPS, showing walk time estimate
 
 ### 5. Saved Locations Screen
@@ -126,7 +126,7 @@ Comprehensive seed file covering priority landmarks from the PRD:
 - `admin` — Senate Building, Bursary, Registry, Vice-Chancellor's Office
 - `health` — OAU Teaching Hospital, Health Center
 - `food` — Cafeterias/restaurants across campus
-- `atm` — GTBank, First Bank, UBA ATMs on campus
+- `banks` — GTBank, First Bank, UBA Banks on campus
 - `gate` — Main gate, Back gate, Parakin gate
 - `sports` — Sports complex, Stadium
 - `lecture` — Major lecture halls (LT1, LT2, Awo Auditorium, etc.)

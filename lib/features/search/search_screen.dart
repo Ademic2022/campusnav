@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             focusNode: _focusNode,
                             style: AppTextStyles.bodyLarge,
                             decoration: InputDecoration(
-                              hintText: 'Search locations, halls, ATMs...',
+                              hintText: 'Search locations, halls, Banks...',
                               hintStyle: AppTextStyles.bodyMedium,
                               prefixIcon: const Icon(Icons.search_rounded,
                                   color: AppColors.textSecondary, size: 20),
@@ -209,7 +209,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               query.isEmpty
-                  ? 'Search hostels, faculties, ATMs, cafeterias and more'
+                  ? 'Search hostels, faculties, Banks, cafeterias and more'
                   : 'Try a different keyword or category',
               style: AppTextStyles.bodyMedium,
               textAlign: TextAlign.center,

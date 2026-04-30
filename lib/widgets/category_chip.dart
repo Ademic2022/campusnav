@@ -43,8 +43,7 @@ class CategoryChip extends StatelessWidget {
               label,
               style: AppTextStyles.labelMedium.copyWith(
                 color: isSelected ? Colors.white : AppColors.textSecondary,
-                fontWeight:
-                    isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ],
@@ -66,7 +65,7 @@ class CategoryChip extends StatelessWidget {
       'lecture': ('Halls', '🎓'),
       'admin': ('Admin', '🏢'),
       'food': ('Food', '🍽️'),
-      'atm': ('ATMs', '💳'),
+      'banks': ('Banks', '🏦'),
       'health': ('Health', '🏥'),
       'gate': ('Gates', '🚪'),
       'sports': ('Sports', '⚽'),

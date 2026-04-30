@@ -31,7 +31,7 @@ OAU is one of Nigeria's largest university campuses (~11,861 acres) with many in
 - Freshers getting lost during registration week
 - Students struggling to find unfamiliar lecture venues
 - Visitors unable to locate administrative offices
-- Difficulty finding nearby services like ATMs, cafeterias, and health centers
+- Difficulty finding nearby services like Banks, cafeterias, and health centers
 - Existing map apps (Google Maps, Apple Maps) do not accurately map internal campus roads and walkways
 
 ---
@@ -79,7 +79,7 @@ Users can search for any campus location by name or category.
 - Lecture halls
 - Administrative offices (e.g. Senate Building, Bursary)
 - Restaurants and cafeterias
-- Banks and ATMs
+- Banks
 - Health center
 
 ### 2. Campus Map
@@ -102,7 +102,7 @@ Users can select a destination and receive the optimal route.
 
 Show places near the user's current location, filtered by category:
 - Cafeterias
-- ATMs
+- Banks
 - Hostels
 - Health center
 - Lecture halls
@@ -213,7 +213,7 @@ To map OAU accurately, landmark coordinates will be collected through:
 2. All faculty buildings
 3. Senate Building and Admin Block
 4. Health Center
-5. Banks and ATMs
+5. Banks
 6. Major cafeterias
 7. Main gate and secondary gates
 8. Sports complex

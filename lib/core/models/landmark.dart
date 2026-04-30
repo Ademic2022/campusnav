@@ -77,7 +77,7 @@ class Landmark {
       case 'faculty': return 'Faculty';
       case 'admin': return 'Admin';
       case 'food': return 'Food';
-      case 'atm': return 'ATM';
+      case 'banks': return 'Bank';
       case 'health': return 'Health';
       case 'gate': return 'Gate';
       case 'sports': return 'Sports';

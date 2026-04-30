@@ -16,7 +16,7 @@ class NearbyProvider extends ChangeNotifier {
   static const List<String> categories = [
     'all',
     'food',
-    'atm',
+    'banks',
     'hostel',
     'health',
     'lecture',

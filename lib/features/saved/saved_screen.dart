@@ -242,17 +242,28 @@ class _SavedCard extends StatelessWidget {
 
   String _emoji(String category) {
     switch (category) {
-      case 'hostel': return '🏠';
-      case 'faculty': return '🏛️';
-      case 'department': return '📚';
-      case 'admin': return '🏢';
-      case 'food': return '🍽️';
-      case 'atm': return '💳';
-      case 'health': return '🏥';
-      case 'gate': return '🚪';
-      case 'sports': return '⚽';
-      case 'lecture': return '🎓';
-      default: return '📍';
+      case 'hostel':
+        return '🏠';
+      case 'faculty':
+        return '🏛️';
+      case 'department':
+        return '📚';
+      case 'admin':
+        return '🏢';
+      case 'food':
+        return '🍽️';
+      case 'banks':
+        return '🏦';
+      case 'health':
+        return '🏥';
+      case 'gate':
+        return '🚪';
+      case 'sports':
+        return '⚽';
+      case 'lecture':
+        return '🎓';
+      default:
+        return '📍';
     }
   }
 }
@@ -287,8 +298,7 @@ class _EmptyState extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                      color: AppColors.primary.withOpacity(0.4)),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.4)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

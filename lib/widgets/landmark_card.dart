@@ -139,7 +139,8 @@ class _LandmarkCardState extends State<LandmarkCard> {
                       icon: _isSaved
                           ? Icons.bookmark_rounded
                           : Icons.bookmark_outline_rounded,
-                      color: _isSaved ? AppColors.accent : AppColors.textSecondary,
+                      color:
+                          _isSaved ? AppColors.accent : AppColors.textSecondary,
                       bgColor: _isSaved
                           ? AppColors.accent.withOpacity(0.15)
                           : AppColors.surfaceHigh,
@@ -157,17 +158,28 @@ class _LandmarkCardState extends State<LandmarkCard> {
 
   String _categoryEmoji(String category) {
     switch (category) {
-      case 'hostel': return '🏠';
-      case 'faculty': return '🏛️';
-      case 'department': return '📚';
-      case 'admin': return '🏢';
-      case 'food': return '🍽️';
-      case 'atm': return '💳';
-      case 'health': return '🏥';
-      case 'gate': return '🚪';
-      case 'sports': return '⚽';
-      case 'lecture': return '🎓';
-      default: return '📍';
+      case 'hostel':
+        return '🏠';
+      case 'faculty':
+        return '🏛️';
+      case 'department':
+        return '📚';
+      case 'admin':
+        return '🏢';
+      case 'food':
+        return '🍽️';
+      case 'banks':
+        return '🏦';
+      case 'health':
+        return '🏥';
+      case 'gate':
+        return '🚪';
+      case 'sports':
+        return '⚽';
+      case 'lecture':
+        return '🎓';
+      default:
+        return '📍';
     }
   }
 }

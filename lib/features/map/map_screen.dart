@@ -816,8 +816,8 @@ class _LandmarkBottomSheet extends StatelessWidget {
         return '🏢';
       case 'food':
         return '🍽️';
-      case 'atm':
-        return '💳';
+      case 'banks':
+        return '🏦';
       case 'health':
         return '🏥';
       case 'gate':
