@@ -68,12 +68,12 @@ class _LandmarkCardState extends State<LandmarkCard> {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: catColor.withOpacity(0.15),
+                  color: catColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: Text(
-                    _categoryEmoji(widget.landmark.category),
+                    AppColors.categoryEmoji(widget.landmark.category),
                     style: const TextStyle(fontSize: 22),
                   ),
                 ),
@@ -97,7 +97,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: catColor.withOpacity(0.18),
+                            color: catColor.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -108,7 +108,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
                         ),
                         if (hasDist) ...[
                           const SizedBox(width: 8),
-                          Icon(Icons.directions_walk,
+                          const Icon(Icons.directions_walk,
                               size: 12, color: AppColors.textMuted),
                           const SizedBox(width: 2),
                           Text(
@@ -130,7 +130,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
                     _IconBtn(
                       icon: Icons.directions_rounded,
                       color: AppColors.primary,
-                      bgColor: AppColors.primary.withOpacity(0.15),
+                      bgColor: AppColors.primary.withValues(alpha: 0.15),
                       onTap: widget.onNavigate!,
                     ),
                   if (widget.showSaveButton) ...[
@@ -142,7 +142,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
                       color:
                           _isSaved ? AppColors.accent : AppColors.textSecondary,
                       bgColor: _isSaved
-                          ? AppColors.accent.withOpacity(0.15)
+                          ? AppColors.accent.withValues(alpha: 0.15)
                           : AppColors.surfaceHigh,
                       onTap: _toggleSave,
                     ),
@@ -156,32 +156,6 @@ class _LandmarkCardState extends State<LandmarkCard> {
     );
   }
 
-  String _categoryEmoji(String category) {
-    switch (category) {
-      case 'hostel':
-        return '🏠';
-      case 'faculty':
-        return '🏛️';
-      case 'department':
-        return '📚';
-      case 'admin':
-        return '🏢';
-      case 'food':
-        return '🍽️';
-      case 'banks':
-        return '🏦';
-      case 'health':
-        return '🏥';
-      case 'gate':
-        return '🚪';
-      case 'sports':
-        return '⚽';
-      case 'lecture':
-        return '🎓';
-      default:
-        return '📍';
-    }
-  }
 }
 
 class _IconBtn extends StatelessWidget {

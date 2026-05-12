@@ -74,7 +74,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             Consumer<NearbyProvider>(
               builder: (context, provider, _) {
                 return SizedBox(
-                  height: 56,
+                  height: 52,
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                     scrollDirection: Axis.horizontal,
@@ -108,6 +108,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
                   if (provider.nearby.isEmpty) {
                     return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -118,10 +120,12 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           Text(
                             'GPS location needed for nearby results',
                             style: AppTextStyles.bodyMedium,
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
-                    );
+                    ),
+                  );
                   }
 
                   final userPos = mapProvider.userPosition;

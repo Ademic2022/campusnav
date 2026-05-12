@@ -5,7 +5,6 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/landmark.dart';
 import '../../core/models/saved_location.dart';
-import '../../core/services/routing_service.dart';
 import '../map/map_provider.dart';
 import 'saved_provider.dart';
 
@@ -159,7 +158,7 @@ class _SavedCard extends StatelessWidget {
         padding: const EdgeInsets.only(right: 24),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.15),
+          color: AppColors.error.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(Icons.delete_rounded, color: AppColors.error),
@@ -179,11 +178,11 @@ class _SavedCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: catColor.withOpacity(0.15),
+                  color: catColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Text(_emoji(saved.category),
+                  child: Text(AppColors.categoryEmoji(saved.category),
                       style: const TextStyle(fontSize: 22)),
                 ),
               ),
@@ -200,7 +199,7 @@ class _SavedCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: catColor.withOpacity(0.18),
+                            color: catColor.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -226,7 +225,7 @@ class _SavedCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
+                    color: AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.directions_rounded,
@@ -240,32 +239,6 @@ class _SavedCard extends StatelessWidget {
     );
   }
 
-  String _emoji(String category) {
-    switch (category) {
-      case 'hostel':
-        return '🏠';
-      case 'faculty':
-        return '🏛️';
-      case 'department':
-        return '📚';
-      case 'admin':
-        return '🏢';
-      case 'food':
-        return '🍽️';
-      case 'banks':
-        return '🏦';
-      case 'health':
-        return '🏥';
-      case 'gate':
-        return '🚪';
-      case 'sports':
-        return '⚽';
-      case 'lecture':
-        return '🎓';
-      default:
-        return '📍';
-    }
-  }
 }
 
 // ─────────────────────────────────────────────
@@ -296,9 +269,9 @@ class _EmptyState extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

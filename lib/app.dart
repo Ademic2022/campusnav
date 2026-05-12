@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/constants/app_colors.dart';
-import 'core/constants/app_text_styles.dart';
 import 'features/map/map_provider.dart';
 import 'features/map/map_screen.dart';
 import 'features/nearby/nearby_provider.dart';

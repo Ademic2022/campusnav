@@ -24,6 +24,15 @@ class MapProvider extends ChangeNotifier {
   bool isLoadingRoute = false;
   String? routeError;
 
+  // Map style URI
+  String mapStyle = 'mapbox://styles/mapbox/dark-v11';
+
+  void setMapStyle(String styleUri) {
+    if (mapStyle == styleUri) return;
+    mapStyle = styleUri;
+    notifyListeners();
+  }
+
   // Bottom nav index
   int navIndex = 0;
 

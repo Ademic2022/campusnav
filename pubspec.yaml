@@ -21,6 +21,7 @@ dependencies:
   geolocator: ^14.0.2
 
   # Local storage (community-maintained Hive fork)
+  hive_ce: ^2.10.1
   hive_ce_flutter: ^2.3.4
 
   # HTTP client for Mapbox Directions API
@@ -50,10 +51,43 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   hive_ce_generator: ^1.8.0
   build_runner: ^2.4.13
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21
+  adaptive_icon_background: "#0A0E1A"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
+  web:
+    generate: false
+  macos:
+    generate: false
+  windows:
+    generate: false
+
+flutter_native_splash:
+  color: "#BDD8F0"
+  image: assets/images/splash_screen.png
+  android_gravity: fill
+  ios_content_mode: scaleAspectFill
+  color_dark: "#BDD8F0"
+  image_dark: assets/images/splash_screen.png
+  android_12:
+    image: assets/images/splash_screen.png
+    color: "#BDD8F0"
+    icon_background_color: "#BDD8F0"
+  fullscreen: false
+  android: true
+  ios: true
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/data/landmarks.json
+    - assets/images/
     - .env

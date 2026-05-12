@@ -60,4 +60,20 @@ class AppColors {
       default: return textSecondary;
     }
   }
+
+  static String categoryEmoji(String category) {
+    switch (category) {
+      case 'hostel': return '🏠';
+      case 'faculty': return '🏛️';
+      case 'department': return '📚';
+      case 'admin': return '🏢';
+      case 'food': return '🍽️';
+      case 'banks': return '🏦';
+      case 'health': return '🏥';
+      case 'gate': return '🚪';
+      case 'sports': return '⚽';
+      case 'lecture': return '🎓';
+      default: return '📍';
+    }
+  }
 }

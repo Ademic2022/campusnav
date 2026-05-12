@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/models/landmark.dart';
 import '../../widgets/category_chip.dart';
 import '../../widgets/landmark_card.dart';
 import '../map/map_provider.dart';
@@ -83,7 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             focusNode: _focusNode,
                             style: AppTextStyles.bodyLarge,
                             decoration: InputDecoration(
-                              hintText: 'Search locations, halls, Banks...',
+                              hintText: 'Search locations, halls, banks...',
                               hintStyle: AppTextStyles.bodyMedium,
                               prefixIcon: const Icon(Icons.search_rounded,
                                   color: AppColors.textSecondary, size: 20),
@@ -197,7 +196,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('🔍', style: const TextStyle(fontSize: 48)),
+            const Text('🔍', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 16),
             Text(
               query.isEmpty
@@ -209,7 +208,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               query.isEmpty
-                  ? 'Search hostels, faculties, Banks, cafeterias and more'
+                  ? 'Search hostels, faculties, banks, cafeterias and more'
                   : 'Try a different keyword or category',
               style: AppTextStyles.bodyMedium,
               textAlign: TextAlign.center,
