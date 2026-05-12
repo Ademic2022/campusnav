@@ -9,8 +9,13 @@ class LocationService {
 
   Position? _lastPosition;
   StreamController<Position>? _controller;
+  bool _userOnCampus = false;
 
   Position? get lastPosition => _lastPosition;
+
+  /// True only when the device's real GPS fix is within OAU bounds.
+  /// False when the user is off-campus or location is unavailable.
+  bool get userOnCampus => _userOnCampus;
 
   /// Request permission and return current position.
   /// Falls back to Main Gate from landmark data if unavailable.
@@ -25,12 +30,13 @@ class LocationService {
           timeLimit: Duration(seconds: 10),
         ),
       );
-      // Ignore simulator/device locations that are far from OAU.
       if (!isOnCampus(pos)) {
+        _userOnCampus = false;
         final fallback = await _mainGateReferencePosition();
         _lastPosition = fallback;
         return fallback;
       }
+      _userOnCampus = true;
       _lastPosition = pos;
       return pos;
     } catch (_) {
@@ -50,7 +56,11 @@ class LocationService {
       ),
     ).listen(
       (pos) {
-        if (!isOnCampus(pos)) return;
+        if (!isOnCampus(pos)) {
+          _userOnCampus = false;
+          return;
+        }
+        _userOnCampus = true;
         _lastPosition = pos;
         _controller?.add(pos);
       },

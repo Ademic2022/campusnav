@@ -1,13 +1,53 @@
+import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 /// Mapbox route profile
 enum RouteProfile { walking, driving }
 
+class RouteStep {
+  final String instruction;
+  final String maneuverType;
+  final String? maneuverModifier;
+  final double distanceMetres;
+  final double durationSeconds;
+  /// [lng, lat] of the point where this maneuver begins.
+  final List<double> maneuverLocation;
+
+  const RouteStep({
+    required this.instruction,
+    required this.maneuverType,
+    this.maneuverModifier,
+    required this.distanceMetres,
+    required this.durationSeconds,
+    required this.maneuverLocation,
+  });
+
+  String get distanceLabel {
+    if (distanceMetres < 1000) return '${distanceMetres.round()} m';
+    return '${(distanceMetres / 1000).toStringAsFixed(1)} km';
+  }
+
+  IconData get icon {
+    if (maneuverType == 'arrive') return Icons.location_on_rounded;
+    if (maneuverType == 'depart') return Icons.navigation_rounded;
+    switch (maneuverModifier) {
+      case 'left':        return Icons.turn_left_rounded;
+      case 'right':       return Icons.turn_right_rounded;
+      case 'slight left': return Icons.turn_slight_left_rounded;
+      case 'slight right':return Icons.turn_slight_right_rounded;
+      case 'sharp left':  return Icons.turn_sharp_left_rounded;
+      case 'sharp right': return Icons.turn_sharp_right_rounded;
+      case 'uturn':       return Icons.u_turn_left_rounded;
+      default:            return Icons.straight_rounded;
+    }
+  }
+}
+
 class RouteResult {
   final List<List<double>> coordinates; // [[lng, lat], ...]
   final double distanceMetres;
   final double durationSeconds;
-  final List<String> steps;
+  final List<RouteStep> steps;
 
   const RouteResult({
     required this.coordinates,
@@ -32,7 +72,8 @@ class RouteResult {
 
 class RoutingException implements Exception {
   final String message;
-  const RoutingException(this.message);
+  final bool isNetworkError;
+  const RoutingException(this.message, {this.isNetworkError = false});
 
   @override
   String toString() => message;
@@ -104,15 +145,26 @@ class RoutingService {
       }
 
       final legs = route['legs'] as List<dynamic>;
-      final steps = <String>[];
+      final steps = <RouteStep>[];
       for (final leg in legs) {
         final legSteps =
             (leg as Map<String, dynamic>)['steps'] as List<dynamic>;
         for (final step in legSteps) {
-          final maneuver = (step as Map<String, dynamic>)['maneuver']
-              as Map<String, dynamic>;
+          final stepMap = step as Map<String, dynamic>;
+          final maneuver = stepMap['maneuver'] as Map<String, dynamic>;
           final instruction = maneuver['instruction'] as String? ?? '';
-          if (instruction.isNotEmpty) steps.add(instruction);
+          if (instruction.isEmpty) continue;
+          final loc = maneuver['location'] as List<dynamic>? ?? [];
+          steps.add(RouteStep(
+            instruction: instruction,
+            maneuverType: maneuver['type'] as String? ?? '',
+            maneuverModifier: maneuver['modifier'] as String?,
+            distanceMetres: (stepMap['distance'] as num).toDouble(),
+            durationSeconds: (stepMap['duration'] as num).toDouble(),
+            maneuverLocation: loc.length >= 2
+                ? [(loc[0] as num).toDouble(), (loc[1] as num).toDouble()]
+                : [0.0, 0.0],
+          ));
         }
       }
 
@@ -136,7 +188,10 @@ class RoutingService {
         case DioExceptionType.receiveTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.connectionError:
-          throw const RoutingException('Network error. Check connection.');
+          throw const RoutingException(
+            'No internet connection. Check your network and try again.',
+            isNetworkError: true,
+          );
         default:
           throw const RoutingException('Route request failed.');
       }
