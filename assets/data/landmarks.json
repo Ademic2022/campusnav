@@ -27,11 +27,29 @@
     "icon": "gate"
   },
   {
+    "id": 77,
+    "name": "Staff Quarters Gate",
+    "category": "gate",
+    "lat": 7.5255,
+    "lng": 4.522,
+    "description": "Gate leading to OAU staff residential quarters",
+    "icon": "gate"
+  },
+  {
+    "id": 149,
+    "name": "Agriculture / Farm Gate",
+    "category": "gate",
+    "lat": 7.5152,
+    "lng": 4.5092,
+    "description": "Entrance near OAU farm and Moore Plantation area — west campus (coordinates estimated — verify on campus)",
+    "icon": "gate"
+  },
+  {
     "id": 4,
     "name": "Senate Building",
     "category": "admin",
     "lat": 7.51865,
-    "lng": 4.52349,
+    "lng": 4.52409,
     "description": "Main administrative building of OAU. Houses the Vice-Chancellor's office.",
     "icon": "admin"
   },
@@ -70,6 +88,213 @@
     "lng": 4.523,
     "description": "Examination and student records office",
     "icon": "admin"
+  },
+  {
+    "id": 48,
+    "name": "Hezekiah Oluwasanmi Library",
+    "category": "admin",
+    "lat": 7.51984,
+    "lng": 4.52305,
+    "description": "Main university library — seats 2,500. Also called OAU Central Library.",
+    "icon": "admin"
+  },
+  {
+    "id": 49,
+    "name": "ICT Centre",
+    "category": "admin",
+    "lat": 7.5193,
+    "lng": 4.5217,
+    "description": "Information and Communication Technology Centre — computer labs and internet access",
+    "icon": "admin"
+  },
+  {
+    "id": 68,
+    "name": "Student Union Building (SUB)",
+    "category": "admin",
+    "lat": 7.5178,
+    "lng": 4.5213,
+    "description": "Ken Saro-Wiwa Building — student government offices, eateries and shops",
+    "icon": "admin"
+  },
+  {
+    "id": 69,
+    "name": "Chapel of Resurrection",
+    "category": "admin",
+    "lat": 7.52,
+    "lng": 4.5245,
+    "description": "Interdenominational chapel on OAU campus",
+    "icon": "admin"
+  },
+  {
+    "id": 70,
+    "name": "All Souls Chapel",
+    "category": "admin",
+    "lat": 7.5121,
+    "lng": 4.5177,
+    "description": "All Souls Anglican Chapel — OAU campus",
+    "icon": "admin"
+  },
+  {
+    "id": 71,
+    "name": "OAU Central Mosque (Unity Mosque)",
+    "category": "admin",
+    "lat": 7.5113,
+    "lng": 4.5169,
+    "description": "Main mosque on OAU campus — Friday Jumat prayers held here",
+    "icon": "admin"
+  },
+  {
+    "id": 72,
+    "name": "Post Office",
+    "category": "admin",
+    "lat": 7.5183,
+    "lng": 4.523,
+    "description": "NIPOST campus post office",
+    "icon": "admin"
+  },
+  {
+    "id": 73,
+    "name": "OAU Bookshop",
+    "category": "admin",
+    "lat": 7.519,
+    "lng": 4.5228,
+    "description": "University bookshop — textbooks, stationery and more",
+    "icon": "admin"
+  },
+  {
+    "id": 75,
+    "name": "OAU Printing Press",
+    "category": "admin",
+    "lat": 7.5178,
+    "lng": 4.521,
+    "description": "University printing press — documents and publications",
+    "icon": "admin"
+  },
+  {
+    "id": 85,
+    "name": "SSANU Secretariat",
+    "category": "admin",
+    "lat": 7.5185,
+    "lng": 4.5215,
+    "description": "Senior Staff Association of Nigerian Universities secretariat",
+    "icon": "admin"
+  },
+  {
+    "id": 86,
+    "name": "NASU Secretariat",
+    "category": "admin",
+    "lat": 7.5184,
+    "lng": 4.5213,
+    "description": "Non-Academic Staff Union secretariat",
+    "icon": "admin"
+  },
+  {
+    "id": 88,
+    "name": "A.G. Leventis Museum of Natural History",
+    "category": "admin",
+    "lat": 7.5167,
+    "lng": 4.5286,
+    "description": "Natural history museum — fossils, stuffed animals, cultural artifacts. Open Mon–Sat",
+    "icon": "admin"
+  },
+  {
+    "id": 140,
+    "name": "Dean of Students' Affairs",
+    "category": "admin",
+    "lat": 7.5183,
+    "lng": 4.5218,
+    "description": "Student welfare, disciplinary matters and campus services (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 141,
+    "name": "Works Department",
+    "category": "admin",
+    "lat": 7.5200,
+    "lng": 4.5200,
+    "description": "Physical planning, maintenance and infrastructure services (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 142,
+    "name": "OAU FM Radio Station",
+    "category": "admin",
+    "lat": 7.5195,
+    "lng": 4.5220,
+    "description": "OAU FM 107.5 — university radio station (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 144,
+    "name": "Postgraduate School",
+    "category": "admin",
+    "lat": 7.5192,
+    "lng": 4.5248,
+    "description": "OAU School of Postgraduate Studies — admissions and postgraduate affairs (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 145,
+    "name": "Centre for Distance Learning (CDL)",
+    "category": "admin",
+    "lat": 7.5196,
+    "lng": 4.5250,
+    "description": "Distance and e-learning programmes administration (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 146,
+    "name": "ASUU Secretariat",
+    "category": "admin",
+    "lat": 7.5182,
+    "lng": 4.5212,
+    "description": "Academic Staff Union of Universities — OAU chapter secretariat (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 150,
+    "name": "OAU International School",
+    "category": "admin",
+    "lat": 7.5110,
+    "lng": 4.5230,
+    "description": "University-affiliated international school for children of staff and community (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 156,
+    "name": "St. Francis Catholic Church",
+    "category": "admin",
+    "lat": 7.5190,
+    "lng": 4.5218,
+    "description": "Catholic chapel on OAU campus (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 157,
+    "name": "NIFES Fellowship Hall",
+    "category": "admin",
+    "lat": 7.5182,
+    "lng": 4.5225,
+    "description": "Nigerian Fellowship of Evangelical Students meeting hall (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 158,
+    "name": "Muslim Students' Society (MSS) Mosque",
+    "category": "admin",
+    "lat": 7.5180,
+    "lng": 4.5226,
+    "description": "Muslim Students' Society mosque and secretariat (coordinates estimated — verify on campus)",
+    "icon": "admin"
+  },
+  {
+    "id": 148,
+    "name": "OAU Guest House",
+    "category": "hostel",
+    "lat": 7.5248,
+    "lng": 4.5315,
+    "description": "University guest house for visiting academics and official guests — near Conference Centre (coordinates estimated — verify on campus)",
+    "icon": "hostel"
   },
   {
     "id": 9,
@@ -171,6 +396,24 @@
     "icon": "hostel"
   },
   {
+    "id": 83,
+    "name": "OAU Conference Centre",
+    "category": "hostel",
+    "lat": 7.5242,
+    "lng": 4.5311,
+    "description": "University conference centre and guest accommodation — for visiting academics and events",
+    "icon": "hostel"
+  },
+  {
+    "id": 99,
+    "name": "Julius Nyerere Hall",
+    "category": "hostel",
+    "lat": 7.5228,
+    "lng": 4.5125,
+    "description": "Male student hostel — named after Julius Nyerere, near Angola Hall (coordinates estimated — verify on campus)",
+    "icon": "hostel"
+  },
+  {
     "id": 20,
     "name": "Faculty of Technology",
     "category": "faculty",
@@ -212,7 +455,7 @@
     "category": "faculty",
     "lat": 7.52032,
     "lng": 4.5242,
-    "description": "Faculty of Arts (Block 1) — English, History, Linguistics, Religious Studies and more",
+    "description": "Faculty of Arts Block 1 — English, History, Linguistics, Religious Studies and more",
     "icon": "faculty"
   },
   {
@@ -221,7 +464,7 @@
     "category": "faculty",
     "lat": 7.51974,
     "lng": 4.52411,
-    "description": "Faculty of Law — LLB and BL programmes",
+    "description": "Faculty of Arts Block 2 — Music, Theatre Arts, French, Arabic and Islamic Studies",
     "icon": "faculty"
   },
   {
@@ -230,7 +473,7 @@
     "category": "faculty",
     "lat": 7.51917,
     "lng": 4.52402,
-    "description": "Faculty of Arts (Block 3) — English, History, Linguistics, Religious Studies and more",
+    "description": "Faculty of Arts Block 3 — Philosophy, Yoruba, Communication and Language Arts",
     "icon": "faculty"
   },
   {
@@ -248,7 +491,7 @@
     "category": "faculty",
     "lat": 7.5212,
     "lng": 4.5227,
-    "description": "Economics, Sociology, Political Science, Psychology",
+    "description": "Economics, Sociology, Political Science, Psychology, Geography",
     "icon": "faculty"
   },
   {
@@ -258,6 +501,15 @@
     "lat": 7.522,
     "lng": 4.5263,
     "description": "Agricultural sciences, forestry and food science",
+    "icon": "faculty"
+  },
+  {
+    "id": 97,
+    "name": "Faculty of Environmental Design and Management",
+    "category": "faculty",
+    "lat": 7.52477,
+    "lng": 4.52664,
+    "description": "Architecture, Estate Management, Urban Planning, Quantity Surveying, Fine Arts",
     "icon": "faculty"
   },
   {
@@ -288,17 +540,26 @@
     "icon": "faculty"
   },
   {
+    "id": 155,
+    "name": "Faculty of Nursing",
+    "category": "faculty",
+    "lat": 7.5124,
+    "lng": 4.5191,
+    "description": "Faculty of Nursing Sciences — nursing and midwifery programmes (coordinates estimated — verify on campus)",
+    "icon": "faculty"
+  },
+  {
     "id": 33,
     "name": "Department of Computer Science",
     "category": "department",
-    "lat": 7.5178,
-    "lng": 4.5284,
-    "description": "Department of Computer Science and Engineering — Faculty of Technology",
+    "lat": 7.5180,
+    "lng": 4.5281,
+    "description": "Computer Science and Engineering — Faculty of Technology (coordinates estimated — verify on campus)",
     "icon": "department"
   },
   {
     "id": 34,
-    "name": "Department of Civil Engineering",
+    "name": "Department of Civil Engineering (Spider Building)",
     "category": "department",
     "lat": 7.5231,
     "lng": 4.5292,
@@ -309,27 +570,441 @@
     "id": 35,
     "name": "Department of Electrical Engineering",
     "category": "department",
-    "lat": 7.5178,
-    "lng": 4.5284,
-    "description": "Electrical and Electronics Engineering — Faculty of Technology",
+    "lat": 7.5175,
+    "lng": 4.5288,
+    "description": "Electrical and Electronics Engineering — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 105,
+    "name": "Department of Mechanical Engineering",
+    "category": "department",
+    "lat": 7.5170,
+    "lng": 4.5290,
+    "description": "Mechanical Engineering — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 106,
+    "name": "Department of Chemical Engineering",
+    "category": "department",
+    "lat": 7.5197,
+    "lng": 4.5288,
+    "description": "Chemical Engineering — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 107,
+    "name": "Department of Agricultural Engineering",
+    "category": "department",
+    "lat": 7.5213,
+    "lng": 4.5278,
+    "description": "Agricultural Engineering — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 78,
+    "name": "Department of Food Science and Technology",
+    "category": "department",
+    "lat": 7.5182,
+    "lng": 4.5278,
+    "description": "Food Science and Technology — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 79,
+    "name": "Department of Architecture",
+    "category": "department",
+    "lat": 7.521235,
+    "lng": 4.518485,
+    "description": "Department of Architecture — Faculty of Environmental Design and Management",
+    "icon": "department"
+  },
+  {
+    "id": 84,
+    "name": "Engineering Workshop",
+    "category": "department",
+    "lat": 7.5185,
+    "lng": 4.5295,
+    "description": "Mechanical Engineering workshop — Faculty of Technology (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 127,
+    "name": "Department of Estate Management",
+    "category": "department",
+    "lat": 7.5252,
+    "lng": 4.5268,
+    "description": "Estate Management — Faculty of Environmental Design and Management (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 128,
+    "name": "Department of Urban and Regional Planning",
+    "category": "department",
+    "lat": 7.5255,
+    "lng": 4.5270,
+    "description": "Urban and Regional Planning — Faculty of Environmental Design and Management (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 129,
+    "name": "Department of Quantity Surveying",
+    "category": "department",
+    "lat": 7.5250,
+    "lng": 4.5265,
+    "description": "Quantity Surveying — Faculty of Environmental Design and Management (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 130,
+    "name": "Department of Fine and Applied Arts",
+    "category": "department",
+    "lat": 7.5245,
+    "lng": 4.5272,
+    "description": "Fine and Applied Arts — Faculty of Environmental Design and Management (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 131,
+    "name": "Department of Building Technology",
+    "category": "department",
+    "lat": 7.5248,
+    "lng": 4.5274,
+    "description": "Building Technology — Faculty of Environmental Design and Management (coordinates estimated — verify on campus)",
     "icon": "department"
   },
   {
     "id": 36,
     "name": "Department of Chemistry",
     "category": "department",
-    "lat": 7.5188,
-    "lng": 4.5212,
-    "description": "Chemistry Department — Faculty of Science",
+    "lat": 7.5186,
+    "lng": 4.5218,
+    "description": "Chemistry Department — Faculty of Science (coordinates estimated — verify on campus)",
     "icon": "department"
   },
   {
     "id": 37,
     "name": "Department of Physics",
     "category": "department",
-    "lat": 7.5188,
-    "lng": 4.5212,
-    "description": "Physics Department — Faculty of Science",
+    "lat": 7.5184,
+    "lng": 4.5215,
+    "description": "Physics Department — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 80,
+    "name": "Department of Biochemistry",
+    "category": "department",
+    "lat": 7.5190,
+    "lng": 4.5220,
+    "description": "Biochemistry Department — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 81,
+    "name": "Department of Mathematics",
+    "category": "department",
+    "lat": 7.5192,
+    "lng": 4.5210,
+    "description": "Mathematics Department — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 93,
+    "name": "Department of Geology",
+    "category": "department",
+    "lat": 7.52063,
+    "lng": 4.52122,
+    "description": "Geology Department — Faculty of Science",
+    "icon": "department"
+  },
+  {
+    "id": 108,
+    "name": "Department of Microbiology",
+    "category": "department",
+    "lat": 7.5194,
+    "lng": 4.5222,
+    "description": "Microbiology Department — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 109,
+    "name": "Department of Botany",
+    "category": "department",
+    "lat": 7.5196,
+    "lng": 4.5208,
+    "description": "Plant Biology Department (Botany) — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 110,
+    "name": "Department of Zoology",
+    "category": "department",
+    "lat": 7.5198,
+    "lng": 4.5210,
+    "description": "Zoology and Environmental Biology — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 111,
+    "name": "Department of Statistics",
+    "category": "department",
+    "lat": 7.5185,
+    "lng": 4.5207,
+    "description": "Statistics Department — Faculty of Science (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 74,
+    "name": "Institute of Ecology and Environmental Studies",
+    "category": "department",
+    "lat": 7.525,
+    "lng": 4.5255,
+    "description": "Environmental and ecological research institute",
+    "icon": "department"
+  },
+  {
+    "id": 94,
+    "name": "BOO Block A (Science)",
+    "category": "department",
+    "lat": 7.51911,
+    "lng": 4.52529,
+    "description": "BOO Block A — Faculty of Science laboratory and lecture complex",
+    "icon": "department"
+  },
+  {
+    "id": 95,
+    "name": "BOO Block B (Science)",
+    "category": "department",
+    "lat": 7.51909,
+    "lng": 4.52545,
+    "description": "BOO Block B — Faculty of Science laboratory and lecture complex",
+    "icon": "department"
+  },
+  {
+    "id": 96,
+    "name": "BOO Block C (Science)",
+    "category": "department",
+    "lat": 7.51888,
+    "lng": 4.5254,
+    "description": "BOO Block C — Faculty of Science laboratory and lecture complex",
+    "icon": "department"
+  },
+  {
+    "id": 112,
+    "name": "Department of Theatre Arts",
+    "category": "department",
+    "lat": 7.5218,
+    "lng": 4.5214,
+    "description": "Dramatic Arts and Theatre Studies — Faculty of Arts. Adjacent to Pit Theatre (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 113,
+    "name": "Department of Music",
+    "category": "department",
+    "lat": 7.5210,
+    "lng": 4.5246,
+    "description": "Music Department — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 114,
+    "name": "Department of English",
+    "category": "department",
+    "lat": 7.5205,
+    "lng": 4.5244,
+    "description": "English Language and Literature — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 154,
+    "name": "Department of Communication and Language Arts",
+    "category": "department",
+    "lat": 7.5203,
+    "lng": 4.5241,
+    "description": "Communication and Language Arts (CLA) — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 115,
+    "name": "Department of History",
+    "category": "department",
+    "lat": 7.5198,
+    "lng": 4.5243,
+    "description": "History and International Studies — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 116,
+    "name": "Department of Linguistics",
+    "category": "department",
+    "lat": 7.5195,
+    "lng": 4.5242,
+    "description": "Linguistics and African Languages — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 117,
+    "name": "Department of Religious Studies",
+    "category": "department",
+    "lat": 7.5200,
+    "lng": 4.5248,
+    "description": "Religious Studies — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 118,
+    "name": "Department of Foreign Languages",
+    "category": "department",
+    "lat": 7.5203,
+    "lng": 4.5244,
+    "description": "French, German, Russian and other foreign languages — Faculty of Arts (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 119,
+    "name": "Department of Economics",
+    "category": "department",
+    "lat": 7.5210,
+    "lng": 4.5232,
+    "description": "Economics Department — Faculty of Social Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 120,
+    "name": "Department of Sociology",
+    "category": "department",
+    "lat": 7.5213,
+    "lng": 4.5228,
+    "description": "Sociology and Anthropology — Faculty of Social Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 121,
+    "name": "Department of Political Science",
+    "category": "department",
+    "lat": 7.5215,
+    "lng": 4.5225,
+    "description": "Political Science — Faculty of Social Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 122,
+    "name": "Department of Psychology",
+    "category": "department",
+    "lat": 7.5208,
+    "lng": 4.5230,
+    "description": "Psychology Department — Faculty of Social Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 123,
+    "name": "Department of Geography",
+    "category": "department",
+    "lat": 7.5217,
+    "lng": 4.5235,
+    "description": "Geography and Environmental Studies — Faculty of Social Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 124,
+    "name": "Department of Business Administration",
+    "category": "department",
+    "lat": 7.5207,
+    "lng": 4.5226,
+    "description": "Business Administration — Faculty of Administration (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 125,
+    "name": "Department of Accounting",
+    "category": "department",
+    "lat": 7.5204,
+    "lng": 4.5224,
+    "description": "Accounting — Faculty of Administration (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 126,
+    "name": "Department of Public Administration",
+    "category": "department",
+    "lat": 7.5202,
+    "lng": 4.5222,
+    "description": "Public Administration — Faculty of Administration (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 132,
+    "name": "Department of Nursing Science",
+    "category": "department",
+    "lat": 7.5124,
+    "lng": 4.5190,
+    "description": "Nursing Science — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 133,
+    "name": "Department of Physiotherapy",
+    "category": "department",
+    "lat": 7.5126,
+    "lng": 4.5192,
+    "description": "Physiotherapy — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 134,
+    "name": "Department of Medical Laboratory Science",
+    "category": "department",
+    "lat": 7.5118,
+    "lng": 4.5185,
+    "description": "Medical Laboratory Science — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 135,
+    "name": "Department of Radiography",
+    "category": "department",
+    "lat": 7.5120,
+    "lng": 4.5187,
+    "description": "Radiography and Radiation Sciences — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 136,
+    "name": "Department of Anatomy",
+    "category": "department",
+    "lat": 7.5128,
+    "lng": 4.5195,
+    "description": "Human Anatomy — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 137,
+    "name": "Department of Physiology",
+    "category": "department",
+    "lat": 7.5130,
+    "lng": 4.5197,
+    "description": "Physiology — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 138,
+    "name": "Department of Pharmacology",
+    "category": "department",
+    "lat": 7.5132,
+    "lng": 4.5193,
+    "description": "Pharmacology and Therapeutics — College of Health Sciences (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 139,
+    "name": "Department of Community Health",
+    "category": "department",
+    "lat": 7.5134,
+    "lng": 4.5191,
+    "description": "Community Health and General Practice — College of Health Sciences (coordinates estimated — verify on campus)",
     "icon": "department"
   },
   {
@@ -397,6 +1072,42 @@
   },
   {
     "id": 45,
+    "name": "Chemical Engineering Lecture Theatre",
+    "category": "lecture",
+    "lat": 7.51938,
+    "lng": 4.52868,
+    "description": "Lecture theatre for Chemical Engineering department — Faculty of Technology",
+    "icon": "lecture"
+  },
+  {
+    "id": 90,
+    "name": "HSLT A",
+    "category": "lecture",
+    "lat": 7.51682,
+    "lng": 4.52509,
+    "description": "Health Science Lecture Theatre A — used for Health Sciences lectures",
+    "icon": "lecture"
+  },
+  {
+    "id": 91,
+    "name": "HSLT B",
+    "category": "lecture",
+    "lat": 7.51672,
+    "lng": 4.52491,
+    "description": "Health Science Lecture Theatre B — used for Health Sciences lectures",
+    "icon": "lecture"
+  },
+  {
+    "id": 92,
+    "name": "HSLT C",
+    "category": "lecture",
+    "lat": 7.51653,
+    "lng": 4.52501,
+    "description": "Health Science Lecture Theatre C — used for Health Sciences lectures",
+    "icon": "lecture"
+  },
+  {
+    "id": 98,
     "name": "OAU Health Centre",
     "category": "health",
     "lat": 7.52027,
@@ -410,7 +1121,7 @@
     "category": "health",
     "lat": 7.4905,
     "lng": 4.5521,
-    "description": "Obafemi Awolowo University Teaching Hospital Complex — full hospital",
+    "description": "Obafemi Awolowo University Teaching Hospital Complex — full hospital in Ile-Ife town",
     "icon": "health"
   },
   {
@@ -421,24 +1132,6 @@
     "lng": 4.5523,
     "description": "Hospital pharmacy — open to students at subsidised rates",
     "icon": "health"
-  },
-  {
-    "id": 48,
-    "name": "OAU Central Library",
-    "category": "admin",
-    "lat": 7.51984,
-    "lng": 4.52305,
-    "description": "Hezekiah Oluwasanmi Library — main university library, seats 2,500",
-    "icon": "admin"
-  },
-  {
-    "id": 49,
-    "name": "ICT Centre",
-    "category": "admin",
-    "lat": 7.5193,
-    "lng": 4.5217,
-    "description": "Information and Communication Technology Centre — computer labs and internet access",
-    "icon": "admin"
   },
   {
     "id": 50,
@@ -468,6 +1161,78 @@
     "icon": "sports"
   },
   {
+    "id": 76,
+    "name": "Swimming Pool (Sports Complex)",
+    "category": "sports",
+    "lat": 7.5163,
+    "lng": 4.521,
+    "description": "Olympic-size swimming pool — part of OAU Sports Complex",
+    "icon": "sports"
+  },
+  {
+    "id": 82,
+    "name": "Botanical Garden",
+    "category": "sports",
+    "lat": 7.526,
+    "lng": 4.526,
+    "description": "OAU Botanical Garden — nature walk and research area",
+    "icon": "sports"
+  },
+  {
+    "id": 89,
+    "name": "Main Bowl",
+    "category": "sports",
+    "lat": 7.5162,
+    "lng": 4.52175,
+    "description": "Main bowl on campus — used for football, athletics and large events",
+    "icon": "sports"
+  },
+  {
+    "id": 143,
+    "name": "Centre for Energy Research and Development (CERD)",
+    "category": "department",
+    "lat": 7.5228,
+    "lng": 4.5286,
+    "description": "Research centre for energy technology and renewable energy solutions (coordinates estimated — verify on campus)",
+    "icon": "department"
+  },
+  {
+    "id": 147,
+    "name": "Sports Council",
+    "category": "sports",
+    "lat": 7.5165,
+    "lng": 4.5215,
+    "description": "OAU Sports Council offices — sports administration and intramural activities (coordinates estimated — verify on campus)",
+    "icon": "sports"
+  },
+  {
+    "id": 151,
+    "name": "Tennis Courts",
+    "category": "sports",
+    "lat": 7.5165,
+    "lng": 4.5212,
+    "description": "OAU tennis courts — part of Sports Complex (coordinates estimated — verify on campus)",
+    "icon": "sports"
+  },
+  {
+    "id": 152,
+    "name": "Basketball Courts",
+    "category": "sports",
+    "lat": 7.5167,
+    "lng": 4.5218,
+    "description": "OAU basketball courts — part of Sports Complex (coordinates estimated — verify on campus)",
+    "icon": "sports"
+  },
+  {
+    "id": 153,
+    "name": "Squash Courts",
+    "category": "sports",
+    "lat": 7.5169,
+    "lng": 4.5212,
+    "description": "OAU squash courts — part of Sports Complex (coordinates estimated — verify on campus)",
+    "icon": "sports"
+  },
+  {
     "id": 53,
     "name": "Staff Club",
     "category": "food",
@@ -482,7 +1247,7 @@
     "category": "food",
     "lat": 7.5178,
     "lng": 4.5213,
-    "description": "Main student cafeteria — affordable meals all day",
+    "description": "Main student cafeteria inside SUB — affordable meals all day",
     "icon": "food"
   },
   {
@@ -531,12 +1296,66 @@
     "icon": "food"
   },
   {
+    "id": 87,
+    "name": "OAU New Market",
+    "category": "food",
+    "lat": 7.516,
+    "lng": 4.5122,
+    "description": "Main campus market — food, clothing, stationery, pharmacy, barbers and more. Located behind ETF Hall",
+    "icon": "food"
+  },
+  {
+    "id": 100,
+    "name": "Awolowo Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5209,
+    "lng": 4.5148,
+    "description": "Cafeteria inside Awolowo Hall — open to all students (coordinates estimated — verify on campus)",
+    "icon": "food"
+  },
+  {
+    "id": 101,
+    "name": "Fajuyi Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5179,
+    "lng": 4.5173,
+    "description": "Cafeteria inside Fajuyi Hall — open to all students (coordinates estimated — verify on campus)",
+    "icon": "food"
+  },
+  {
+    "id": 102,
+    "name": "ETF Hall Canteen",
+    "category": "food",
+    "lat": 7.5184,
+    "lng": 4.5149,
+    "description": "Canteen inside ETF Hall area — open to all students (coordinates estimated — verify on campus)",
+    "icon": "food"
+  },
+  {
+    "id": 103,
+    "name": "Mozambique Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5232,
+    "lng": 4.5138,
+    "description": "Cafeteria inside Mozambique Hall — open to all students (coordinates estimated — verify on campus)",
+    "icon": "food"
+  },
+  {
+    "id": 104,
+    "name": "Postgraduate Hall Cafeteria",
+    "category": "food",
+    "lat": 7.5230,
+    "lng": 4.5162,
+    "description": "Cafeteria serving Postgraduate and Murtala Muhammed Halls (coordinates estimated — verify on campus)",
+    "icon": "food"
+  },
+  {
     "id": 60,
     "name": "Zenith Bank",
     "category": "banks",
     "lat": 7.51403,
     "lng": 4.52324,
-    "description": "Zenith Bank ATM — near Senate Building",
+    "description": "Zenith Bank branch and ATM — along Adesoji Aderemi Road",
     "icon": "bank"
   },
   {
@@ -554,7 +1373,7 @@
     "category": "banks",
     "lat": 7.51528,
     "lng": 4.52343,
-    "description": "First Bank ATM — near Bursary",
+    "description": "First Bank branch and ATM — along Adesoji Aderemi Road",
     "icon": "bank"
   },
   {
@@ -563,7 +1382,7 @@
     "category": "banks",
     "lat": 7.51462,
     "lng": 4.52335,
-    "description": "OAU Microfinance Bank",
+    "description": "OAU Microfinance Bank — campus banking services",
     "icon": "bank"
   },
   {
@@ -572,7 +1391,7 @@
     "category": "banks",
     "lat": 7.51439,
     "lng": 4.5233,
-    "description": "United Bank for Africa ATM on campus",
+    "description": "United Bank for Africa branch and ATM on campus",
     "icon": "bank"
   },
   {
@@ -601,266 +1420,5 @@
     "lng": 4.52336,
     "description": "Polaris Bank branch and ATM on campus — along Adesoji Aderemi Road",
     "icon": "bank"
-  },
-  {
-    "id": 68,
-    "name": "Student Union Building (SUB)",
-    "category": "admin",
-    "lat": 7.5178,
-    "lng": 4.5213,
-    "description": "Student Union Building (Ken Saro-Wiwa Building) — student government offices, eateries and shops",
-    "icon": "admin"
-  },
-  {
-    "id": 69,
-    "name": "Chapel of Resurrection",
-    "category": "admin",
-    "lat": 7.52,
-    "lng": 4.5245,
-    "description": "Interdenominational chapel on OAU campus",
-    "icon": "admin"
-  },
-  {
-    "id": 70,
-    "name": "All Souls Chapel",
-    "category": "admin",
-    "lat": 7.5121,
-    "lng": 4.5177,
-    "description": "All Souls Anglican Chapel — OAU campus",
-    "icon": "admin"
-  },
-  {
-    "id": 71,
-    "name": "OAU Central Mosque (Unity Mosque)",
-    "category": "admin",
-    "lat": 7.5113,
-    "lng": 4.5169,
-    "description": "Main mosque on OAU campus — Unity Mosque where Friday Jumat prayers are held",
-    "icon": "admin"
-  },
-  {
-    "id": 72,
-    "name": "Post Office",
-    "category": "admin",
-    "lat": 7.5183,
-    "lng": 4.523,
-    "description": "NIPOST campus post office",
-    "icon": "admin"
-  },
-  {
-    "id": 73,
-    "name": "OAU Bookshop",
-    "category": "admin",
-    "lat": 7.519,
-    "lng": 4.5228,
-    "description": "University bookshop — textbooks, stationery and more",
-    "icon": "admin"
-  },
-  {
-    "id": 74,
-    "name": "Institute of Ecology and Environmental Studies",
-    "category": "department",
-    "lat": 7.525,
-    "lng": 4.5255,
-    "description": "Environmental and ecological research institute",
-    "icon": "department"
-  },
-  {
-    "id": 75,
-    "name": "OAU Printing Press",
-    "category": "admin",
-    "lat": 7.5178,
-    "lng": 4.521,
-    "description": "University printing press — documents and publications",
-    "icon": "admin"
-  },
-  {
-    "id": 76,
-    "name": "Swimming Pool (Sports Complex)",
-    "category": "sports",
-    "lat": 7.5163,
-    "lng": 4.521,
-    "description": "Olympic-size swimming pool — part of OAU Sports Complex",
-    "icon": "sports"
-  },
-  {
-    "id": 77,
-    "name": "OAU Staff Quarters Gate",
-    "category": "gate",
-    "lat": 7.5255,
-    "lng": 4.522,
-    "description": "Gate leading to OAU staff residential quarters",
-    "icon": "gate"
-  },
-  {
-    "id": 78,
-    "name": "Food Technology Building",
-    "category": "department",
-    "lat": 7.5178,
-    "lng": 4.5284,
-    "description": "Department of Food Science and Technology — Faculty of Technology",
-    "icon": "department"
-  },
-  {
-    "id": 79,
-    "name": "Architecture Building",
-    "category": "department",
-    "lat": 7.521235,
-    "lng": 4.518485,
-    "description": "Department of Architecture — Faculty of Technology",
-    "icon": "department"
-  },
-  {
-    "id": 80,
-    "name": "Biochemistry Building",
-    "category": "department",
-    "lat": 7.5188,
-    "lng": 4.5212,
-    "description": "Department of Biochemistry — Faculty of Science",
-    "icon": "department"
-  },
-  {
-    "id": 81,
-    "name": "Mathematics Building",
-    "category": "department",
-    "lat": 7.5188,
-    "lng": 4.5212,
-    "description": "Department of Mathematics — Faculty of Science",
-    "icon": "department"
-  },
-  {
-    "id": 82,
-    "name": "Botanical Garden",
-    "category": "sports",
-    "lat": 7.526,
-    "lng": 4.526,
-    "description": "OAU Botanical Garden — nature walk and research area",
-    "icon": "sports"
-  },
-  {
-    "id": 83,
-    "name": "OAU Conference Centre",
-    "category": "hostel",
-    "lat": 7.5242,
-    "lng": 4.5311,
-    "description": "University conference centre and guest accommodation — for visiting academics and events",
-    "icon": "hostel"
-  },
-  {
-    "id": 84,
-    "name": "Engineering Workshop",
-    "category": "department",
-    "lat": 7.5178,
-    "lng": 4.5284,
-    "description": "Mechanical Engineering workshop — Faculty of Technology",
-    "icon": "department"
-  },
-  {
-    "id": 85,
-    "name": "SSANU Secretariat",
-    "category": "admin",
-    "lat": 7.5185,
-    "lng": 4.5215,
-    "description": "Senior Staff Association of Nigerian Universities secretariat",
-    "icon": "admin"
-  },
-  {
-    "id": 86,
-    "name": "NASU Secretariat",
-    "category": "admin",
-    "lat": 7.5184,
-    "lng": 4.5213,
-    "description": "Non-Academic Staff Union secretariat",
-    "icon": "admin"
-  },
-  {
-    "id": 87,
-    "name": "OAU New Market",
-    "category": "food",
-    "lat": 7.516,
-    "lng": 4.5122,
-    "description": "Main campus market — food, clothing, stationery, pharmacy, barbers and more. Located behind ETF Hall",
-    "icon": "food"
-  },
-  {
-    "id": 88,
-    "name": "A.G. Leventis Museum of Natural History",
-    "category": "admin",
-    "lat": 7.5167,
-    "lng": 4.5286,
-    "description": "Natural history museum on campus — fossils, stuffed animals, cultural artifacts. Open Mon–Sat",
-    "icon": "admin"
-  },
-  {
-    "id": 89,
-    "name": "Main Bowl",
-    "category": "sports",
-    "lat": 7.5162,
-    "lng": 4.52175,
-    "description": "Main bowl on campus — used for football and athletics",
-    "icon": "sports"
-  },
-  {
-    "id": 90,
-    "name": "HSLT A Lecture Theatre",
-    "category": "hall",
-    "lat": 7.51682,
-    "lng": 4.52509,
-    "description": "Health Science Lecture Theatre A on campus — used for lectures",
-    "icon": "hall"
-  },
-  {
-    "id": 91,
-    "name": "HSLT B Lecture Theatre",
-    "category": "hall",
-    "lat": 7.51672,
-    "lng": 4.52491,
-    "description": "Health Science Lecture Theatre B on campus — used for lectures",
-    "icon": "hall"
-  },
-  {
-    "id": 92,
-    "name": "HSLT C Lecture Theatre",
-    "category": "hall",
-    "lat": 7.51653,
-    "lng": 4.52501,
-    "description": "Health Science Lecture Theatre C on campus — used for lectures",
-    "icon": "hall"
-  },
-  {
-    "id": 93,
-    "name": "Geology Department",
-    "category": "department",
-    "lat": 7.52063,
-    "lng": 4.52122,
-    "description": "Geology Department — Faculty of Science",
-    "icon": "department"
-  },
-  {
-    "id": 94,
-    "name": "BOOA",
-    "category": "department",
-    "lat": 7.51911,
-    "lng": 4.52529,
-    "description": "BOOA Building — Faculty of Science",
-    "icon": "department"
-  },
-  {
-    "id": 95,
-    "name": "BOOB",
-    "category": "department",
-    "lat": 7.51909,
-    "lng": 4.52545,
-    "description": "BOOB Building — Faculty of Science",
-    "icon": "department"
-  },
-  {
-    "id": 96,
-    "name": "BOOC",
-    "category": "department",
-    "lat": 7.51888,
-    "lng": 4.5254,
-    "description": "BOOC Building — Faculty of Science",
-    "icon": "department"
   }
 ]

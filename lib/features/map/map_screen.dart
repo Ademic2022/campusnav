@@ -65,6 +65,18 @@ class _MapScreenState extends State<MapScreen> {
     // Disable compass and attribution for cleaner look
     await mapboxMap.compass.updateSettings(CompassSettings(enabled: false));
     await mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
+
+    await _applyLocationPuck(mapboxMap);
+  }
+
+  Future<void> _applyLocationPuck(MapboxMap map) async {
+    await map.location.updateSettings(LocationComponentSettings(
+      enabled: true,
+      puckBearingEnabled: true,
+      puckBearing: PuckBearing.HEADING,
+      pulsingEnabled: true,
+      pulsingColor: AppColors.primary.toARGB32(),
+    ));
   }
 
   Future<void> _changeMapStyle(String styleUri) async {
@@ -75,13 +87,14 @@ class _MapScreenState extends State<MapScreen> {
 
     await _mapboxMap!.loadStyleURI(styleUri);
 
-    // Annotation managers are invalidated after a style change — re-create them.
+    // Annotation managers and location puck are reset after a style change.
     _polylineManager =
         await _mapboxMap!.annotations.createPolylineAnnotationManager();
     _pointAnnotationManager =
         await _mapboxMap!.annotations.createPointAnnotationManager();
     await _pointAnnotationManager!.setIconAllowOverlap(true);
     await _pointAnnotationManager!.setIconIgnorePlacement(true);
+    await _applyLocationPuck(_mapboxMap!);
   }
 
   Future<void> _flyToUserLocation() async {
@@ -261,7 +274,10 @@ class _MapScreenState extends State<MapScreen> {
 
     final isRouting = mapProvider.activeRoute != null;
 
-    final hasStart = isRouting || mapProvider.canRouteFromCurrentStart;
+    // The Mapbox puck shows the user's real position when on campus.
+    // Only place a custom gate marker when routing starts from the main gate.
+    final showGateMarker = mapProvider.isStartingFromGate &&
+        (isRouting || mapProvider.canRouteFromCurrentStart);
 
     final targetDest = isRouting
         ? mapProvider.routeDestination ?? mapProvider.selectedLandmark
@@ -269,8 +285,8 @@ class _MapScreenState extends State<MapScreen> {
     final hasDestination = targetDest != null;
 
     final markerKey = [
-      hasStart ? mapProvider.routeStartLat : 'none',
-      hasStart ? mapProvider.routeStartLng : 'none',
+      showGateMarker ? mapProvider.routeStartLat : 'gate-off',
+      showGateMarker ? mapProvider.routeStartLng : 'gate-off',
       hasDestination ? targetDest.id : 'none',
     ].join('-');
 
@@ -279,7 +295,7 @@ class _MapScreenState extends State<MapScreen> {
 
     await _pointAnnotationManager!.deleteAll();
 
-    if (hasStart) {
+    if (showGateMarker) {
       await _pointAnnotationManager!.create(
         PointAnnotationOptions(
           geometry: Point(
