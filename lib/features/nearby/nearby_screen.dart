@@ -45,7 +45,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () { HapticFeedback.lightImpact(); context.pop(); },
+                    onTap: () => context.pop(),
                     child: Container(
                       width: 44,
                       height: 44,
