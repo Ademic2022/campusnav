@@ -521,6 +521,7 @@ class _MapScreenState extends State<MapScreen> {
                       behavior: HitTestBehavior.opaque,
                       onVerticalDragEnd: (d) {
                         if ((d.primaryVelocity ?? 0) < -300) {
+                          HapticFeedback.lightImpact();
                           setState(() => _navBarVisible = true);
                         }
                       },
@@ -552,6 +553,7 @@ class _MapScreenState extends State<MapScreen> {
                   ? GestureDetector(
                       onVerticalDragEnd: (d) {
                         if ((d.primaryVelocity ?? 0) > 300) {
+                          HapticFeedback.lightImpact();
                           setState(() => _navBarVisible = false);
                         }
                       },
@@ -583,7 +585,10 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
         height: 52,
         decoration: BoxDecoration(
@@ -645,7 +650,10 @@ class _MapFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
         width: 48,
         height: 48,
@@ -674,7 +682,10 @@ class _ReopenSheetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
@@ -706,238 +717,275 @@ class _ReopenSheetButton extends StatelessWidget {
 // ─────────────────────────────────────────────
 // Landmark bottom sheet
 // ─────────────────────────────────────────────
-class _LandmarkBottomSheet extends StatelessWidget {
+class _LandmarkBottomSheet extends StatefulWidget {
   final Landmark landmark;
   final MapProvider mapProvider;
   const _LandmarkBottomSheet(
       {required this.landmark, required this.mapProvider});
 
   @override
+  State<_LandmarkBottomSheet> createState() => _LandmarkBottomSheetState();
+}
+
+class _LandmarkBottomSheetState extends State<_LandmarkBottomSheet> {
+  double _dragOffset = 0;
+
+  void _onDragUpdate(DragUpdateDetails d) {
+    setState(() => _dragOffset = (_dragOffset + d.delta.dy).clamp(0.0, double.infinity));
+  }
+
+  void _onDragEnd(DragEndDetails d) {
+    final velocity = d.primaryVelocity ?? 0;
+    if (velocity > 400 || _dragOffset > 80) {
+      HapticFeedback.lightImpact();
+      widget.mapProvider.hideLandmarkSheet();
+    } else {
+      setState(() => _dragOffset = 0);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final mapProvider = widget.mapProvider;
+    final landmark = widget.landmark;
     final startLat = mapProvider.routeStartLat;
     final startLng = mapProvider.routeStartLng;
     final catColor = AppColors.categoryColor(landmark.category);
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 24)],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceHigh,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
+    return GestureDetector(
+      onVerticalDragUpdate: _onDragUpdate,
+      onVerticalDragEnd: _onDragEnd,
+      child: Transform.translate(
+        offset: Offset(0, _dragOffset),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 24)],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: catColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        AppColors.categoryEmoji(landmark.category),
-                        style: const TextStyle(fontSize: 26),
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceHigh,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(landmark.name,
-                            style: AppTextStyles.headlineMedium),
-                        const SizedBox(height: 2),
-                        Text(landmark.description,
-                            style: AppTextStyles.bodySmall,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => mapProvider.hideLandmarkSheet(),
-                    icon: const Icon(Icons.close_rounded,
-                        color: AppColors.textSecondary),
-                  ),
-                ],
-              ),
-              if (mapProvider.canRouteFromCurrentStart) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _InfoChip(
-                      icon: Icons.directions_walk,
-                      label: landmark.friendlyDistance(startLat, startLng),
-                    ),
-                    const SizedBox(width: 8),
-                    _InfoChip(
-                      icon: Icons.access_time_rounded,
-                      label:
-                          '~${landmark.walkingMinutes(startLat, startLng)} min walk',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      mapProvider.isStartingFromGate
-                          ? Icons.door_front_door_rounded
-                          : Icons.my_location_rounded,
-                      size: 13,
-                      color: AppColors.textMuted,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      mapProvider.isStartingFromGate
-                          ? 'Starting from Main Gate'
-                          : 'Starting from your location',
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: AppColors.textMuted),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 16),
-
-              // Route profile selector + Get Directions
-              Row(
-                children: [
-                  Expanded(
-                    child: _RouteProfileBtn(
-                      label: 'Walk',
-                      icon: Icons.directions_walk_rounded,
-                      isActive:
-                          mapProvider.routeProfile == RouteProfile.walking,
-                      onTap: () =>
-                          mapProvider.setRouteProfile(RouteProfile.walking),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _RouteProfileBtn(
-                      label: 'Drive',
-                      icon: Icons.directions_car_rounded,
-                      isActive:
-                          mapProvider.routeProfile == RouteProfile.driving,
-                      onTap: () =>
-                          mapProvider.setRouteProfile(RouteProfile.driving),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Error card with retry
-              if (mapProvider.routeError != null)
-                _RouteErrorCard(
-                  message: mapProvider.routeError!,
-                  isNetworkError: mapProvider.routeIsNetworkError,
-                  onRetry: () => mapProvider.fetchRoute(),
-                ),
-
-              // Route info + Start Navigation
-              if (mapProvider.activeRoute != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
+                  const SizedBox(height: 16),
+                  Row(
                     children: [
-                      const Icon(Icons.route_rounded,
-                          color: AppColors.primary, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${mapProvider.activeRoute!.distanceLabel}  •  ${mapProvider.activeRoute!.durationLabel}',
-                        style: AppTextStyles.titleMedium
-                            .copyWith(color: AppColors.primary),
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: catColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Center(
+                          child: Text(
+                            AppColors.categoryEmoji(landmark.category),
+                            style: const TextStyle(fontSize: 26),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(landmark.name,
+                                style: AppTextStyles.headlineMedium),
+                            const SizedBox(height: 2),
+                            Text(landmark.description,
+                                style: AppTextStyles.bodySmall,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
+                  if (mapProvider.canRouteFromCurrentStart) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _InfoChip(
+                          icon: Icons.directions_walk,
+                          label: landmark.friendlyDistance(startLat, startLng),
+                        ),
+                        const SizedBox(width: 8),
+                        _InfoChip(
+                          icon: Icons.access_time_rounded,
+                          label:
+                              '~${landmark.walkingMinutes(startLat, startLng)} min walk',
+                        ),
+                      ],
                     ),
-                    onPressed: () => mapProvider.startNavigation(),
-                    icon: const Icon(Icons.navigation_rounded),
-                    label: Text('Start Navigation',
-                        style: AppTextStyles.labelLarge),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          mapProvider.isStartingFromGate
+                              ? Icons.door_front_door_rounded
+                              : Icons.my_location_rounded,
+                          size: 13,
+                          color: AppColors.textMuted,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          mapProvider.isStartingFromGate
+                              ? 'Starting from Main Gate'
+                              : 'Starting from your location',
+                          style: AppTextStyles.bodySmall
+                              .copyWith(color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+
+                  // Route profile selector + Get Directions
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _RouteProfileBtn(
+                          label: 'Walk',
+                          icon: Icons.directions_walk_rounded,
+                          isActive:
+                              mapProvider.routeProfile == RouteProfile.walking,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            mapProvider.setRouteProfile(RouteProfile.walking);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _RouteProfileBtn(
+                          label: 'Drive',
+                          icon: Icons.directions_car_rounded,
+                          isActive:
+                              mapProvider.routeProfile == RouteProfile.driving,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            mapProvider.setRouteProfile(RouteProfile.driving);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ] else ...[
-                // Get Directions button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
+                  const SizedBox(height: 12),
+
+                  // Error card with retry
+                  if (mapProvider.routeError != null)
+                    _RouteErrorCard(
+                      message: mapProvider.routeError!,
+                      isNetworkError: mapProvider.routeIsNetworkError,
+                      onRetry: () {
+                        HapticFeedback.lightImpact();
+                        mapProvider.fetchRoute();
+                      },
                     ),
-                    onPressed: mapProvider.isLoadingRoute
-                        ? null
-                        : () => mapProvider.fetchRoute(),
-                    icon: mapProvider.isLoadingRoute
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.directions_rounded),
-                    label: Text(
-                      mapProvider.isLoadingRoute
-                          ? 'Getting route...'
-                          : 'Get Directions',
-                      style: AppTextStyles.labelLarge,
+
+                  // Route info + Start Navigation
+                  if (mapProvider.activeRoute != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.route_rounded,
+                              color: AppColors.primary, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${mapProvider.activeRoute!.distanceLabel}  •  ${mapProvider.activeRoute!.durationLabel}',
+                            style: AppTextStyles.titleMedium
+                                .copyWith(color: AppColors.primary),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ],
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          mapProvider.startNavigation();
+                        },
+                        icon: const Icon(Icons.navigation_rounded),
+                        label: Text('Start Navigation',
+                            style: AppTextStyles.labelLarge),
+                      ),
+                    ),
+                  ] else ...[
+                    // Get Directions button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        onPressed: mapProvider.isLoadingRoute
+                            ? null
+                            : () {
+                                HapticFeedback.mediumImpact();
+                                mapProvider.fetchRoute();
+                              },
+                        icon: mapProvider.isLoadingRoute
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.directions_rounded),
+                        label: Text(
+                          mapProvider.isLoadingRoute
+                              ? 'Getting route...'
+                              : 'Get Directions',
+                          style: AppTextStyles.labelLarge,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
-
 }
 
 class _InfoChip extends StatelessWidget {
@@ -1112,7 +1160,10 @@ class _NavItem extends StatelessWidget {
     final color = isActive ? AppColors.primary : AppColors.textSecondary;
     return Expanded(
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1180,7 +1231,10 @@ class _StylePickerCard extends StatelessWidget {
         children: _styles.map((s) {
           final isActive = currentStyle == s.uri;
           return GestureDetector(
-            onTap: () => onStyleSelected(s.uri),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onStyleSelected(s.uri);
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               margin: const EdgeInsets.symmetric(vertical: 3),
@@ -1290,148 +1344,188 @@ class _RouteErrorCard extends StatelessWidget {
 // ─────────────────────────────────────────────
 // Navigation overlay sheet
 // ─────────────────────────────────────────────
-class _NavigationSheet extends StatelessWidget {
+class _NavigationSheet extends StatefulWidget {
   final MapProvider mapProvider;
   const _NavigationSheet({required this.mapProvider});
 
   @override
+  State<_NavigationSheet> createState() => _NavigationSheetState();
+}
+
+class _NavigationSheetState extends State<_NavigationSheet> {
+  double _dragOffset = 0;
+
+  void _onDragUpdate(DragUpdateDetails d) {
+    setState(() => _dragOffset = (_dragOffset + d.delta.dy).clamp(0.0, double.infinity));
+  }
+
+  void _onDragEnd(DragEndDetails d) {
+    final velocity = d.primaryVelocity ?? 0;
+    if (velocity > 400 || _dragOffset > 80) {
+      HapticFeedback.lightImpact();
+      widget.mapProvider.endNavigation();
+    } else {
+      setState(() => _dragOffset = 0);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final mapProvider = widget.mapProvider;
     final step = mapProvider.currentStep;
     final stepIndex = mapProvider.currentStepIndex;
     final total = mapProvider.totalSteps;
     final hasNext = mapProvider.hasNextStep;
     final hasPrev = mapProvider.hasPrevStep;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 24)],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceHigh,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Header: step counter + voice toggle + end button
-              Row(
+    return GestureDetector(
+      onVerticalDragUpdate: _onDragUpdate,
+      onVerticalDragEnd: _onDragEnd,
+      child: Transform.translate(
+        offset: Offset(0, _dragOffset),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 24)],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Step ${stepIndex + 1} of $total',
-                      style: AppTextStyles.labelSmall
-                          .copyWith(color: AppColors.primary),
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => mapProvider.endNavigation(),
+                  // Handle
+                  Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                      width: 40,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.3)),
-                      ),
-                      child: Text(
-                        'End',
-                        style: AppTextStyles.labelSmall
-                            .copyWith(color: AppColors.error),
+                        color: AppColors.surfaceHigh,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-              if (step != null) ...[
-                // Current step
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(14),
+                  // Header: step counter + end button
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Step ${stepIndex + 1} of $total',
+                          style: AppTextStyles.labelSmall
+                              .copyWith(color: AppColors.primary),
+                        ),
                       ),
-                      child:
-                          Icon(step.icon, color: AppColors.primary, size: 26),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(step.instruction,
-                              style: AppTextStyles.titleMedium),
-                          const SizedBox(height: 4),
-                          Text(
-                            step.distanceLabel,
-                            style: AppTextStyles.bodySmall
-                                .copyWith(color: AppColors.textSecondary),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          mapProvider.endNavigation();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: AppColors.error.withValues(alpha: 0.3)),
                           ),
-                        ],
+                          child: Text(
+                            'End',
+                            style: AppTextStyles.labelSmall
+                                .copyWith(color: AppColors.error),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Prev / Next controls
-              Row(
-                children: [
-                  Expanded(
-                    child: _NavStepBtn(
-                      label: 'Previous',
-                      icon: Icons.arrow_back_rounded,
-                      enabled: hasPrev,
-                      onTap: () => mapProvider.prevStep(),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _NavStepBtn(
-                      label: hasNext ? 'Next' : 'Arrived',
-                      icon: hasNext
-                          ? Icons.arrow_forward_rounded
-                          : Icons.location_on_rounded,
-                      enabled: true,
-                      isPrimary: true,
-                      onTap: hasNext
-                          ? () => mapProvider.nextStep()
-                          : () => mapProvider.endNavigation(),
+                  const SizedBox(height: 16),
+
+                  if (step != null) ...[
+                    // Current step
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(step.icon,
+                              color: AppColors.primary, size: 26),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(step.instruction,
+                                  style: AppTextStyles.titleMedium),
+                              const SizedBox(height: 4),
+                              Text(
+                                step.distanceLabel,
+                                style: AppTextStyles.bodySmall
+                                    .copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Prev / Next controls
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _NavStepBtn(
+                          label: 'Previous',
+                          icon: Icons.arrow_back_rounded,
+                          enabled: hasPrev,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            mapProvider.prevStep();
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _NavStepBtn(
+                          label: hasNext ? 'Next' : 'Arrived',
+                          icon: hasNext
+                              ? Icons.arrow_forward_rounded
+                              : Icons.location_on_rounded,
+                          enabled: true,
+                          isPrimary: true,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            if (hasNext) {
+                              mapProvider.nextStep();
+                            } else {
+                              mapProvider.endNavigation();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
