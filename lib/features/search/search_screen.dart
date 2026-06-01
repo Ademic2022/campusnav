@@ -24,8 +24,6 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-      // Load all landmarks on open
       context.read<SearchProvider>().onQueryChanged('');
     });
   }
