@@ -25,25 +25,34 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Build and package IPA
+      - name: Disable Swift Package Manager (use CocoaPods)
+        run: flutter config --no-enable-swift-package-manager
+
+      - name: Build IPA (allow signing-export failure, we extract manually)
+        run: flutter build ipa --no-codesign || true
+        env:
+          FLUTTER_XCODE_CODE_SIGNING_ALLOWED: "NO"
+          FLUTTER_XCODE_CODE_SIGNING_REQUIRED: "NO"
+          FLUTTER_XCODE_CODE_SIGN_IDENTITY: ""
+
+      - name: Package IPA from xcarchive
         run: |
-          # flutter build ipa archives successfully but fails at the export/signing step.
-          # We allow that failure and extract the IPA ourselves from the xcarchive.
-          flutter build ipa --no-codesign || true
+          echo "=== Searching for xcarchive ==="
+          find build -name "*.xcarchive" 2>/dev/null || echo "none found under build/"
+          find ~/Library/Developer/Xcode/Archives -name "*.xcarchive" 2>/dev/null | head -5 || true
 
-          ARCHIVE=$(find build/ios -name "*.xcarchive" 2>/dev/null | head -1)
+          ARCHIVE=$(find build -name "*.xcarchive" 2>/dev/null | head -1)
           if [ -z "$ARCHIVE" ]; then
-            echo "ERROR: No xcarchive found — build failed before archiving."
+            ARCHIVE=$(find ~/Library/Developer/Xcode/Archives -name "*.xcarchive" 2>/dev/null | head -1)
+          fi
+
+          if [ -z "$ARCHIVE" ]; then
+            echo "ERROR: No xcarchive found anywhere."
             exit 1
           fi
-          echo "Archive: $ARCHIVE"
 
+          echo "Using archive: $ARCHIVE"
           APP="$ARCHIVE/Products/Applications/Runner.app"
-          if [ ! -d "$APP" ]; then
-            echo "ERROR: Runner.app not found inside archive."
-            exit 1
-          fi
-
           mkdir -p Payload
           cp -r "$APP" Payload/
           zip -r campusnav.ipa Payload/
