@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/models/landmark.dart';
@@ -38,6 +39,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
   }
 
   Future<void> _toggleSave() async {
+    HapticFeedback.lightImpact();
     await StorageService.instance.toggle(widget.landmark);
     setState(() {
       _isSaved = StorageService.instance.isSaved(widget.landmark.id);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -163,66 +164,69 @@ class _SavedCard extends StatelessWidget {
         ),
         child: const Icon(Icons.delete_rounded, color: AppColors.error),
       ),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: catColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onNavigate();
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: catColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(AppColors.categoryEmoji(saved.category),
+                        style: const TextStyle(fontSize: 22)),
+                  ),
                 ),
-                child: Center(
-                  child: Text(AppColors.categoryEmoji(saved.category),
-                      style: const TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(saved.name, style: AppTextStyles.titleMedium),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: catColor.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(6),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(saved.name, style: AppTextStyles.titleMedium),
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: catColor.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              landmark.categoryLabel,
+                              style: AppTextStyles.labelSmall
+                                  .copyWith(color: catColor),
+                            ),
                           ),
-                          child: Text(
-                            landmark.categoryLabel,
-                            style: AppTextStyles.labelSmall
-                                .copyWith(color: catColor),
-                          ),
-                        ),
-                        if (hasDist) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            landmark.friendlyDistance(userLat!, userLng!),
-                            style: AppTextStyles.bodySmall,
-                          ),
+                          if (hasDist) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              landmark.friendlyDistance(userLat!, userLng!),
+                              style: AppTextStyles.bodySmall,
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              GestureDetector(
-                onTap: onNavigate,
-                child: Container(
+                Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.15),
@@ -231,8 +235,8 @@ class _SavedCard extends StatelessWidget {
                   child: const Icon(Icons.directions_rounded,
                       color: AppColors.primary, size: 20),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

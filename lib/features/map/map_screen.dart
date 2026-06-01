@@ -32,13 +32,29 @@ class _MapScreenState extends State<MapScreen> {
   String _currentStyle = MapboxStyles.DARK;
   bool _showStylePicker = false;
   bool _navBarVisible = true;
+  bool _navPanelVisible = true;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MapProvider>().initLocation();
+      final provider = context.read<MapProvider>();
+      provider.addListener(_onProviderChange);
+      provider.initLocation();
     });
+  }
+
+  void _onProviderChange() {
+    final isNavigating = context.read<MapProvider>().isNavigating;
+    if (!isNavigating && !_navPanelVisible) {
+      setState(() => _navPanelVisible = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    try { context.read<MapProvider>().removeListener(_onProviderChange); } catch (_) {}
+    super.dispose();
   }
 
   void _onMapCreated(MapboxMap mapboxMap) async {
@@ -419,12 +435,47 @@ class _MapScreenState extends State<MapScreen> {
                 ),
 
                 // ── Navigation overlay ──
-                if (mapProvider.isNavigating)
+                if (mapProvider.isNavigating && _navPanelVisible)
                   Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: _NavigationSheet(mapProvider: mapProvider),
+                    child: _NavigationSheet(
+                      mapProvider: mapProvider,
+                      onCollapse: () => setState(() => _navPanelVisible = false),
+                    ),
+                  ),
+
+                // ── Nav panel collapsed pull-up handle ──
+                if (mapProvider.isNavigating && !_navPanelVisible)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) < -200) {
+                          HapticFeedback.lightImpact();
+                          setState(() => _navPanelVisible = true);
+                        }
+                      },
+                      child: SafeArea(
+                        top: false,
+                        child: Container(
+                          height: 44,
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
 
                 // ── Selected landmark bottom sheet ──
@@ -441,18 +492,35 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
 
+                // ── Swipe-up handle when landmark sheet is hidden ──
                 if (!mapProvider.isNavigating &&
                     mapProvider.selectedLandmark != null &&
                     !mapProvider.isLandmarkSheetVisible)
                   Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 10,
-                    child: SafeArea(
-                      top: false,
-                      child: Center(
-                        child: _ReopenSheetButton(
-                          onTap: mapProvider.showLandmarkSheet,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) < -200) {
+                          HapticFeedback.lightImpact();
+                          mapProvider.showLandmarkSheet();
+                        }
+                      },
+                      child: SafeArea(
+                        top: false,
+                        child: Container(
+                          height: 44,
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -670,45 +738,6 @@ class _MapFab extends StatelessWidget {
           ],
         ),
         child: Icon(icon, color: AppColors.primary, size: 22),
-      ),
-    );
-  }
-}
-
-class _ReopenSheetButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _ReopenSheetButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.keyboard_arrow_up_rounded,
-                color: AppColors.textPrimary, size: 18),
-            const SizedBox(width: 6),
-            Text('Show details', style: AppTextStyles.labelMedium),
-          ],
-        ),
       ),
     );
   }
@@ -1346,7 +1375,8 @@ class _RouteErrorCard extends StatelessWidget {
 // ─────────────────────────────────────────────
 class _NavigationSheet extends StatefulWidget {
   final MapProvider mapProvider;
-  const _NavigationSheet({required this.mapProvider});
+  final VoidCallback onCollapse;
+  const _NavigationSheet({required this.mapProvider, required this.onCollapse});
 
   @override
   State<_NavigationSheet> createState() => _NavigationSheetState();
@@ -1363,7 +1393,8 @@ class _NavigationSheetState extends State<_NavigationSheet> {
     final velocity = d.primaryVelocity ?? 0;
     if (velocity > 400 || _dragOffset > 80) {
       HapticFeedback.lightImpact();
-      widget.mapProvider.endNavigation();
+      setState(() => _dragOffset = 0);
+      widget.onCollapse();
     } else {
       setState(() => _dragOffset = 0);
     }

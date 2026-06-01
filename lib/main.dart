@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'core/models/saved_location.dart';
@@ -8,7 +9,8 @@ import 'core/services/storage_service.dart';
 import 'app.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await dotenv.load(fileName: '.env');
 
@@ -36,6 +38,9 @@ Future<void> main() async {
 
   // Set Mapbox access token
   MapboxOptions.setAccessToken(mapboxToken);
+
+  await Future.delayed(const Duration(milliseconds: 2500));
+  FlutterNativeSplash.remove();
 
   runApp(OauNavigatorApp(mapboxToken: mapboxToken));
 }
