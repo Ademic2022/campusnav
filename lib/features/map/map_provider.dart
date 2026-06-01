@@ -36,6 +36,7 @@ class MapProvider extends ChangeNotifier {
   void toggleVoice() {
     voiceEnabled = !voiceEnabled;
     if (!voiceEnabled) _tts.stop();
+    HapticFeedback.selectionClick();
     notifyListeners();
   }
 
@@ -81,6 +82,7 @@ class MapProvider extends ChangeNotifier {
     if (activeRoute == null || activeRoute!.steps.isEmpty) return;
     _currentStepIndex = 0;
     isNavigating = true;
+    HapticFeedback.mediumImpact();
     _speak(currentStep?.instruction ?? '');
     notifyListeners();
   }
@@ -116,6 +118,7 @@ class MapProvider extends ChangeNotifier {
       LatLng(step.maneuverLocation[1], step.maneuverLocation[0]),
     );
     if (dist < 20) {
+      HapticFeedback.mediumImpact();
       if (hasNextStep) {
         _currentStepIndex++;
         _speak(currentStep?.instruction ?? '');
