@@ -1347,26 +1347,6 @@ class _NavigationSheet extends StatelessWidget {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: () => mapProvider.toggleVoice(),
-                    child: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        mapProvider.voiceEnabled
-                            ? Icons.volume_up_rounded
-                            : Icons.volume_off_rounded,
-                        color: mapProvider.voiceEnabled
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
                     onTap: () => mapProvider.endNavigation(),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
