@@ -25,64 +25,14 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Disable code signing in Xcode project
+      - name: Build iOS app (no code signing)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package into IPA
         run: |
-          python3 << 'EOF'
-          import re
-
-          path = 'ios/Runner.xcodeproj/project.pbxproj'
-          with open(path, 'r') as f:
-              content = f.read()
-
-          no_sign = (
-              '\n\t\t\t\tCODE_SIGNING_ALLOWED = NO;'
-              '\n\t\t\t\tCODE_SIGNING_REQUIRED = NO;'
-              '\n\t\t\t\tCODE_SIGN_IDENTITY = "";'
-          )
-
-          # Inject after every IPHONEOS_DEPLOYMENT_TARGET line (covers all configs)
-          updated = re.sub(
-              r'(IPHONEOS_DEPLOYMENT_TARGET = \d+\.\d+;)',
-              lambda m: m.group(0) + no_sign,
-              content
-          )
-
-          with open(path, 'w') as f:
-              f.write(updated)
-
-          print('Done — CODE_SIGNING_ALLOWED = NO injected into all build configs')
-          EOF
-
-      - name: Build IPA (archive step — export may fail, we package manually)
-        run: flutter build ipa --no-codesign || true
-
-      - name: Debug — show build output
-        if: always()
-        run: |
-          echo "=== build/ tree (depth 6) ==="
-          find build -maxdepth 6 -type d 2>/dev/null | head -40 || echo "no build dir"
-          echo "=== xcarchive search ==="
-          find . -name "*.xcarchive" -maxdepth 10 2>/dev/null | head -10
-          find ~/Library/Developer/Xcode/Archives -name "*.xcarchive" 2>/dev/null | head -5 || true
-
-      - name: Package IPA from xcarchive
-        run: |
-          ARCHIVE=$(find . -name "*.xcarchive" -maxdepth 10 2>/dev/null | head -1)
-          if [ -z "$ARCHIVE" ]; then
-            ARCHIVE=$(find ~/Library/Developer/Xcode/Archives -name "*.xcarchive" 2>/dev/null | head -1)
-          fi
-
-          if [ -z "$ARCHIVE" ]; then
-            echo "ERROR: No xcarchive found."
-            exit 1
-          fi
-
-          echo "Archive: $ARCHIVE"
-          APP="$ARCHIVE/Products/Applications/Runner.app"
           mkdir -p Payload
-          cp -r "$APP" Payload/
+          cp -r build/ios/iphoneos/Runner.app Payload/
           zip -r campusnav.ipa Payload/
-          echo "IPA ready: $(ls -lh campusnav.ipa)"
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4

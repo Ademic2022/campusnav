@@ -18,7 +18,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+class _MapScreenState extends State<MapScreen> {
   MapboxMap? _mapboxMap;
   PolylineAnnotationManager? _polylineManager;
   PointAnnotationManager? _pointAnnotationManager;
@@ -31,31 +31,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   int? _lastFlownLandmarkId;
   String _currentStyle = MapboxStyles.DARK;
   bool _showStylePicker = false;
-
-  late AnimationController _navCtrl;
-  late Animation<Offset> _navSlide;
-  double _navBarH = 94.0; // cached nav bar height (content + safe area)
+  bool _navBarVisible = true;
 
   @override
   void initState() {
     super.initState();
-    _navCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 280),
-    );
-    _navSlide = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, 1),
-    ).animate(CurvedAnimation(parent: _navCtrl, curve: Curves.easeOut));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MapProvider>().initLocation();
     });
-  }
-
-  @override
-  void dispose() {
-    _navCtrl.dispose();
-    super.dispose();
   }
 
   void _onMapCreated(MapboxMap mapboxMap) async {
@@ -358,9 +341,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           });
         }
 
-        // Cache nav bar height for drag handlers (60px content + bottom safe area).
-        _navBarH = 60.0 + MediaQuery.of(context).padding.bottom;
-
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light,
           child: Scaffold(
@@ -405,7 +385,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 if (_showStylePicker)
                   Positioned(
                     right: 72,
-                    bottom: _navBarH + 68,
+                    bottom: 168,
                     child: _StylePickerCard(
                       currentStyle: _currentStyle,
                       onStyleSelected: (style) {
@@ -418,7 +398,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 // ── Layers button ──
                 Positioned(
                   right: 16,
-                  bottom: _navBarH + 68,
+                  bottom: 168,
                   child: _MapFab(
                     icon: _showStylePicker
                         ? Icons.close_rounded
@@ -431,44 +411,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 // ── My location FAB ──
                 Positioned(
                   right: 16,
-                  bottom: _navBarH + 10,
+                  bottom: 110,
                   child: _MapFab(
                     icon: Icons.my_location_rounded,
                     onTap: _flyToUserLocation,
-                  ),
-                ),
-
-                // ── Bottom nav bar (drag down to hide, drag up to show) ──
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: SlideTransition(
-                    position: _navSlide,
-                    child: GestureDetector(
-                      onVerticalDragUpdate: (d) {
-                        _navCtrl.value = (_navCtrl.value + d.delta.dy / _navBarH)
-                            .clamp(0.0, 1.0);
-                      },
-                      onVerticalDragEnd: (d) {
-                        final vel = d.primaryVelocity ?? 0;
-                        if (vel > 200 || _navCtrl.value > 0.4) {
-                          HapticFeedback.mediumImpact();
-                          _navCtrl.forward();
-                        } else {
-                          HapticFeedback.lightImpact();
-                          _navCtrl.reverse();
-                        }
-                      },
-                      child: _BottomNav(
-                        currentIndex: mapProvider.navIndex,
-                        onTap: (i) {
-                          mapProvider.setNavIndex(i);
-                          if (i == 1) context.push('/nearby');
-                          if (i == 2) context.push('/saved');
-                        },
-                      ),
-                    ),
                   ),
                 ),
 
@@ -543,15 +489,13 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     },
                   ),
 
-                // ── Navigation camera follow + auto-hide nav bar ──
+                // ── Navigation camera follow ──
                 Builder(builder: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mapProvider.isNavigating) {
-                      if (!_wasNavigating) _navCtrl.forward(); // hide on nav start
                       _wasNavigating = true;
                       _followForNavigation(mapProvider);
                     } else if (_wasNavigating) {
-                      _navCtrl.reverse(); // restore on nav end
                       _wasNavigating = false;
                       _resetNavigationCamera();
                     }
@@ -567,51 +511,60 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     child: SafeArea(child: _LocatingIndicator()),
                   ),
 
-                // ── Pull-up handle (visible while nav bar is hidden) ──
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: AnimatedBuilder(
-                    animation: _navCtrl,
-                    builder: (context, _) {
-                      if (_navCtrl.value < 0.15) return const SizedBox.shrink();
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onVerticalDragUpdate: (d) {
-                          _navCtrl.value = (_navCtrl.value + d.delta.dy / _navBarH)
-                              .clamp(0.0, 1.0);
-                        },
-                        onVerticalDragEnd: (d) {
-                          final vel = d.primaryVelocity ?? 0;
-                          if (vel < -200 || _navCtrl.value < 0.6) {
-                            HapticFeedback.lightImpact();
-                            _navCtrl.reverse();
-                          } else {
-                            _navCtrl.forward();
-                          }
-                        },
-                        child: SafeArea(
-                          top: false,
+                // ── Pull-up handle when bottom nav is hidden ──
+                if (!_navBarVisible)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) < -300) {
+                          setState(() => _navBarVisible = true);
+                        }
+                      },
+                      child: SafeArea(
+                        top: false,
+                        child: Container(
+                          height: 22,
+                          alignment: Alignment.center,
                           child: Container(
-                            height: 20,
-                            alignment: Alignment.center,
-                            child: Container(
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
 
               ],
+            ),
+            // ── Bottom navigation bar (swipe down to hide) ──
+            bottomNavigationBar: AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _navBarVisible
+                  ? GestureDetector(
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) > 300) {
+                          setState(() => _navBarVisible = false);
+                        }
+                      },
+                      child: _BottomNav(
+                        currentIndex: mapProvider.navIndex,
+                        onTap: (i) {
+                          mapProvider.setNavIndex(i);
+                          if (i == 1) context.push('/nearby');
+                          if (i == 2) context.push('/saved');
+                        },
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
             ),
           ),
         );
