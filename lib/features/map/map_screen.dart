@@ -31,6 +31,7 @@ class _MapScreenState extends State<MapScreen> {
   int? _lastFlownLandmarkId;
   String _currentStyle = MapboxStyles.DARK;
   bool _showStylePicker = false;
+  bool _navBarVisible = true;
 
   @override
   void initState() {
@@ -510,16 +511,60 @@ class _MapScreenState extends State<MapScreen> {
                     child: SafeArea(child: _LocatingIndicator()),
                   ),
 
+                // ── Pull-up handle when bottom nav is hidden ──
+                if (!_navBarVisible)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) < -300) {
+                          setState(() => _navBarVisible = true);
+                        }
+                      },
+                      child: SafeArea(
+                        top: false,
+                        child: Container(
+                          height: 22,
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
               ],
             ),
-            // ── Bottom navigation bar ──
-            bottomNavigationBar: _BottomNav(
-              currentIndex: mapProvider.navIndex,
-              onTap: (i) {
-                mapProvider.setNavIndex(i);
-                if (i == 1) context.push('/nearby');
-                if (i == 2) context.push('/saved');
-              },
+            // ── Bottom navigation bar (swipe down to hide) ──
+            bottomNavigationBar: AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _navBarVisible
+                  ? GestureDetector(
+                      onVerticalDragEnd: (d) {
+                        if ((d.primaryVelocity ?? 0) > 300) {
+                          setState(() => _navBarVisible = false);
+                        }
+                      },
+                      child: _BottomNav(
+                        currentIndex: mapProvider.navIndex,
+                        onTap: (i) {
+                          mapProvider.setNavIndex(i);
+                          if (i == 1) context.push('/nearby');
+                          if (i == 2) context.push('/saved');
+                        },
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
             ),
           ),
         );
@@ -1284,7 +1329,7 @@ class _NavigationSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Header: step counter + end button
+              // Header: step counter + voice toggle + end button
               Row(
                 children: [
                   Container(
@@ -1301,6 +1346,26 @@ class _NavigationSheet extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  GestureDetector(
+                    onTap: () => mapProvider.toggleVoice(),
+                    child: Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceHigh,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        mapProvider.voiceEnabled
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_off_rounded,
+                        color: mapProvider.voiceEnabled
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () => mapProvider.endNavigation(),
                     child: Container(
