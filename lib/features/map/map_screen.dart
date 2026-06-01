@@ -695,7 +695,7 @@ class _MapFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () { HapticFeedback.lightImpact(); onTap(); },
       child: Container(
         width: 48,
         height: 48,
@@ -724,7 +724,7 @@ class _ReopenSheetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () { HapticFeedback.lightImpact(); onTap(); },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
@@ -1031,7 +1031,7 @@ class _RouteProfileBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () { HapticFeedback.selectionClick(); onTap(); },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         height: 44,
@@ -1162,7 +1162,7 @@ class _NavItem extends StatelessWidget {
     final color = isActive ? AppColors.primary : AppColors.textSecondary;
     return Expanded(
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () { HapticFeedback.selectionClick(); onTap(); },
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1230,7 +1230,7 @@ class _StylePickerCard extends StatelessWidget {
         children: _styles.map((s) {
           final isActive = currentStyle == s.uri;
           return GestureDetector(
-            onTap: () => onStyleSelected(s.uri),
+            onTap: () { HapticFeedback.selectionClick(); onStyleSelected(s.uri); },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               margin: const EdgeInsets.symmetric(vertical: 3),
@@ -1397,7 +1397,7 @@ class _NavigationSheet extends StatelessWidget {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: () => mapProvider.toggleVoice(),
+                    onTap: () { HapticFeedback.selectionClick(); mapProvider.toggleVoice(); },
                     child: Container(
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
@@ -1417,7 +1417,7 @@ class _NavigationSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () => mapProvider.endNavigation(),
+                    onTap: () { HapticFeedback.mediumImpact(); mapProvider.endNavigation(); },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
@@ -1528,7 +1528,7 @@ class _NavStepBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final activeColor = isPrimary ? Colors.white : AppColors.textSecondary;
     return GestureDetector(
-      onTap: enabled ? onTap : null,
+      onTap: enabled ? () { HapticFeedback.selectionClick(); onTap(); } : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         height: 48,

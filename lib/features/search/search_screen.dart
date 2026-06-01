@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => context.pop(),
+                    onTap: () { HapticFeedback.lightImpact(); context.pop(); },
                     child: Container(
                       width: 44,
                       height: 44,

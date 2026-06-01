@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/models/landmark.dart';
@@ -38,6 +39,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
   }
 
   Future<void> _toggleSave() async {
+    HapticFeedback.lightImpact();
     await StorageService.instance.toggle(widget.landmark);
     setState(() {
       _isSaved = StorageService.instance.isSaved(widget.landmark.id);
@@ -51,7 +53,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
     final hasDist = widget.userLat != null && widget.userLng != null;
 
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: widget.onTap == null ? null : () { HapticFeedback.selectionClick(); widget.onTap!(); },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
@@ -174,7 +176,7 @@ class _IconBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () { HapticFeedback.lightImpact(); onTap(); },
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
