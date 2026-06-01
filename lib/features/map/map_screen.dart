@@ -5,13 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/oau_bounds.dart';
 import '../../core/models/landmark.dart';
 import '../../core/services/routing_service.dart';
-import '../../widgets/category_chip.dart';
-import '../search/search_provider.dart';
 import 'map_provider.dart';
+import 'widgets/landmark_sheet.dart';
+import 'widgets/locating_indicator.dart';
+import 'widgets/map_fab.dart';
+import 'widgets/map_style_picker.dart';
+import 'widgets/navigation_sheet.dart';
+import 'widgets/search_sheet.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -74,7 +77,6 @@ class _MapScreenState extends State<MapScreen> {
       quickZoomEnabled: true,
       pitchEnabled: true,
     ));
-    // Disable compass and attribution for cleaner look
     await mapboxMap.compass.updateSettings(CompassSettings(enabled: false));
     await mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
 
@@ -99,7 +101,6 @@ class _MapScreenState extends State<MapScreen> {
 
     await _mapboxMap!.loadStyleURI(styleUri);
 
-    // Annotation managers and location puck are reset after a style change.
     _polylineManager =
         await _mapboxMap!.annotations.createPolylineAnnotationManager();
     _pointAnnotationManager =
@@ -243,7 +244,6 @@ class _MapScreenState extends State<MapScreen> {
     const icon = Icons.location_on;
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
 
-    // Draw shadow
     textPainter.text = TextSpan(
       text: String.fromCharCode(icon.codePoint),
       style: TextStyle(
@@ -256,7 +256,6 @@ class _MapScreenState extends State<MapScreen> {
     textPainter.layout();
     textPainter.paint(canvas, const Offset(0, 4));
 
-    // Draw icon
     textPainter.text = TextSpan(
       text: String.fromCharCode(icon.codePoint),
       style: TextStyle(
@@ -286,8 +285,6 @@ class _MapScreenState extends State<MapScreen> {
 
     final isRouting = mapProvider.activeRoute != null;
 
-    // The Mapbox puck shows the user's real position when on campus.
-    // Only place a custom gate marker when routing starts from the main gate.
     final showGateMarker = mapProvider.isStartingFromGate &&
         (isRouting || mapProvider.canRouteFromCurrentStart);
 
@@ -342,7 +339,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Consumer<MapProvider>(
       builder: (context, mapProvider, _) {
-        // Fly only when the selected landmark changes.
         if (mapProvider.selectedLandmark == null) {
           _lastFlownLandmarkId = null;
         } else if (_lastFlownLandmarkId != mapProvider.selectedLandmark!.id) {
@@ -358,7 +354,6 @@ class _MapScreenState extends State<MapScreen> {
             backgroundColor: AppColors.background,
             body: Stack(
               children: [
-                // ── Mapbox Map ──
                 MapWidget(
                   key: const ValueKey('mapbox_map'),
                   cameraOptions: CameraOptions(
@@ -374,7 +369,6 @@ class _MapScreenState extends State<MapScreen> {
                   onMapCreated: _onMapCreated,
                 ),
 
-                // ── Style change side-effect ──
                 Builder(builder: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     _changeMapStyle(mapProvider.mapStyle);
@@ -382,12 +376,11 @@ class _MapScreenState extends State<MapScreen> {
                   return const SizedBox.shrink();
                 }),
 
-                // ── Style picker popup ──
                 if (_showStylePicker)
                   Positioned(
                     right: 72,
                     bottom: 220,
-                    child: _StylePickerCard(
+                    child: MapStylePicker(
                       currentStyle: _currentStyle,
                       onStyleSelected: (style) {
                         mapProvider.setMapStyle(style);
@@ -396,11 +389,10 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
 
-                // ── Layers button ──
                 Positioned(
                   right: 16,
                   bottom: 220,
-                  child: _MapFab(
+                  child: MapFab(
                     icon: _showStylePicker
                         ? Icons.close_rounded
                         : Icons.layers_rounded,
@@ -409,39 +401,34 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-                // ── My location FAB ──
                 Positioned(
                   right: 16,
                   bottom: 160,
-                  child: _MapFab(
+                  child: MapFab(
                     icon: Icons.my_location_rounded,
                     onTap: _flyToUserLocation,
                   ),
                 ),
 
-                // ── Navigation sheet ──
                 if (mapProvider.isNavigating)
                   Positioned.fill(
-                    child: _NavigationSheet(mapProvider: mapProvider),
+                    child: NavigationSheet(mapProvider: mapProvider),
                   ),
 
-                // ── Bottom sheet: search + categories (no landmark) ──
                 if (!mapProvider.isNavigating && mapProvider.selectedLandmark == null)
                   Positioned.fill(
-                    child: _SearchSheet(
+                    child: SearchSheet(
                       onSearchTap: () => context.push('/search'),
                     ),
                   ),
 
-                // ── Landmark detail sheet ──
                 if (!mapProvider.isNavigating && mapProvider.selectedLandmark != null)
                   Positioned.fill(
-                    child: _LandmarkSheet(
+                    child: LandmarkSheet(
                       mapProvider: mapProvider,
                     ),
                   ),
 
-                // ── Route markers (start + destination) ──
                 Builder(
                   builder: (_) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -451,7 +438,6 @@ class _MapScreenState extends State<MapScreen> {
                   },
                 ),
 
-                // ── Render active route ──
                 if (mapProvider.activeRoute != null)
                   Builder(
                     builder: (_) {
@@ -472,7 +458,6 @@ class _MapScreenState extends State<MapScreen> {
                     },
                   ),
 
-                // ── Navigation camera follow ──
                 Builder(builder: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mapProvider.isNavigating) {
@@ -486,14 +471,12 @@ class _MapScreenState extends State<MapScreen> {
                   return const SizedBox.shrink();
                 }),
 
-                // ── Loading overlay ──
                 if (mapProvider.isLocating)
                   const Positioned(
                     top: 0,
                     right: 16,
-                    child: SafeArea(child: _LocatingIndicator()),
+                    child: SafeArea(child: LocatingIndicator()),
                   ),
-
               ],
             ),
           ),
@@ -502,1086 +485,3 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// FAB button
-// ─────────────────────────────────────────────
-class _MapFab extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _MapFab({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(icon, color: AppColors.primary, size: 22),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Search sheet — draggable, peek shows pill search bar,
-// expanded shows categories + quick access
-// ─────────────────────────────────────────────
-class _SearchSheet extends StatelessWidget {
-  final VoidCallback onSearchTap;
-  const _SearchSheet({required this.onSearchTap});
-
-  // handle(24) + searchPad(2) + searchBar(50) + bottomBreath(14) = 90px
-  static const double _peekPx = 90.0;
-  static const double _mid    = 0.50;
-  static const double _full   = 0.88;
-
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final bottomPad    = MediaQuery.of(context).padding.bottom;
-    final peek = (_peekPx / screenHeight).clamp(0.08, 0.14);
-
-    return DraggableScrollableSheet(
-      initialChildSize: peek,
-      minChildSize: peek,
-      maxChildSize: _full,
-      snap: true,
-      snapSizes: [_mid, _full],
-      expand: true,
-      builder: (context, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))],
-        ),
-        child: ListView(
-          controller: scrollController,
-          padding: EdgeInsets.only(bottom: bottomPad + 16),
-          children: [
-            // Drag handle
-            Center(child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            )),
-
-            // ── Pill search bar ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 2, 16, 0),
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  onSearchTap();
-                },
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceHigh,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Row(children: [
-                    const SizedBox(width: 16),
-                    const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text('Search OAU campus...', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary))),
-                    Container(
-                      margin: const EdgeInsets.only(right: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Row(children: [
-                        const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 14),
-                        const SizedBox(width: 4),
-                        Text('OAU', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary)),
-                      ]),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ── Category chips ──
-            Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 10),
-              child: Text('Browse by Category',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
-            ),
-            SizedBox(
-              height: 42,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: CategoryChip.buildRow(
-                  categories: SearchProvider.categories.where((c) => c != 'all').toList(),
-                  selected: '',
-                  onChanged: (cat) {
-                    HapticFeedback.lightImpact();
-                    context.read<SearchProvider>().onCategoryChanged(cat);
-                    context.push('/search');
-                  },
-                ).map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ── Quick access ──
-            Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 10),
-              child: Text('Quick Access',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(children: [
-                Expanded(child: _QuickAccessCard(
-                  icon: Icons.near_me_rounded,
-                  label: 'Nearby Places',
-                  subtitle: 'Locations around you',
-                  color: AppColors.accent,
-                  onTap: () { HapticFeedback.lightImpact(); context.push('/nearby'); },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _QuickAccessCard(
-                  icon: Icons.bookmark_rounded,
-                  label: 'Saved Places',
-                  subtitle: 'Your bookmarks',
-                  color: AppColors.primary,
-                  onTap: () { HapticFeedback.lightImpact(); context.push('/saved'); },
-                )),
-              ]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Landmark detail sheet (shown when a landmark is selected)
-// ─────────────────────────────────────────────
-class _LandmarkSheet extends StatefulWidget {
-  final MapProvider mapProvider;
-  const _LandmarkSheet({required this.mapProvider});
-
-  @override
-  State<_LandmarkSheet> createState() => _LandmarkSheetState();
-}
-
-class _LandmarkSheetState extends State<_LandmarkSheet> {
-  final _ctrl = DraggableScrollableController();
-
-  static const double _peek   = 0.165;
-  static const double _detail = 0.46;
-  static const double _full   = 0.88;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.mapProvider.addListener(_onProviderChange);
-    // Auto-expand to detail on first mount
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _ctrl.isAttached && _ctrl.size < _detail - 0.02) {
-        _ctrl.animateTo(_detail,
-            duration: const Duration(milliseconds: 380),
-            curve: Curves.easeOutCubic);
-      }
-    });
-  }
-
-  void _onProviderChange() {
-    if (!mounted || !_ctrl.isAttached) return;
-    if (widget.mapProvider.selectedLandmark != null && _ctrl.size < _detail - 0.02) {
-      _ctrl.animateTo(_detail,
-          duration: const Duration(milliseconds: 380),
-          curve: Curves.easeOutCubic);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.mapProvider.removeListener(_onProviderChange);
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final mp = widget.mapProvider;
-    final landmark = mp.selectedLandmark;
-    if (landmark == null) return const SizedBox.shrink();
-
-    final catColor = AppColors.categoryColor(landmark.category);
-    final startLat = mp.routeStartLat;
-    final startLng = mp.routeStartLng;
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-
-    return DraggableScrollableSheet(
-      controller: _ctrl,
-      initialChildSize: _peek,
-      minChildSize: _peek,
-      maxChildSize: _full,
-      snap: true,
-      snapSizes: const [_detail, _full],
-      expand: true,
-      builder: (context, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))],
-        ),
-        child: ListView(
-          controller: scrollController,
-          padding: EdgeInsets.only(bottom: bottomPad + 16),
-          children: [
-            // Handle
-            Center(child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            )),
-
-            // ── Landmark header ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 12, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 52, height: 52,
-                    decoration: BoxDecoration(
-                      color: catColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(child: Text(
-                      AppColors.categoryEmoji(landmark.category),
-                      style: const TextStyle(fontSize: 26),
-                    )),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(landmark.name, style: AppTextStyles.headlineMedium),
-                      const SizedBox(height: 2),
-                      Text(landmark.description,
-                          style: AppTextStyles.bodySmall,
-                          maxLines: 2, overflow: TextOverflow.ellipsis),
-                    ],
-                  )),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      mp.clearSelectedLandmark();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.close_rounded,
-                          color: AppColors.textSecondary, size: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Distance chips ──
-            if (mp.canRouteFromCurrentStart) ...[
-              const SizedBox(height: 14),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(children: [
-                  _InfoChip(icon: Icons.directions_walk, label: landmark.friendlyDistance(startLat, startLng)),
-                  const SizedBox(width: 8),
-                  _InfoChip(icon: Icons.access_time_rounded, label: '~${landmark.walkingMinutes(startLat, startLng)} min walk'),
-                ]),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(children: [
-                  Icon(mp.isStartingFromGate ? Icons.door_front_door_rounded : Icons.my_location_rounded,
-                      size: 13, color: AppColors.textMuted),
-                  const SizedBox(width: 5),
-                  Text(
-                    mp.isStartingFromGate ? 'Starting from Main Gate' : 'Starting from your location',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                  ),
-                ]),
-              ),
-            ],
-
-            // ── Walk / Drive toggle ──
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(children: [
-                Expanded(child: _RouteProfileBtn(
-                  label: 'Walk', icon: Icons.directions_walk_rounded,
-                  isActive: mp.routeProfile == RouteProfile.walking,
-                  onTap: () { HapticFeedback.lightImpact(); mp.setRouteProfile(RouteProfile.walking); },
-                )),
-                const SizedBox(width: 10),
-                Expanded(child: _RouteProfileBtn(
-                  label: 'Drive', icon: Icons.directions_car_rounded,
-                  isActive: mp.routeProfile == RouteProfile.driving,
-                  onTap: () { HapticFeedback.lightImpact(); mp.setRouteProfile(RouteProfile.driving); },
-                )),
-              ]),
-            ),
-            const SizedBox(height: 12),
-
-            // ── Route error ──
-            if (mp.routeError != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: _RouteErrorCard(
-                  message: mp.routeError!,
-                  isNetworkError: mp.routeIsNetworkError,
-                  onRetry: () { HapticFeedback.lightImpact(); mp.fetchRoute(); },
-                ),
-              ),
-
-            // ── Route summary + Start Navigation ──
-            if (mp.activeRoute != null) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(children: [
-                    const Icon(Icons.route_rounded, color: AppColors.primary, size: 20),
-                    const SizedBox(width: 8),
-                    Text('${mp.activeRoute!.distanceLabel}  •  ${mp.activeRoute!.durationLabel}',
-                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.primary)),
-                  ]),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(width: double.infinity, height: 52,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0),
-                    onPressed: () { HapticFeedback.mediumImpact(); mp.startNavigation(); },
-                    icon: const Icon(Icons.navigation_rounded),
-                    label: Text('Start Navigation', style: AppTextStyles.labelLarge),
-                  ),
-                ),
-              ),
-            ] else ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(width: double.infinity, height: 52,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0),
-                    onPressed: mp.isLoadingRoute ? null : () { HapticFeedback.mediumImpact(); mp.fetchRoute(); },
-                    icon: mp.isLoadingRoute
-                        ? const SizedBox(width: 18, height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.directions_rounded),
-                    label: Text(mp.isLoadingRoute ? 'Getting route...' : 'Get Directions',
-                        style: AppTextStyles.labelLarge),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _InfoChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceHigh,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: AppColors.textSecondary),
-          const SizedBox(width: 5),
-          Text(label, style: AppTextStyles.bodySmall),
-        ],
-      ),
-    );
-  }
-}
-
-class _RouteProfileBtn extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _RouteProfileBtn({
-    required this.label,
-    required this.icon,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 44,
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.accent.withValues(alpha: 0.15)
-              : AppColors.surfaceHigh,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isActive ? AppColors.accent : AppColors.border,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon,
-                color: isActive ? AppColors.accent : AppColors.textSecondary,
-                size: 18),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: isActive ? AppColors.accent : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Locating indicator
-// ─────────────────────────────────────────────
-class _LocatingIndicator extends StatelessWidget {
-  const _LocatingIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 80),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(
-            width: 14,
-            height: 14,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text('Locating...', style: AppTextStyles.bodySmall),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Map style picker card
-// ─────────────────────────────────────────────
-class _StylePickerCard extends StatelessWidget {
-  final String currentStyle;
-  final void Function(String) onStyleSelected;
-
-  const _StylePickerCard({
-    required this.currentStyle,
-    required this.onStyleSelected,
-  });
-
-  static final _styles = [
-    (label: 'Dark',      uri: MapboxStyles.DARK,              icon: Icons.dark_mode_rounded,     color: const Color(0xFF334155)),
-    (label: 'Satellite', uri: MapboxStyles.SATELLITE_STREETS, icon: Icons.satellite_alt_rounded, color: const Color(0xFF166534)),
-    (label: 'Standard',  uri: MapboxStyles.STANDARD,          icon: Icons.map_outlined,          color: const Color(0xFF1D4ED8)),
-    (label: 'Outdoors',  uri: MapboxStyles.OUTDOORS,          icon: Icons.terrain_rounded,       color: const Color(0xFF92400E)),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: _styles.map((s) {
-          final isActive = currentStyle == s.uri;
-          return GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              onStyleSelected(s.uri);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              margin: const EdgeInsets.symmetric(vertical: 3),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.primary.withValues(alpha: 0.15)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: s.color,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(s.icon, color: Colors.white, size: 16),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    s.label,
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: isActive ? AppColors.primary : AppColors.textPrimary,
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (isActive)
-                    const Icon(Icons.check_rounded,
-                        size: 14, color: AppColors.primary),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Route error card with retry
-// ─────────────────────────────────────────────
-class _RouteErrorCard extends StatelessWidget {
-  final String message;
-  final bool isNetworkError;
-  final VoidCallback onRetry;
-
-  const _RouteErrorCard({
-    required this.message,
-    required this.isNetworkError,
-    required this.onRetry,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isNetworkError
-                ? Icons.wifi_off_rounded
-                : Icons.error_outline_rounded,
-            color: AppColors.error,
-            size: 20,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(message,
-                style:
-                    AppTextStyles.bodySmall.copyWith(color: AppColors.error)),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: onRetry,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Retry',
-                style:
-                    AppTextStyles.labelSmall.copyWith(color: AppColors.error),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Navigation sheet — same DraggableScrollableSheet
-// behaviour as _LandmarkSheet
-// ─────────────────────────────────────────────
-class _NavigationSheet extends StatefulWidget {
-  final MapProvider mapProvider;
-  const _NavigationSheet({required this.mapProvider});
-
-  @override
-  State<_NavigationSheet> createState() => _NavigationSheetState();
-}
-
-class _NavigationSheetState extends State<_NavigationSheet> {
-  final _ctrl = DraggableScrollableController();
-
-  static const double _peek   = 0.165;
-  static const double _detail = 0.46;
-  static const double _full   = 0.88;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.mapProvider.addListener(_onProviderChange);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _ctrl.isAttached && _ctrl.size < _detail - 0.02) {
-        _ctrl.animateTo(_detail,
-            duration: const Duration(milliseconds: 380),
-            curve: Curves.easeOutCubic);
-      }
-    });
-  }
-
-  void _onProviderChange() {
-    if (!mounted || !_ctrl.isAttached) return;
-    if (widget.mapProvider.isNavigating && _ctrl.size < _detail - 0.02) {
-      _ctrl.animateTo(_detail,
-          duration: const Duration(milliseconds: 380),
-          curve: Curves.easeOutCubic);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.mapProvider.removeListener(_onProviderChange);
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final mp = widget.mapProvider;
-    final step = mp.currentStep;
-    final stepIndex = mp.currentStepIndex;
-    final total = mp.totalSteps;
-    final hasNext = mp.hasNextStep;
-    final hasPrev = mp.hasPrevStep;
-    final dest = mp.routeDestination?.name ?? 'destination';
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-    final route = mp.activeRoute;
-
-    // Next step preview
-    final nextStep = hasNext && route != null
-        ? route.steps[stepIndex + 1]
-        : null;
-
-    // Remaining distance from current step onward
-    final remainingMetres = route != null
-        ? route.steps.skip(stepIndex).fold(0.0, (s, st) => s + st.distanceMetres)
-        : 0.0;
-    final remainingLabel = remainingMetres < 1000
-        ? '${remainingMetres.round()} m remaining'
-        : '${(remainingMetres / 1000).toStringAsFixed(1)} km remaining';
-
-    // Walking time for remaining distance (~5 km/h)
-    final remainingMins = (remainingMetres / 83.3).ceil();
-
-    return DraggableScrollableSheet(
-      controller: _ctrl,
-      initialChildSize: _peek,
-      minChildSize: _peek,
-      maxChildSize: _full,
-      snap: true,
-      snapSizes: const [_detail, _full],
-      expand: true,
-      builder: (context, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))],
-        ),
-        child: ListView(
-          controller: scrollController,
-          padding: EdgeInsets.only(bottom: bottomPad + 16),
-          children: [
-            // Handle
-            Center(child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            )),
-
-            // Destination + step counter + End
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 16, 10),
-              child: Row(children: [
-                Container(
-                  width: 8, height: 8,
-                  decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text('To $dest',
-                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text('${stepIndex + 1}/$total',
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary)),
-                ),
-                GestureDetector(
-                  onTap: () { HapticFeedback.lightImpact(); mp.endNavigation(); },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-                    ),
-                    child: Text('End', style: AppTextStyles.labelSmall.copyWith(color: AppColors.error)),
-                  ),
-                ),
-              ]),
-            ),
-
-            // Step progress bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: total > 0 ? (stepIndex + 1) / total : 0,
-                  minHeight: 4,
-                  backgroundColor: AppColors.surfaceHigh,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
-            ),
-
-            const Divider(height: 1, color: AppColors.divider),
-
-            // Current step instruction
-            if (step != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 56, height: 56,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(step.icon, color: AppColors.primary, size: 30),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(step.instruction, style: AppTextStyles.headlineMedium,
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 4),
-                        Row(children: [
-                          const Icon(Icons.straighten_rounded,
-                              size: 13, color: AppColors.textSecondary),
-                          const SizedBox(width: 4),
-                          Text(step.distanceLabel,
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                        ]),
-                      ],
-                    )),
-                  ],
-                ),
-              ),
-
-            // Next step preview
-            if (nextStep != null) ...[
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceHigh,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(children: [
-                    Icon(nextStep.icon, size: 18, color: AppColors.textSecondary),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text(
-                      'Then: ${nextStep.instruction}',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                      maxLines: 1, overflow: TextOverflow.ellipsis,
-                    )),
-                    Text(nextStep.distanceLabel,
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.textMuted)),
-                  ]),
-                ),
-              ),
-            ],
-
-            // Remaining distance + time summary
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-                ),
-                child: Row(children: [
-                  const Icon(Icons.route_rounded, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Text(remainingLabel,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary)),
-                  const Spacer(),
-                  const Icon(Icons.access_time_rounded, size: 14, color: AppColors.primary),
-                  const SizedBox(width: 4),
-                  Text('~$remainingMins min',
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary)),
-                ]),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Prev / Next buttons
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Row(children: [
-                Expanded(child: _NavStepBtn(
-                  label: 'Previous',
-                  icon: Icons.arrow_back_rounded,
-                  enabled: hasPrev,
-                  onTap: () { HapticFeedback.lightImpact(); mp.prevStep(); },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _NavStepBtn(
-                  label: hasNext ? 'Next Step' : 'Arrived 🎉',
-                  icon: hasNext ? Icons.arrow_forward_rounded : Icons.flag_rounded,
-                  enabled: true,
-                  isPrimary: true,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    if (hasNext) mp.nextStep();
-                    else mp.endNavigation();
-                  },
-                )),
-              ]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NavStepBtn extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool enabled;
-  final bool isPrimary;
-  final VoidCallback onTap;
-
-  const _NavStepBtn({
-    required this.label,
-    required this.icon,
-    required this.enabled,
-    required this.onTap,
-    this.isPrimary = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final activeColor = isPrimary ? Colors.white : AppColors.textSecondary;
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        height: 48,
-        decoration: BoxDecoration(
-          color: isPrimary
-              ? AppColors.primary.withValues(alpha: enabled ? 1.0 : 0.4)
-              : AppColors.surfaceHigh,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isPrimary ? Colors.transparent : AppColors.border,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon,
-                size: 18,
-                color: activeColor.withValues(alpha: enabled ? 1.0 : 0.4)),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: activeColor.withValues(alpha: enabled ? 1.0 : 0.4),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Quick access card for Nearby / Saved
-// ─────────────────────────────────────────────
-class _QuickAccessCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickAccessCard({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(height: 10),
-            Text(label,
-                style: AppTextStyles.titleMedium.copyWith(color: color),
-                maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            Text(subtitle,
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                maxLines: 1, overflow: TextOverflow.ellipsis),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
