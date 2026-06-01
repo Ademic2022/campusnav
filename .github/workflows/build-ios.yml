@@ -25,17 +25,29 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Build IPA (no code signing)
-        run: flutter build ipa --no-codesign
-
-      - name: Package IPA from xcarchive
+      - name: Build and package IPA
         run: |
-          ARCHIVE=$(find build/ios -name "*.xcarchive" | head -1)
+          # flutter build ipa archives successfully but fails at the export/signing step.
+          # We allow that failure and extract the IPA ourselves from the xcarchive.
+          flutter build ipa --no-codesign || true
+
+          ARCHIVE=$(find build/ios -name "*.xcarchive" 2>/dev/null | head -1)
+          if [ -z "$ARCHIVE" ]; then
+            echo "ERROR: No xcarchive found — build failed before archiving."
+            exit 1
+          fi
           echo "Archive: $ARCHIVE"
+
+          APP="$ARCHIVE/Products/Applications/Runner.app"
+          if [ ! -d "$APP" ]; then
+            echo "ERROR: Runner.app not found inside archive."
+            exit 1
+          fi
+
           mkdir -p Payload
-          cp -r "$ARCHIVE/Products/Applications/Runner.app" Payload/
+          cp -r "$APP" Payload/
           zip -r campusnav.ipa Payload/
-          echo "Done: $(ls -lh campusnav.ipa)"
+          echo "IPA ready: $(ls -lh campusnav.ipa)"
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
