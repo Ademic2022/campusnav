@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../../core/models/landmark.dart';
@@ -11,39 +10,6 @@ import '../../core/constants/oau_bounds.dart';
 class MapProvider extends ChangeNotifier {
   // Mapbox token — set before using routing
   String mapboxToken = '';
-
-  // Voice guidance
-  final FlutterTts _tts = FlutterTts();
-  bool _ttsReady = false;
-  bool voiceEnabled = true;
-
-  Future<void> _initTts() async {
-    if (_ttsReady) return;
-    await _tts.setLanguage('en-US');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
-    _ttsReady = true;
-  }
-
-  void _speak(String text) async {
-    if (!voiceEnabled || text.isEmpty) return;
-    await _initTts();
-    await _tts.stop();
-    await _tts.speak(text);
-  }
-
-  void toggleVoice() {
-    voiceEnabled = !voiceEnabled;
-    if (!voiceEnabled) _tts.stop();
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _tts.stop();
-    super.dispose();
-  }
 
   // User's current GPS position
   Position? userPosition;
@@ -82,28 +48,24 @@ class MapProvider extends ChangeNotifier {
     _currentStepIndex = 0;
     isNavigating = true;
     HapticFeedback.mediumImpact();
-    _speak(currentStep?.instruction ?? '');
     notifyListeners();
   }
 
   void endNavigation() {
     isNavigating = false;
     _currentStepIndex = 0;
-    _tts.stop();
     notifyListeners();
   }
 
   void nextStep() {
     if (!hasNextStep) return;
     _currentStepIndex++;
-    _speak(currentStep?.instruction ?? '');
     notifyListeners();
   }
 
   void prevStep() {
     if (!hasPrevStep) return;
     _currentStepIndex--;
-    _speak(currentStep?.instruction ?? '');
     notifyListeners();
   }
 
@@ -120,11 +82,9 @@ class MapProvider extends ChangeNotifier {
       HapticFeedback.mediumImpact();
       if (hasNextStep) {
         _currentStepIndex++;
-        _speak(currentStep?.instruction ?? '');
       } else {
         isNavigating = false;
         _currentStepIndex = 0;
-        _speak('You have arrived at your destination.');
       }
     }
   }
