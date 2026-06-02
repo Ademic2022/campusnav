@@ -376,40 +376,6 @@ class _MapScreenState extends State<MapScreen> {
                   return const SizedBox.shrink();
                 }),
 
-                if (_showStylePicker)
-                  Positioned(
-                    right: 72,
-                    bottom: 220,
-                    child: MapStylePicker(
-                      currentStyle: _currentStyle,
-                      onStyleSelected: (style) {
-                        mapProvider.setMapStyle(style);
-                        setState(() => _showStylePicker = false);
-                      },
-                    ),
-                  ),
-
-                Positioned(
-                  right: 16,
-                  bottom: 220,
-                  child: MapFab(
-                    icon: _showStylePicker
-                        ? Icons.close_rounded
-                        : Icons.layers_rounded,
-                    onTap: () => setState(
-                        () => _showStylePicker = !_showStylePicker),
-                  ),
-                ),
-
-                Positioned(
-                  right: 16,
-                  bottom: 160,
-                  child: MapFab(
-                    icon: Icons.my_location_rounded,
-                    onTap: _flyToUserLocation,
-                  ),
-                ),
-
                 if (mapProvider.isNavigating)
                   Positioned.fill(
                     child: NavigationSheet(mapProvider: mapProvider),
@@ -470,6 +436,40 @@ class _MapScreenState extends State<MapScreen> {
                   });
                   return const SizedBox.shrink();
                 }),
+
+                if (_showStylePicker)
+                  Positioned(
+                    right: 72,
+                    bottom: 220,
+                    child: MapStylePicker(
+                      currentStyle: _currentStyle,
+                      onStyleSelected: (style) {
+                        mapProvider.setMapStyle(style);
+                        setState(() => _showStylePicker = false);
+                      },
+                    ),
+                  ),
+
+                Positioned(
+                  right: 16,
+                  bottom: 220,
+                  child: MapFab(
+                    icon: _showStylePicker
+                        ? Icons.close_rounded
+                        : Icons.layers_rounded,
+                    onTap: () => setState(
+                        () => _showStylePicker = !_showStylePicker),
+                  ),
+                ),
+
+                Positioned(
+                  right: 16,
+                  bottom: 160,
+                  child: MapFab(
+                    icon: Icons.my_location_rounded,
+                    onTap: _flyToUserLocation,
+                  ),
+                ),
 
                 if (mapProvider.isLocating)
                   const Positioned(
