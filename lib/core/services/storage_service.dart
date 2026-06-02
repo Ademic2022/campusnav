@@ -7,11 +7,20 @@ class StorageService {
   static final StorageService instance = StorageService._();
 
   static const String _boxName = 'saved_locations';
+  static const String _settingsBoxName = 'app_settings';
   late Box<SavedLocation> _box;
+  late Box _settingsBox;
 
   Future<void> init() async {
     _box = await Hive.openBox<SavedLocation>(_boxName);
+    _settingsBox = await Hive.openBox(_settingsBoxName);
   }
+
+  bool get hasSeenOnboarding =>
+      _settingsBox.get('onboarding_seen', defaultValue: false) as bool;
+
+  Future<void> markOnboardingSeen() =>
+      _settingsBox.put('onboarding_seen', true);
 
   List<SavedLocation> getAll() {
     return _box.values.toList()

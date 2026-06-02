@@ -37,5 +37,10 @@ Future<void> main() async {
   // Set Mapbox access token
   MapboxOptions.setAccessToken(mapboxToken);
 
-  runApp(OauNavigatorApp(mapboxToken: mapboxToken));
+  final showOnboarding = !StorageService.instance.hasSeenOnboarding;
+
+  runApp(OauNavigatorApp(
+    mapboxToken: mapboxToken,
+    showOnboarding: showOnboarding,
+  ));
 }

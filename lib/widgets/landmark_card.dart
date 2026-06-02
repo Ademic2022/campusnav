@@ -59,7 +59,7 @@ class _LandmarkCardState extends State<LandmarkCard> {
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 1),
+          border: Border.all(color: AppColors.borderStrong, width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),

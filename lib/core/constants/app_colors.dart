@@ -31,6 +31,7 @@ class AppColors {
 
   // Borders / dividers
   static const Color border = Color(0xFF1E293B);
+  static const Color borderStrong = Color(0xFF2D3F5A);  // clearly visible card outline
   static const Color divider = Color(0xFF1E293B);
 
   // Category colors

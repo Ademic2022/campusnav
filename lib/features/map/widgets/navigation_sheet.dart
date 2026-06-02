@@ -299,7 +299,7 @@ class NavStepBtn extends StatelessWidget {
               : AppColors.surfaceHigh,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isPrimary ? Colors.transparent : AppColors.border,
+            color: isPrimary ? Colors.transparent : AppColors.borderStrong,
           ),
         ),
         child: Row(

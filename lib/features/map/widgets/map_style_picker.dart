@@ -28,7 +28,7 @@ class MapStylePicker extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.borderStrong),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.4),

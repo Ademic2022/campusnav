@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/landmark.dart';
 import '../../core/models/saved_location.dart';
+import '../../widgets/nav_back_button.dart';
 import '../map/map_provider.dart';
 import 'saved_provider.dart';
 
@@ -40,20 +41,7 @@ class _SavedScreenState extends State<SavedScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceElevated,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: const Icon(Icons.arrow_back_rounded,
-                          color: AppColors.textPrimary, size: 20),
-                    ),
-                  ),
+                  const NavBackButton(),
                   const SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +162,7 @@ class _SavedCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceElevated,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.borderStrong),
           ),
           child: Padding(
             padding: const EdgeInsets.all(14),

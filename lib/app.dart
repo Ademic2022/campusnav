@@ -6,6 +6,7 @@ import 'features/map/map_provider.dart';
 import 'features/map/map_screen.dart';
 import 'features/nearby/nearby_provider.dart';
 import 'features/nearby/nearby_screen.dart';
+import 'features/onboarding/onboarding_screen.dart';
 import 'features/saved/saved_provider.dart';
 import 'features/saved/saved_screen.dart';
 import 'features/search/search_provider.dart';
@@ -13,43 +14,67 @@ import 'features/search/search_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ─────────────────────────────────────────────
-// Router
-// ─────────────────────────────────────────────
-final _router = GoRouter(
-  initialLocation: '/',
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const MapScreen(),
-    ),
-    GoRoute(
-      path: '/search',
-      builder: (context, state) => const SearchScreen(),
-    ),
-    GoRoute(
-      path: '/nearby',
-      builder: (context, state) => const NearbyScreen(),
-    ),
-    GoRoute(
-      path: '/saved',
-      builder: (context, state) => const SavedScreen(),
-    ),
-  ],
-);
-
-// ─────────────────────────────────────────────
 // App root
 // ─────────────────────────────────────────────
-class OauNavigatorApp extends StatelessWidget {
+class OauNavigatorApp extends StatefulWidget {
   final String mapboxToken;
-  const OauNavigatorApp({super.key, required this.mapboxToken});
+  final bool showOnboarding;
+
+  const OauNavigatorApp({
+    super.key,
+    required this.mapboxToken,
+    this.showOnboarding = false,
+  });
+
+  @override
+  State<OauNavigatorApp> createState() => _OauNavigatorAppState();
+}
+
+class _OauNavigatorAppState extends State<OauNavigatorApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = GoRouter(
+      initialLocation: widget.showOnboarding ? '/onboarding' : '/',
+      routes: [
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const OnboardingScreen(),
+        ),
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const MapScreen(),
+        ),
+        GoRoute(
+          path: '/search',
+          builder: (context, state) => const SearchScreen(),
+        ),
+        GoRoute(
+          path: '/nearby',
+          builder: (context, state) => const NearbyScreen(),
+        ),
+        GoRoute(
+          path: '/saved',
+          builder: (context, state) => const SavedScreen(),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => MapProvider()..mapboxToken = mapboxToken,
+          create: (_) => MapProvider()..mapboxToken = widget.mapboxToken,
         ),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => NearbyProvider()),

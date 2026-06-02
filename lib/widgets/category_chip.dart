@@ -30,7 +30,7 @@ class CategoryChip extends StatelessWidget {
           color: isSelected ? color : AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? color : AppColors.border,
+            color: isSelected ? color : AppColors.borderStrong,
             width: 1.5,
           ),
         ),

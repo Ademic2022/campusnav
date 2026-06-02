@@ -302,7 +302,7 @@ class RouteProfileBtn extends StatelessWidget {
               : AppColors.surfaceHigh,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? AppColors.accent : AppColors.border,
+            color: isActive ? AppColors.accent : AppColors.borderStrong,
           ),
         ),
         child: Row(
