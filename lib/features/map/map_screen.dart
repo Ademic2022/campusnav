@@ -440,34 +440,38 @@ class _MapScreenState extends State<MapScreen> {
                 if (_showStylePicker)
                   Positioned(
                     right: 72,
-                    bottom: 220,
-                    child: MapStylePicker(
-                      currentStyle: _currentStyle,
-                      onStyleSelected: (style) {
-                        mapProvider.setMapStyle(style);
-                        setState(() => _showStylePicker = false);
-                      },
+                    top: 0,
+                    child: SafeArea(
+                      child: MapStylePicker(
+                        currentStyle: _currentStyle,
+                        onStyleSelected: (style) {
+                          mapProvider.setMapStyle(style);
+                          setState(() => _showStylePicker = false);
+                        },
+                      ),
                     ),
                   ),
 
                 Positioned(
                   right: 16,
-                  bottom: 220,
-                  child: MapFab(
-                    icon: _showStylePicker
-                        ? Icons.close_rounded
-                        : Icons.layers_rounded,
-                    onTap: () => setState(
-                        () => _showStylePicker = !_showStylePicker),
-                  ),
-                ),
-
-                Positioned(
-                  right: 16,
-                  bottom: 160,
-                  child: MapFab(
-                    icon: Icons.my_location_rounded,
-                    onTap: _flyToUserLocation,
+                  top: 50,
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        MapFab(
+                          icon: _showStylePicker
+                              ? Icons.close_rounded
+                              : Icons.layers_rounded,
+                          onTap: () => setState(
+                              () => _showStylePicker = !_showStylePicker),
+                        ),
+                        const SizedBox(height: 12),
+                        MapFab(
+                          icon: Icons.my_location_rounded,
+                          onTap: _flyToUserLocation,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
