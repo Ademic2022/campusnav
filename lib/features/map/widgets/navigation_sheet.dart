@@ -4,6 +4,57 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../map_provider.dart';
 
+class _ReroutingBanner extends StatefulWidget {
+  const _ReroutingBanner();
+
+  @override
+  State<_ReroutingBanner> createState() => _ReroutingBannerState();
+}
+
+class _ReroutingBannerState extends State<_ReroutingBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.amber.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
+      ),
+      child: Row(children: [
+        RotationTransition(
+          turns: _ctrl,
+          child: const Icon(Icons.sync_rounded, size: 16, color: Colors.amber),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'Recalculating route...',
+          style: AppTextStyles.bodySmall.copyWith(color: Colors.amber),
+        ),
+      ]),
+    );
+  }
+}
+
 class NavigationSheet extends StatefulWidget {
   final MapProvider mapProvider;
   const NavigationSheet({super.key, required this.mapProvider});
@@ -100,6 +151,8 @@ class _NavigationSheetState extends State<NavigationSheet> {
                 ),
               ),
             )),
+
+            if (mp.isRerouting) const _ReroutingBanner(),
 
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 16, 10),

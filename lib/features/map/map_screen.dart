@@ -164,7 +164,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Future<void> _drawRoute(RouteResult route) async {
+  Future<void> _drawRoute(RouteResult route, {bool skipCamera = false}) async {
     if (_mapboxMap == null || _polylineManager == null) return;
 
     final routeKey = '${route.coordinates.length}-${route.distanceMetres}';
@@ -192,6 +192,8 @@ class _MapScreenState extends State<MapScreen> {
         lineOpacity: 0.9,
       ),
     );
+
+    if (skipCamera) return;
 
     final lats = route.coordinates.map((c) => c[1]);
     final lngs = route.coordinates.map((c) => c[0]);
@@ -408,7 +410,10 @@ class _MapScreenState extends State<MapScreen> {
                   Builder(
                     builder: (_) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _drawRoute(mapProvider.activeRoute!);
+                        _drawRoute(
+                          mapProvider.activeRoute!,
+                          skipCamera: mapProvider.isNavigating,
+                        );
                       });
                       return const SizedBox.shrink();
                     },

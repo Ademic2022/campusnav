@@ -30,6 +30,12 @@ class MapProvider extends ChangeNotifier {
   bool isNavigating = false;
   int _currentStepIndex = 0;
 
+  // Rerouting
+  bool isRerouting = false;
+  DateTime? _lastRerouteTime;
+  static const _offRouteThresholdMetres = 40.0;
+  static const _rerouteCooldown = Duration(seconds: 15);
+
   int get currentStepIndex => _currentStepIndex;
   int get totalSteps => activeRoute?.steps.length ?? 0;
 
@@ -47,12 +53,16 @@ class MapProvider extends ChangeNotifier {
     if (activeRoute == null || activeRoute!.steps.isEmpty) return;
     _currentStepIndex = 0;
     isNavigating = true;
+    // Grace period: don't reroute immediately after starting
+    _lastRerouteTime = DateTime.now();
     notifyListeners();
   }
 
   void endNavigation() {
     isNavigating = false;
+    isRerouting = false;
     _currentStepIndex = 0;
+    _lastRerouteTime = null;
     notifyListeners();
   }
 
@@ -69,7 +79,7 @@ class MapProvider extends ChangeNotifier {
   }
 
   void _checkStepAdvance(Position pos) {
-    if (!isNavigating) return;
+    if (!isNavigating || isRerouting) return;
     final step = currentStep;
     if (step == null || step.maneuverLocation[0] == 0.0) return;
     final dist = const Distance().as(
@@ -86,6 +96,55 @@ class MapProvider extends ChangeNotifier {
       }
       notifyListeners();
     }
+  }
+
+  void _checkOffRoute(Position pos) {
+    if (!isNavigating || isRerouting || isLoadingRoute) return;
+    final route = activeRoute;
+    if (route == null || route.coordinates.isEmpty) return;
+
+    if (_lastRerouteTime != null &&
+        DateTime.now().difference(_lastRerouteTime!) < _rerouteCooldown) {
+      return;
+    }
+
+    final userLatLng = LatLng(pos.latitude, pos.longitude);
+    const distCalc = Distance();
+    for (final coord in route.coordinates) {
+      final d = distCalc.as(LengthUnit.Meter, userLatLng, LatLng(coord[1], coord[0]));
+      if (d < _offRouteThresholdMetres) return; // still on route
+    }
+    _triggerReroute();
+  }
+
+  Future<void> _triggerReroute() async {
+    final pos = userPosition;
+    final dest = routeDestination;
+    if (isRerouting || dest == null || pos == null || mapboxToken.isEmpty) return;
+
+    isRerouting = true;
+    _lastRerouteTime = DateTime.now();
+    notifyListeners();
+
+    try {
+      final result = await RoutingService.instance.getRoute(
+        fromLat: pos.latitude,
+        fromLng: pos.longitude,
+        toLat: dest.lat,
+        toLng: dest.lng,
+        accessToken: mapboxToken,
+        profile: routeProfile,
+      );
+      if (result != null && isNavigating) {
+        activeRoute = result;
+        _currentStepIndex = 0;
+      }
+    } on RoutingException {
+      // Silently fail; user continues with the existing route
+    }
+
+    isRerouting = false;
+    notifyListeners();
   }
 
   // Map style URI
@@ -134,6 +193,7 @@ class MapProvider extends ChangeNotifier {
     LocationService.instance.getPositionStream().listen((pos) {
       userPosition = pos;
       _checkStepAdvance(pos);
+      _checkOffRoute(pos);
       notifyListeners();
     });
   }
@@ -247,6 +307,8 @@ class MapProvider extends ChangeNotifier {
     routeDestination = null;
     routeError = null;
     routeIsNetworkError = false;
+    isRerouting = false;
+    _lastRerouteTime = null;
     if (isNavigating) endNavigation();
     notifyListeners();
   }
