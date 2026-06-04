@@ -313,6 +313,68 @@ class MapProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Marked location (long-press pin) ──────────────────────────────────────
+
+  double? _markedLat;
+  double? _markedLng;
+
+  double? get markedLat => _markedLat;
+  double? get markedLng => _markedLng;
+  bool get hasMarkedLocation => _markedLat != null && _markedLng != null;
+
+  String get markedCoordinateLabel {
+    if (_markedLat == null || _markedLng == null) return '';
+    final latStr = '${_markedLat!.abs().toStringAsFixed(5)}° ${_markedLat! >= 0 ? 'N' : 'S'}';
+    final lngStr = '${_markedLng!.abs().toStringAsFixed(5)}° ${_markedLng! >= 0 ? 'E' : 'W'}';
+    return '$latStr, $lngStr';
+  }
+
+  String markedLocationDistanceLabel(Position? userPos) {
+    if (userPos == null || _markedLat == null || _markedLng == null) return '';
+    final d = const Distance().as(
+      LengthUnit.Meter,
+      LatLng(userPos.latitude, userPos.longitude),
+      LatLng(_markedLat!, _markedLng!),
+    );
+    if (d < 1000) return '${d.round()} m away';
+    return '${(d / 1000).toStringAsFixed(1)} km away';
+  }
+
+  void setMarkedLocation(double lat, double lng) {
+    if (isNavigating) return;
+    _markedLat = lat;
+    _markedLng = lng;
+    selectedLandmark = null;
+    isLandmarkSheetVisible = false;
+    activeRoute = null;
+    routeDestination = null;
+    routeError = null;
+    routeIsNetworkError = false;
+    notifyListeners();
+  }
+
+  void clearMarkedLocation() {
+    _markedLat = null;
+    _markedLng = null;
+    notifyListeners();
+  }
+
+  /// Convert the marked location into a temporary landmark and open directions.
+  void navigateToMarkedLocation() {
+    if (_markedLat == null || _markedLng == null) return;
+    final temp = Landmark(
+      id: -1,
+      name: 'Marked Location',
+      category: 'other',
+      lat: _markedLat!,
+      lng: _markedLng!,
+      description: markedCoordinateLabel,
+      icon: 'other',
+    );
+    clearMarkedLocation();
+    selectLandmark(temp);
+  }
+
   void setNavIndex(int index) {
     navIndex = index;
     notifyListeners();

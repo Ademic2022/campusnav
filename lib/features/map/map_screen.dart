@@ -13,6 +13,7 @@ import 'widgets/landmark_sheet.dart';
 import 'widgets/locating_indicator.dart';
 import 'widgets/map_fab.dart';
 import 'widgets/map_style_picker.dart';
+import 'widgets/marked_location_sheet.dart';
 import 'widgets/navigation_sheet.dart';
 import 'widgets/search_sheet.dart';
 
@@ -33,6 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _wasNavigating = false;
   Uint8List? _startMarkerImage;
   Uint8List? _destMarkerImage;
+  Uint8List? _markedPinImage;
   int? _lastFlownLandmarkId;
   String _currentStyle = MapboxStyles.DARK;
   bool _showStylePicker = false;
@@ -164,6 +166,58 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _onMapLongTap(MapContentGestureContext ctx) {
+    HapticFeedback.mediumImpact();
+    final provider = context.read<MapProvider>();
+    if (provider.isNavigating) return;
+    final coord = ctx.point.coordinates;
+    provider.setMarkedLocation(coord.lat.toDouble(), coord.lng.toDouble());
+    _mapboxMap?.flyTo(
+      CameraOptions(center: ctx.point, zoom: 17.5),
+      MapAnimationOptions(duration: 600),
+    );
+  }
+
+  Future<Uint8List> _createMarkedPinImage() async {
+    const iconSize = 96.0;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    const icon = Icons.location_on;
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+
+    // Shadow
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        color: Colors.black.withValues(alpha: 0.4),
+        fontSize: iconSize,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, const Offset(0, 4));
+
+    // Pin
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        color: const Color(0xFF8B5CF6),
+        fontSize: iconSize,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset.zero);
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(iconSize.toInt(), iconSize.toInt());
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
+  }
+
   Future<void> _drawRoute(RouteResult route, {bool skipCamera = false}) async {
     if (_mapboxMap == null || _polylineManager == null) return;
 
@@ -279,6 +333,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _ensureMarkerImages() async {
     _startMarkerImage ??= await _createStartLocationMarker();
     _destMarkerImage ??= await _createDestLocationMarker();
+    _markedPinImage ??= await _createMarkedPinImage();
   }
 
   Future<void> _updateMarkers(MapProvider mapProvider) async {
@@ -299,6 +354,7 @@ class _MapScreenState extends State<MapScreen> {
       showGateMarker ? mapProvider.routeStartLat : 'gate-off',
       showGateMarker ? mapProvider.routeStartLng : 'gate-off',
       hasDestination ? targetDest.id : 'none',
+      mapProvider.hasMarkedLocation ? '${mapProvider.markedLat}-${mapProvider.markedLng}' : 'pin-off',
     ].join('-');
 
     if (_activeMarkerKey == markerKey) return;
@@ -332,6 +388,19 @@ class _MapScreenState extends State<MapScreen> {
           iconSize: 1.0,
           iconAnchor: IconAnchor.BOTTOM,
           iconOffset: [0.0, 0.0],
+        ),
+      );
+    }
+
+    if (mapProvider.hasMarkedLocation) {
+      await _pointAnnotationManager!.create(
+        PointAnnotationOptions(
+          geometry: Point(
+            coordinates: Position(mapProvider.markedLng!, mapProvider.markedLat!),
+          ),
+          image: _markedPinImage,
+          iconSize: 1.0,
+          iconAnchor: IconAnchor.BOTTOM,
         ),
       );
     }
@@ -369,6 +438,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   styleUri: mapProvider.mapStyle,
                   onMapCreated: _onMapCreated,
+                  onLongTapListener: _onMapLongTap,
                 ),
 
                 Builder(builder: (_) {
@@ -383,7 +453,7 @@ class _MapScreenState extends State<MapScreen> {
                     child: NavigationSheet(mapProvider: mapProvider),
                   ),
 
-                if (!mapProvider.isNavigating && mapProvider.selectedLandmark == null)
+                if (!mapProvider.isNavigating && mapProvider.selectedLandmark == null && !mapProvider.hasMarkedLocation)
                   Positioned.fill(
                     child: SearchSheet(
                       onSearchTap: () => context.push('/search'),
@@ -395,6 +465,11 @@ class _MapScreenState extends State<MapScreen> {
                     child: LandmarkSheet(
                       mapProvider: mapProvider,
                     ),
+                  ),
+
+                if (!mapProvider.isNavigating && mapProvider.hasMarkedLocation)
+                  Positioned.fill(
+                    child: MarkedLocationSheet(mapProvider: mapProvider),
                   ),
 
                 Builder(

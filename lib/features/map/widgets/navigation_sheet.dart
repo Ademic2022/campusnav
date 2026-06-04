@@ -65,6 +65,7 @@ class NavigationSheet extends StatefulWidget {
 
 class _NavigationSheetState extends State<NavigationSheet> {
   final _ctrl = DraggableScrollableController();
+  bool _hasExpanded = false;
 
   static const double _peek   = 0.165;
   static const double _detail = 0.46;
@@ -76,6 +77,7 @@ class _NavigationSheetState extends State<NavigationSheet> {
     widget.mapProvider.addListener(_onProviderChange);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _ctrl.isAttached && _ctrl.size < _detail - 0.02) {
+        _hasExpanded = true;
         _ctrl.animateTo(_detail,
             duration: const Duration(milliseconds: 380),
             curve: Curves.easeOutCubic);
@@ -85,7 +87,14 @@ class _NavigationSheetState extends State<NavigationSheet> {
 
   void _onProviderChange() {
     if (!mounted || !_ctrl.isAttached) return;
-    if (widget.mapProvider.isNavigating && _ctrl.size < _detail - 0.02) {
+    final isNavigating = widget.mapProvider.isNavigating;
+    if (!isNavigating) {
+      _hasExpanded = false;
+      return;
+    }
+    // Snap to detail only once when navigation first starts.
+    if (!_hasExpanded) {
+      _hasExpanded = true;
       _ctrl.animateTo(_detail,
           duration: const Duration(milliseconds: 380),
           curve: Curves.easeOutCubic);
