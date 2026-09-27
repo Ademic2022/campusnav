@@ -1,4 +1,5 @@
-import 'dart:math';
+import '../constants/travel_pace.dart';
+import '../utils/geo.dart';
 
 class Landmark {
   final int id;
@@ -43,19 +44,13 @@ class Landmark {
 
   /// Haversine distance in metres from this landmark to [otherLat],[otherLng]
   double distanceTo(double otherLat, double otherLng) {
-    const earthRadius = 6371000.0; // metres
-    final dLat = _toRad(otherLat - lat);
-    final dLng = _toRad(otherLng - lng);
-    final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRad(lat)) *
-            cos(_toRad(otherLat)) *
-            sin(dLng / 2) *
-            sin(dLng / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
+    return haversineMetres(
+      lat1: lat,
+      lng1: lng,
+      lat2: otherLat,
+      lng2: otherLng,
+    );
   }
-
-  double _toRad(double deg) => deg * pi / 180;
 
   /// Friendly distance string
   String friendlyDistance(double userLat, double userLng) {
@@ -64,26 +59,40 @@ class Landmark {
     return '${(d / 1000).toStringAsFixed(1)}km away';
   }
 
-  /// Estimated walking time in minutes (avg 80m/min)
+  /// Estimated walking time in minutes.
   int walkingMinutes(double userLat, double userLng) {
-    final d = distanceTo(userLat, userLng);
-    return max(1, (d / 80).round());
+    return TravelPace.minutesFor(
+      distanceTo(userLat, userLng),
+      isDriving: false,
+    );
   }
 
   /// Human-readable category label
   String get categoryLabel {
     switch (category) {
-      case 'hostel': return 'Hostel';
-      case 'faculty': return 'Faculty';
-      case 'admin': return 'Admin';
-      case 'food': return 'Food';
-      case 'banks': return 'Bank';
-      case 'health': return 'Health';
-      case 'gate': return 'Gate';
-      case 'sports': return 'Sports';
-      case 'lecture': return 'Lecture Hall';
-      case 'department': return 'Department';
-      default: return category[0].toUpperCase() + category.substring(1);
+      case 'hostel':
+        return 'Hostel';
+      case 'faculty':
+        return 'Faculty';
+      case 'admin':
+        return 'Admin';
+      case 'food':
+        return 'Food';
+      case 'banks':
+        return 'Bank';
+      case 'health':
+        return 'Health';
+      case 'gate':
+        return 'Gate';
+      case 'sports':
+        return 'Sports';
+      case 'lecture':
+        return 'Lecture Hall';
+      case 'department':
+        return 'Department';
+      default:
+        if (category.isEmpty) return 'Place';
+        return category[0].toUpperCase() + category.substring(1);
     }
   }
 

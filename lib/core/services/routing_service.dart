@@ -10,6 +10,7 @@ class RouteStep {
   final String? maneuverModifier;
   final double distanceMetres;
   final double durationSeconds;
+
   /// [lng, lat] of the point where this maneuver begins.
   final List<double> maneuverLocation;
 
@@ -31,14 +32,22 @@ class RouteStep {
     if (maneuverType == 'arrive') return Icons.location_on_rounded;
     if (maneuverType == 'depart') return Icons.navigation_rounded;
     switch (maneuverModifier) {
-      case 'left':        return Icons.turn_left_rounded;
-      case 'right':       return Icons.turn_right_rounded;
-      case 'slight left': return Icons.turn_slight_left_rounded;
-      case 'slight right':return Icons.turn_slight_right_rounded;
-      case 'sharp left':  return Icons.turn_sharp_left_rounded;
-      case 'sharp right': return Icons.turn_sharp_right_rounded;
-      case 'uturn':       return Icons.u_turn_left_rounded;
-      default:            return Icons.straight_rounded;
+      case 'left':
+        return Icons.turn_left_rounded;
+      case 'right':
+        return Icons.turn_right_rounded;
+      case 'slight left':
+        return Icons.turn_slight_left_rounded;
+      case 'slight right':
+        return Icons.turn_slight_right_rounded;
+      case 'sharp left':
+        return Icons.turn_sharp_left_rounded;
+      case 'sharp right':
+        return Icons.turn_sharp_right_rounded;
+      case 'uturn':
+        return Icons.u_turn_left_rounded;
+      default:
+        return Icons.straight_rounded;
     }
   }
 }
@@ -79,6 +88,14 @@ class RoutingException implements Exception {
   String toString() => message;
 }
 
+/// Thrown when a route request is superseded by a newer one.
+class RouteCancelledException implements Exception {
+  const RouteCancelledException();
+
+  @override
+  String toString() => 'Route request cancelled';
+}
+
 class RoutingService {
   RoutingService._();
   static final RoutingService instance = RoutingService._();
@@ -91,6 +108,9 @@ class RoutingService {
 
   /// Get a route from [fromLat],[fromLng] to [toLat],[toLng].
   /// Pass your Mapbox access token in [accessToken].
+  ///
+  /// Throws [RouteCancelledException] if [cancelToken] is cancelled, so a
+  /// superseded request cannot overwrite a newer result.
   Future<RouteResult?> getRoute({
     required double fromLat,
     required double fromLng,
@@ -98,6 +118,7 @@ class RoutingService {
     required double toLng,
     required String accessToken,
     RouteProfile profile = RouteProfile.walking,
+    CancelToken? cancelToken,
   }) async {
     final profileStr =
         profile == RouteProfile.walking ? 'walking' : 'driving-traffic';
@@ -112,69 +133,21 @@ class RoutingService {
           'steps': 'true',
           'overview': 'full',
         },
+        cancelToken: cancelToken,
       );
 
-      final data = response.data as Map<String, dynamic>;
-      final routes = data['routes'] as List<dynamic>;
-      if (routes.isEmpty) {
-        throw const RoutingException('No route found for this destination.');
-      }
-
-      final route = routes.first as Map<String, dynamic>;
-      final geometry = route['geometry'] as Map<String, dynamic>;
-      final rawCoords = geometry['coordinates'] as List<dynamic>;
-      final coordinates = rawCoords
-          .map((c) => [
-                (c as List<dynamic>)[0] as double,
-                c[1] as double,
-              ])
-          .toList();
-
-      // Directions geometry is road-snapped and may start/end near the input
-      // points. Ensure rendered polyline touches exact requested coordinates.
-      final exactStart = [fromLng, fromLat];
-      final exactEnd = [toLng, toLat];
-      if (coordinates.isEmpty ||
-          coordinates.first[0] != exactStart[0] ||
-          coordinates.first[1] != exactStart[1]) {
-        coordinates.insert(0, exactStart);
-      }
-      if (coordinates.last[0] != exactEnd[0] ||
-          coordinates.last[1] != exactEnd[1]) {
-        coordinates.add(exactEnd);
-      }
-
-      final legs = route['legs'] as List<dynamic>;
-      final steps = <RouteStep>[];
-      for (final leg in legs) {
-        final legSteps =
-            (leg as Map<String, dynamic>)['steps'] as List<dynamic>;
-        for (final step in legSteps) {
-          final stepMap = step as Map<String, dynamic>;
-          final maneuver = stepMap['maneuver'] as Map<String, dynamic>;
-          final instruction = maneuver['instruction'] as String? ?? '';
-          if (instruction.isEmpty) continue;
-          final loc = maneuver['location'] as List<dynamic>? ?? [];
-          steps.add(RouteStep(
-            instruction: instruction,
-            maneuverType: maneuver['type'] as String? ?? '',
-            maneuverModifier: maneuver['modifier'] as String?,
-            distanceMetres: (stepMap['distance'] as num).toDouble(),
-            durationSeconds: (stepMap['duration'] as num).toDouble(),
-            maneuverLocation: loc.length >= 2
-                ? [(loc[0] as num).toDouble(), (loc[1] as num).toDouble()]
-                : [0.0, 0.0],
-          ));
-        }
-      }
-
-      return RouteResult(
-        coordinates: coordinates,
-        distanceMetres: (route['distance'] as num).toDouble(),
-        durationSeconds: (route['duration'] as num).toDouble(),
-        steps: steps,
+      return parseRouteResponse(
+        response.data as Map<String, dynamic>,
+        fromLat: fromLat,
+        fromLng: fromLng,
+        toLat: toLat,
+        toLng: toLng,
       );
     } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) {
+        throw const RouteCancelledException();
+      }
+
       final data = e.response?.data;
       if (data is Map<String, dynamic>) {
         final message = data['message'] as String?;
@@ -195,6 +168,87 @@ class RoutingService {
         default:
           throw const RoutingException('Route request failed.');
       }
+    }
+  }
+
+  /// Parses a Mapbox Directions response into a [RouteResult].
+  ///
+  /// Coordinates may arrive as JSON integers when they have no fractional
+  /// part, so every value is read as [num] rather than cast to [double].
+  @visibleForTesting
+  static RouteResult parseRouteResponse(
+    Map<String, dynamic> data, {
+    required double fromLat,
+    required double fromLng,
+    required double toLat,
+    required double toLng,
+  }) {
+    try {
+      final routes = data['routes'] as List<dynamic>? ?? const [];
+      if (routes.isEmpty) {
+        throw const RoutingException('No route found for this destination.');
+      }
+
+      final route = routes.first as Map<String, dynamic>;
+      final geometry = route['geometry'] as Map<String, dynamic>;
+      final rawCoords = geometry['coordinates'] as List<dynamic>? ?? const [];
+      final coordinates = rawCoords
+          .map((c) => [
+                (c as List<dynamic>)[0] as num,
+                (c[1] as num),
+              ])
+          .map((c) => [c[0].toDouble(), c[1].toDouble()])
+          .toList();
+
+      // Directions geometry is road-snapped and may start/end near the input
+      // points. Ensure rendered polyline touches exact requested coordinates.
+      final exactStart = [fromLng, fromLat];
+      final exactEnd = [toLng, toLat];
+      if (coordinates.isEmpty ||
+          coordinates.first[0] != exactStart[0] ||
+          coordinates.first[1] != exactStart[1]) {
+        coordinates.insert(0, exactStart);
+      }
+      if (coordinates.last[0] != exactEnd[0] ||
+          coordinates.last[1] != exactEnd[1]) {
+        coordinates.add(exactEnd);
+      }
+
+      final legs = route['legs'] as List<dynamic>? ?? const [];
+      final steps = <RouteStep>[];
+      for (final leg in legs) {
+        final legSteps =
+            (leg as Map<String, dynamic>)['steps'] as List<dynamic>? ??
+                const [];
+        for (final step in legSteps) {
+          final stepMap = step as Map<String, dynamic>;
+          final maneuver = stepMap['maneuver'] as Map<String, dynamic>;
+          final instruction = maneuver['instruction'] as String? ?? '';
+          if (instruction.isEmpty) continue;
+          final loc = maneuver['location'] as List<dynamic>? ?? const [];
+          steps.add(RouteStep(
+            instruction: instruction,
+            maneuverType: maneuver['type'] as String? ?? '',
+            maneuverModifier: maneuver['modifier'] as String?,
+            distanceMetres: (stepMap['distance'] as num).toDouble(),
+            durationSeconds: (stepMap['duration'] as num).toDouble(),
+            maneuverLocation: loc.length >= 2
+                ? [(loc[0] as num).toDouble(), (loc[1] as num).toDouble()]
+                : const [0.0, 0.0],
+          ));
+        }
+      }
+
+      return RouteResult(
+        coordinates: coordinates,
+        distanceMetres: (route['distance'] as num).toDouble(),
+        durationSeconds: (route['duration'] as num).toDouble(),
+        steps: steps,
+      );
+    } on RoutingException {
+      rethrow;
+    } on Object catch (_) {
+      throw const RoutingException('Route data could not be read.');
     }
   }
 }

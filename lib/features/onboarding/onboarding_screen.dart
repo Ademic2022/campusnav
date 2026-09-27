@@ -15,10 +15,10 @@ Widget _ring(double size, Color color, double bgOpacity,
     height: size,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
-      color: color.withOpacity(bgOpacity),
+      color: color.withValues(alpha: bgOpacity),
       border: borderOpacity > 0
           ? Border.all(
-              color: color.withOpacity(borderOpacity), width: borderWidth)
+              color: color.withValues(alpha: borderOpacity), width: borderWidth)
           : null,
     ),
   );
@@ -214,7 +214,7 @@ class _ProgressDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: active
             ? AppColors.primary
-            : AppColors.textMuted.withOpacity(0.35),
+            : AppColors.textMuted.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -357,12 +357,12 @@ class _WelcomeIllustration extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primary.withOpacity(0.32),
-                  AppColors.primary.withOpacity(0.07),
+                  AppColors.primary.withValues(alpha: 0.32),
+                  AppColors.primary.withValues(alpha: 0.07),
                 ],
               ),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.48),
+                color: AppColors.primary.withValues(alpha: 0.48),
                 width: 1.5,
               ),
             ),
@@ -372,23 +372,23 @@ class _WelcomeIllustration extends StatelessWidget {
           Positioned(
               top: 20,
               left: 54,
-              child: _dot(10, AppColors.accent.withOpacity(0.85))),
+              child: _dot(10, AppColors.accent.withValues(alpha: 0.85))),
           Positioned(
               top: 60,
               right: 22,
-              child: _dot(8, AppColors.catFaculty.withOpacity(0.75))),
+              child: _dot(8, AppColors.catFaculty.withValues(alpha: 0.75))),
           Positioned(
               bottom: 30,
               left: 26,
-              child: _dot(9, AppColors.catHostel.withOpacity(0.75))),
+              child: _dot(9, AppColors.catHostel.withValues(alpha: 0.75))),
           Positioned(
               bottom: 50,
               right: 44,
-              child: _dot(12, AppColors.catFood.withOpacity(0.8))),
+              child: _dot(12, AppColors.catFood.withValues(alpha: 0.8))),
           Positioned(
               top: 98,
               left: 12,
-              child: _dot(6, AppColors.catHealth.withOpacity(0.6))),
+              child: _dot(6, AppColors.catHealth.withValues(alpha: 0.6))),
         ],
       ),
     );
@@ -412,9 +412,9 @@ class _CatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: cat.color.withOpacity(0.12),
+        color: cat.color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cat.color.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: cat.color.withValues(alpha: 0.5), width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -472,7 +472,7 @@ class _DashedConnector extends StatelessWidget {
                 height: 5,
                 margin: const EdgeInsets.symmetric(vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),
@@ -482,7 +482,7 @@ class _DashedConnector extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -517,7 +517,7 @@ class _NavigateIllustration extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.borderStrong, width: 1.5),
       ),
-      child: Column(
+      child: const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _RoutePoint(
@@ -526,16 +526,16 @@ class _NavigateIllustration extends StatelessWidget {
             sublabel: 'Your location',
             solid: true,
           ),
-          const _DashedConnector(),
+          _DashedConnector(),
           _RoutePoint(
             color: AppColors.accent,
             label: 'Faculty of Science',
             sublabel: 'Destination',
             solid: false,
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           Row(
-            children: const [
+            children: [
               _ModeChip(emoji: '🚶', label: 'Walking', active: true),
               SizedBox(width: 8),
               _ModeChip(emoji: '🚗', label: 'Driving', active: false),
@@ -571,7 +571,7 @@ class _RoutePoint extends StatelessWidget {
             height: 22,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: solid ? color : color.withOpacity(0.15),
+              color: solid ? color : color.withValues(alpha: 0.15),
               border: solid ? null : Border.all(color: color, width: 2),
             ),
             child: solid
@@ -619,12 +619,12 @@ class _ModeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: active
-              ? AppColors.primary.withOpacity(0.14)
+              ? AppColors.primary.withValues(alpha: 0.14)
               : AppColors.surface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: active
-                ? AppColors.primary.withOpacity(0.4)
+                ? AppColors.primary.withValues(alpha: 0.4)
                 : AppColors.borderStrong,
             width: 1.5,
           ),
@@ -672,37 +672,37 @@ class _NearbyIllustration extends StatelessWidget {
             height: 52,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.routeWalking.withOpacity(0.15),
+              color: AppColors.routeWalking.withValues(alpha: 0.15),
               border: Border.all(color: AppColors.routeWalking, width: 2),
             ),
             child:
                 const Center(child: Text('📍', style: TextStyle(fontSize: 24))),
           ),
           // Orbiting landmark dots
-          Positioned(
+          const Positioned(
               top: 24,
               child: _LandmarkDot(
                   emoji: '🏠', color: AppColors.catHostel)),
-          Positioned(
+          const Positioned(
               top: 52,
               right: 24,
               child: _LandmarkDot(
                   emoji: '🍽️', color: AppColors.catFood)),
-          Positioned(
+          const Positioned(
               bottom: 52,
               right: 20,
               child: _LandmarkDot(
                   emoji: '🏥', color: AppColors.catHealth)),
-          Positioned(
+          const Positioned(
               bottom: 24,
               child: _LandmarkDot(
                   emoji: '🏦', color: AppColors.catBank)),
-          Positioned(
+          const Positioned(
               bottom: 52,
               left: 20,
               child: _LandmarkDot(
                   emoji: '🏛️', color: AppColors.catFaculty)),
-          Positioned(
+          const Positioned(
               top: 52,
               left: 24,
               child: _LandmarkDot(
@@ -726,8 +726,8 @@ class _LandmarkDot extends StatelessWidget {
       height: 36,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(0.15),
-        border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+        color: color.withValues(alpha: 0.15),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
       ),
       child: Center(child: Text(emoji, style: const TextStyle(fontSize: 16))),
     );

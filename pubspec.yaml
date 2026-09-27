@@ -33,9 +33,6 @@ dependencies:
   # App navigation/routing
   go_router: ^14.2.0
 
-  # Lat/lng math utilities
-  latlong2: ^0.9.1
-
   # Custom Google Fonts
   google_fonts: ^6.2.1
 

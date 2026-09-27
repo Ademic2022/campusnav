@@ -6,20 +6,31 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../widgets/category_chip.dart';
 import '../../search/search_provider.dart';
+import '../map_provider.dart';
 
 class SearchSheet extends StatelessWidget {
   final VoidCallback onSearchTap;
   const SearchSheet({super.key, required this.onSearchTap});
 
   static const double _peekPx = 90.0;
-  static const double _mid    = 0.50;
-  static const double _full   = 0.88;
+  static const double _mid = 0.50;
+  static const double _full = 0.88;
+
+  /// Label shown next to the category row so it is obvious the selection is
+  /// also filtering what is drawn on the map.
+  String _categorySummary(MapProvider mapProvider) {
+    if (!mapProvider.poiVisible) return 'Map pins hidden';
+    final category = mapProvider.poiCategory;
+    if (category == 'all') return 'All pins';
+    return '${CategoryChip.labelFor(category)} pins';
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final bottomPad    = MediaQuery.of(context).padding.bottom;
+    final bottomPad = MediaQuery.of(context).padding.bottom;
     final peek = (_peekPx / screenHeight).clamp(0.08, 0.14);
+    final mapProvider = context.watch<MapProvider>();
 
     return DraggableScrollableSheet(
       initialChildSize: peek,
@@ -32,23 +43,27 @@ class SearchSheet extends StatelessWidget {
         decoration: const BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))
+          ],
         ),
         child: ListView(
           controller: scrollController,
           padding: EdgeInsets.only(bottom: bottomPad + 16),
           children: [
-            Center(child: Padding(
+            Center(
+                child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Container(
-                width: 36, height: 4,
+                width: 36,
+                height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.surfaceHigh,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             )),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 2, 16, 0),
               child: GestureDetector(
@@ -64,33 +79,57 @@ class SearchSheet extends StatelessWidget {
                   ),
                   child: Row(children: [
                     const SizedBox(width: 16),
-                    const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
+                    const Icon(Icons.search_rounded,
+                        color: AppColors.textSecondary, size: 20),
                     const SizedBox(width: 10),
-                    Expanded(child: Text('Search OAU campus...', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary))),
+                    Expanded(
+                        child: Text('Search OAU campus...',
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: AppColors.textSecondary))),
                     Container(
                       margin: const EdgeInsets.only(right: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 14),
+                        const Icon(Icons.location_on_rounded,
+                            color: AppColors.primary, size: 14),
                         const SizedBox(width: 4),
-                        Text('OAU', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary)),
+                        Text('OAU',
+                            style: AppTextStyles.labelSmall
+                                .copyWith(color: AppColors.primary)),
                       ]),
                     ),
                   ]),
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
             Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 10),
-              child: Text('Browse by Category',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
+              child: Row(
+                children: [
+                  Text('Browse by Category',
+                      style: AppTextStyles.labelMedium
+                          .copyWith(color: AppColors.textSecondary)),
+                  const SizedBox(width: 12),
+                  // Flexible so a long summary (e.g. "Map pins hidden")
+                  // ellipsizes instead of overflowing the row.
+                  Expanded(
+                    child: Text(
+                      _categorySummary(mapProvider),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.labelSmall
+                          .copyWith(color: AppColors.textMuted),
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: 42,
@@ -98,41 +137,58 @@ class SearchSheet extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: CategoryChip.buildRow(
-                  categories: SearchProvider.categories.where((c) => c != 'all').toList(),
-                  selected: '',
+                  categories: SearchProvider.categories
+                      .where((c) => c != 'all')
+                      .toList(),
+                  selected: mapProvider.poiCategory,
                   onChanged: (cat) {
                     HapticFeedback.lightImpact();
+                    // One category control drives both the search results and
+                    // the map's POI layer, so the two can never disagree.
+                    mapProvider.setPoiCategory(cat);
+                    // The sheet renders no result list of its own, so hand off
+                    // to the search screen where the matches are actually shown.
                     context.read<SearchProvider>().onCategoryChanged(cat);
                     context.push('/search');
                   },
-                ).map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
+                )
+                    .map((chip) => Padding(
+                        padding: const EdgeInsets.only(right: 8), child: chip))
+                    .toList(),
               ),
             ),
-
             const SizedBox(height: 20),
-
             Padding(
               padding: const EdgeInsets.only(left: 16, bottom: 10),
               child: Text('Quick Access',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
+                  style: AppTextStyles.labelMedium
+                      .copyWith(color: AppColors.textSecondary)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(children: [
-                Expanded(child: QuickAccessCard(
+                Expanded(
+                    child: QuickAccessCard(
                   icon: Icons.near_me_rounded,
                   label: 'Nearby Places',
                   subtitle: 'Locations around you',
                   color: AppColors.accent,
-                  onTap: () { HapticFeedback.lightImpact(); context.push('/nearby'); },
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.push('/nearby');
+                  },
                 )),
                 const SizedBox(width: 12),
-                Expanded(child: QuickAccessCard(
+                Expanded(
+                    child: QuickAccessCard(
                   icon: Icons.bookmark_rounded,
                   label: 'Saved Places',
                   subtitle: 'Your bookmarks',
                   color: AppColors.primary,
-                  onTap: () { HapticFeedback.lightImpact(); context.push('/saved'); },
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.push('/saved');
+                  },
                 )),
               ]),
             ),
@@ -174,7 +230,8 @@ class QuickAccessCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
@@ -184,11 +241,14 @@ class QuickAccessCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(label,
                 style: AppTextStyles.titleMedium.copyWith(color: color),
-                maxLines: 1, overflow: TextOverflow.ellipsis),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
             const SizedBox(height: 2),
             Text(subtitle,
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                maxLines: 1, overflow: TextOverflow.ellipsis),
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: AppColors.textMuted),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
           ],
         ),
       ),

@@ -7,7 +7,10 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/oau_bounds.dart';
 import '../../core/models/landmark.dart';
+import '../../core/services/landmark_service.dart';
 import '../../core/services/routing_service.dart';
+import 'poi/map_poi_controller.dart';
+
 import 'map_provider.dart';
 import 'widgets/landmark_sheet.dart';
 import 'widgets/locating_indicator.dart';
@@ -28,7 +31,8 @@ class _MapScreenState extends State<MapScreen> {
   MapboxMap? _mapboxMap;
   PolylineAnnotationManager? _polylineManager;
   PointAnnotationManager? _pointAnnotationManager;
-  String? _activeRouteKey;
+  final MapPoiController _poi = MapPoiController();
+  RouteResult? _activeRoute;
   String? _activeMarkerKey;
   String? _lastNavPositionKey;
   bool _wasNavigating = false;
@@ -38,6 +42,8 @@ class _MapScreenState extends State<MapScreen> {
   int? _lastFlownLandmarkId;
   String _currentStyle = MapboxStyles.DARK;
   bool _showStylePicker = false;
+  List<Landmark> _landmarks = const [];
+  String? _poiDataKey;
 
   @override
   void initState() {
@@ -46,19 +52,74 @@ class _MapScreenState extends State<MapScreen> {
       final provider = context.read<MapProvider>();
       provider.addListener(_onProviderChange);
       provider.initLocation();
+      _loadLandmarks();
     });
   }
 
-  void _onProviderChange() {}
+  /// Keeps the POI source in step with the provider. Runs on every notification
+  /// (including GPS ticks) but each branch is guarded so the platform is only
+  /// touched when the POI layer actually needs to change.
+  void _onProviderChange() {
+    if (!mounted) return;
+    _syncPoiData();
+    _syncPoiHighlight();
+  }
+
+  Future<void> _loadLandmarks() async {
+    try {
+      final all = await LandmarkService.instance.getAll();
+      if (!mounted) return;
+      setState(() => _landmarks = all);
+      _syncPoiData();
+    } on Object {
+      // POI layer simply stays empty; the rest of the map still works.
+    }
+  }
+
+  void _syncPoiData() {
+    final map = _mapboxMap;
+    if (map == null) return;
+
+    final provider = context.read<MapProvider>();
+    final categories = provider.poiCategory == 'all'
+        ? const <String>{}
+        : <String>{provider.poiCategory};
+
+    final key = [
+      _landmarks.length,
+      provider.poiCategory,
+      provider.poiVisible,
+    ].join('-');
+    if (_poiDataKey == key) return;
+    _poiDataKey = key;
+
+    // An empty filter with poiVisible off means "draw nothing".
+    final effective = provider.poiVisible ? categories : <String>{'__none__'};
+
+    _poi.ensureAttached(map).then((_) {
+      return _poi.updateData(_landmarks, categories: effective);
+    }).catchError((Object _) {});
+  }
+
+  void _syncPoiHighlight() {
+    final map = _mapboxMap;
+    if (map == null) return;
+    final selected = context.read<MapProvider>().selectedLandmark;
+    _poi.setSelected(selected).catchError((Object _) {});
+  }
 
   @override
   void dispose() {
-    try { context.read<MapProvider>().removeListener(_onProviderChange); } catch (_) {}
+    try {
+      context.read<MapProvider>().removeListener(_onProviderChange);
+    } catch (_) {}
+    _poi.dispose();
     super.dispose();
   }
 
-  void _onMapCreated(MapboxMap mapboxMap) async {
+  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
+    _poiDataKey = null;
     _polylineManager =
         await mapboxMap.annotations.createPolylineAnnotationManager();
     _pointAnnotationManager =
@@ -83,6 +144,9 @@ class _MapScreenState extends State<MapScreen> {
     await mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
 
     await _applyLocationPuck(mapboxMap);
+
+    _syncPoiData();
+    _syncPoiHighlight();
   }
 
   Future<void> _applyLocationPuck(MapboxMap map) async {
@@ -98,7 +162,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _changeMapStyle(String styleUri) async {
     if (_mapboxMap == null || _currentStyle == styleUri) return;
     _currentStyle = styleUri;
-    _activeRouteKey = null;
+    _activeRoute = null;
     _activeMarkerKey = null;
 
     await _mapboxMap!.loadStyleURI(styleUri);
@@ -110,6 +174,11 @@ class _MapScreenState extends State<MapScreen> {
     await _pointAnnotationManager!.setIconAllowOverlap(true);
     await _pointAnnotationManager!.setIconIgnorePlacement(true);
     await _applyLocationPuck(_mapboxMap!);
+
+    // Loading a new style discards custom sources and layers.
+    _poiDataKey = null;
+    _syncPoiData();
+    _syncPoiHighlight();
   }
 
   Future<void> _flyToUserLocation() async {
@@ -178,6 +247,46 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  /// Handles a tap on the POI layer: a cluster zooms in to split apart, a
+  /// landmark opens its detail sheet.
+  Future<void> _onMapTap(MapContentGestureContext ctx) async {
+    if (!mounted) return;
+    final provider = context.read<MapProvider>();
+    if (provider.isNavigating) return;
+
+    final hit = await _poi.resolveTap(ctx.touchPosition);
+    if (hit == null || !mounted) return;
+
+    if (hit.isCluster) {
+      final zoom = await _poi.clusterExpansionZoom(hit.properties);
+      if (zoom == null || !mounted) return;
+      await _mapboxMap?.easeTo(
+        CameraOptions(center: ctx.point, zoom: zoom.clamp(0, 20)),
+        MapAnimationOptions(duration: 400),
+      );
+      return;
+    }
+
+    final id = hit.landmarkId;
+    if (id == null) return;
+
+    final landmark = _landmarks.firstWhere(
+      (l) => l.id == id,
+      orElse: () => Landmark(
+        id: id,
+        name: 'Selected place',
+        category: 'other',
+        lat: ctx.point.coordinates.lat.toDouble(),
+        lng: ctx.point.coordinates.lng.toDouble(),
+        description: '',
+        icon: 'other',
+      ),
+    );
+
+    HapticFeedback.selectionClick();
+    provider.selectLandmark(landmark);
+  }
+
   Future<Uint8List> _createMarkedPinImage() async {
     const iconSize = 96.0;
     final recorder = ui.PictureRecorder();
@@ -221,9 +330,10 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _drawRoute(RouteResult route, {bool skipCamera = false}) async {
     if (_mapboxMap == null || _polylineManager == null) return;
 
-    final routeKey = '${route.coordinates.length}-${route.distanceMetres}';
-    if (_activeRouteKey == routeKey) return;
-    _activeRouteKey = routeKey;
+    // Identity check: a reroute that returns the same point count and distance
+    // is still a different route, so the old polyline must be replaced.
+    if (identical(_activeRoute, route)) return;
+    _activeRoute = route;
 
     await _polylineManager!.deleteAll();
 
@@ -354,7 +464,9 @@ class _MapScreenState extends State<MapScreen> {
       showGateMarker ? mapProvider.routeStartLat : 'gate-off',
       showGateMarker ? mapProvider.routeStartLng : 'gate-off',
       hasDestination ? targetDest.id : 'none',
-      mapProvider.hasMarkedLocation ? '${mapProvider.markedLat}-${mapProvider.markedLng}' : 'pin-off',
+      mapProvider.hasMarkedLocation
+          ? '${mapProvider.markedLat}-${mapProvider.markedLng}'
+          : 'pin-off',
     ].join('-');
 
     if (_activeMarkerKey == markerKey) return;
@@ -396,7 +508,8 @@ class _MapScreenState extends State<MapScreen> {
       await _pointAnnotationManager!.create(
         PointAnnotationOptions(
           geometry: Point(
-            coordinates: Position(mapProvider.markedLng!, mapProvider.markedLat!),
+            coordinates:
+                Position(mapProvider.markedLng!, mapProvider.markedLat!),
           ),
           image: _markedPinImage,
           iconSize: 1.0,
@@ -410,12 +523,14 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Consumer<MapProvider>(
       builder: (context, mapProvider, _) {
-        if (mapProvider.selectedLandmark == null) {
+        final selected = mapProvider.selectedLandmark;
+        if (selected == null) {
           _lastFlownLandmarkId = null;
-        } else if (_lastFlownLandmarkId != mapProvider.selectedLandmark!.id) {
-          _lastFlownLandmarkId = mapProvider.selectedLandmark!.id;
+        } else if (_lastFlownLandmarkId != selected.id) {
+          _lastFlownLandmarkId = selected.id;
+          // Capture the landmark now: it may be cleared before the frame ends.
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _flyToLandmark(mapProvider.selectedLandmark!);
+            _flyToLandmark(selected);
           });
         }
 
@@ -439,39 +554,37 @@ class _MapScreenState extends State<MapScreen> {
                   styleUri: mapProvider.mapStyle,
                   onMapCreated: _onMapCreated,
                   onLongTapListener: _onMapLongTap,
+                  onTapListener: _onMapTap,
                 ),
-
                 Builder(builder: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     _changeMapStyle(mapProvider.mapStyle);
                   });
                   return const SizedBox.shrink();
                 }),
-
                 if (mapProvider.isNavigating)
                   Positioned.fill(
                     child: NavigationSheet(mapProvider: mapProvider),
                   ),
-
-                if (!mapProvider.isNavigating && mapProvider.selectedLandmark == null && !mapProvider.hasMarkedLocation)
+                if (!mapProvider.isNavigating &&
+                    mapProvider.selectedLandmark == null &&
+                    !mapProvider.hasMarkedLocation)
                   Positioned.fill(
                     child: SearchSheet(
                       onSearchTap: () => context.push('/search'),
                     ),
                   ),
-
-                if (!mapProvider.isNavigating && mapProvider.selectedLandmark != null)
+                if (!mapProvider.isNavigating &&
+                    mapProvider.selectedLandmark != null)
                   Positioned.fill(
                     child: LandmarkSheet(
                       mapProvider: mapProvider,
                     ),
                   ),
-
                 if (!mapProvider.isNavigating && mapProvider.hasMarkedLocation)
                   Positioned.fill(
                     child: MarkedLocationSheet(mapProvider: mapProvider),
                   ),
-
                 Builder(
                   builder: (_) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -480,7 +593,6 @@ class _MapScreenState extends State<MapScreen> {
                     return const SizedBox.shrink();
                   },
                 ),
-
                 if (mapProvider.activeRoute != null)
                   Builder(
                     builder: (_) {
@@ -497,13 +609,15 @@ class _MapScreenState extends State<MapScreen> {
                   Builder(
                     builder: (_) {
                       WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        _activeRouteKey = null;
+                        // Only clear when a polyline was actually drawn, so
+                        // idle GPS ticks do not hit the platform channel.
+                        if (_activeRoute == null) return;
+                        _activeRoute = null;
                         await _polylineManager?.deleteAll();
                       });
                       return const SizedBox.shrink();
                     },
                   ),
-
                 Builder(builder: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mapProvider.isNavigating) {
@@ -516,7 +630,6 @@ class _MapScreenState extends State<MapScreen> {
                   });
                   return const SizedBox.shrink();
                 }),
-
                 if (_showStylePicker)
                   Positioned(
                     right: 72,
@@ -531,7 +644,6 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     ),
                   ),
-
                 Positioned(
                   right: 16,
                   top: 50,
@@ -554,12 +666,25 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
-
                 if (mapProvider.isLocating)
                   const Positioned(
                     top: 0,
                     right: 16,
                     child: SafeArea(child: LocatingIndicator()),
+                  ),
+                if (!mapProvider.isNavigating)
+                  Positioned(
+                    right: 16,
+                    bottom: MediaQuery.of(context).padding.bottom + 108,
+                    child: SafeArea(
+                      top: false,
+                      child: MapFab(
+                        icon: mapProvider.poiVisible
+                            ? Icons.pin_drop_rounded
+                            : Icons.pin_drop_outlined,
+                        onTap: mapProvider.togglePoiVisibility,
+                      ),
+                    ),
                   ),
               ],
             ),

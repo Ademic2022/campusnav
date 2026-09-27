@@ -9,6 +9,7 @@ class LocationService {
 
   Position? _lastPosition;
   StreamController<Position>? _controller;
+  StreamSubscription<Position>? _positionSubscription;
   bool _userOnCampus = false;
 
   Position? get lastPosition => _lastPosition;
@@ -45,11 +46,16 @@ class LocationService {
   }
 
   /// Continuous stream of location updates (geofenced to campus).
+  ///
+  /// Replaces any previously returned stream, cancelling the underlying
+  /// platform subscription so repeated calls cannot leak listeners.
   Stream<Position> getPositionStream() {
+    _positionSubscription?.cancel();
     _controller?.close();
-    _controller = StreamController<Position>.broadcast();
+    final controller = StreamController<Position>.broadcast();
+    _controller = controller;
 
-    Geolocator.getPositionStream(
+    _positionSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 10, // metres
@@ -62,14 +68,14 @@ class LocationService {
         }
         _userOnCampus = true;
         _lastPosition = pos;
-        _controller?.add(pos);
+        if (!controller.isClosed) controller.add(pos);
       },
       onError: (_) {
         // silently ignore stream errors
       },
     );
 
-    return _controller!.stream;
+    return controller.stream;
   }
 
   /// Returns true if [pos] is within OAU campus bounding box
@@ -131,8 +137,10 @@ class LocationService {
     );
   }
 
-  void dispose() {
-    _controller?.close();
+  Future<void> dispose() async {
+    await _positionSubscription?.cancel();
+    _positionSubscription = null;
+    await _controller?.close();
     _controller = null;
   }
 }

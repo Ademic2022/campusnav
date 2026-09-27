@@ -38,9 +38,18 @@ class _LandmarkCardState extends State<LandmarkCard> {
     _isSaved = StorageService.instance.isSaved(widget.landmark.id);
   }
 
+  @override
+  void didUpdateWidget(covariant LandmarkCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.landmark.id != widget.landmark.id) {
+      _isSaved = StorageService.instance.isSaved(widget.landmark.id);
+    }
+  }
+
   Future<void> _toggleSave() async {
     HapticFeedback.lightImpact();
     await StorageService.instance.toggle(widget.landmark);
+    if (!mounted) return;
     setState(() {
       _isSaved = StorageService.instance.isSaved(widget.landmark.id);
     });
@@ -157,7 +166,6 @@ class _LandmarkCardState extends State<LandmarkCard> {
       ),
     );
   }
-
 }
 
 class _IconBtn extends StatelessWidget {

@@ -1,11 +1,15 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
 import '../../core/models/landmark.dart';
 import '../../core/services/landmark_service.dart';
 import '../../core/services/location_service.dart';
 import '../../core/services/routing_service.dart';
 import '../../core/constants/oau_bounds.dart';
+import '../../core/constants/travel_pace.dart';
+import '../../core/utils/geo.dart';
 
 class MapProvider extends ChangeNotifier {
   // Mapbox token — set before using routing
@@ -36,8 +40,25 @@ class MapProvider extends ChangeNotifier {
   static const _offRouteThresholdMetres = 40.0;
   static const _rerouteCooldown = Duration(seconds: 15);
 
+  CancelToken? _routeCancelToken;
+  int _routeRequestId = 0;
+
   int get currentStepIndex => _currentStepIndex;
   int get totalSteps => activeRoute?.steps.length ?? 0;
+
+  bool get _isDriving => routeProfile == RouteProfile.driving;
+
+  /// Remaining metres to the destination from the current step onward.
+  double get remainingMetres {
+    final steps = activeRoute?.steps;
+    if (steps == null || steps.isEmpty) return 0;
+    final from = _currentStepIndex.clamp(0, steps.length);
+    return steps.skip(from).fold(0.0, (sum, step) => sum + step.distanceMetres);
+  }
+
+  /// Profile-aware remaining time estimate.
+  int get remainingMinutes =>
+      TravelPace.minutesFor(remainingMetres, isDriving: _isDriving);
 
   RouteStep? get currentStep {
     final steps = activeRoute?.steps;
@@ -82,10 +103,11 @@ class MapProvider extends ChangeNotifier {
     if (!isNavigating || isRerouting) return;
     final step = currentStep;
     if (step == null || step.maneuverLocation[0] == 0.0) return;
-    final dist = const Distance().as(
-      LengthUnit.Meter,
-      LatLng(pos.latitude, pos.longitude),
-      LatLng(step.maneuverLocation[1], step.maneuverLocation[0]),
+    final dist = haversineMetres(
+      lat1: pos.latitude,
+      lng1: pos.longitude,
+      lat2: step.maneuverLocation[1],
+      lng2: step.maneuverLocation[0],
     );
     if (dist < 20) {
       if (hasNextStep) {
@@ -108,19 +130,21 @@ class MapProvider extends ChangeNotifier {
       return;
     }
 
-    final userLatLng = LatLng(pos.latitude, pos.longitude);
-    const distCalc = Distance();
-    for (final coord in route.coordinates) {
-      final d = distCalc.as(LengthUnit.Meter, userLatLng, LatLng(coord[1], coord[0]));
-      if (d < _offRouteThresholdMetres) return; // still on route
-    }
+    final distance = minDistanceToPolylineMetres(
+      lat: pos.latitude,
+      lng: pos.longitude,
+      coordinates: route.coordinates,
+    );
+    if (distance < _offRouteThresholdMetres) return; // still on route
     _triggerReroute();
   }
 
   Future<void> _triggerReroute() async {
     final pos = userPosition;
     final dest = routeDestination;
-    if (isRerouting || dest == null || pos == null || mapboxToken.isEmpty) return;
+    if (isRerouting || dest == null || pos == null || mapboxToken.isEmpty) {
+      return;
+    }
 
     isRerouting = true;
     _lastRerouteTime = DateTime.now();
@@ -159,6 +183,25 @@ class MapProvider extends ChangeNotifier {
   // Bottom nav index
   int navIndex = 0;
 
+  // ── Map POI layer ─────────────────────────────────────────────────────────
+
+  /// Active category filter for map POIs. 'all' means no filtering.
+  String poiCategory = 'all';
+  bool _poiVisible = true;
+
+  bool get poiVisible => _poiVisible;
+
+  void setPoiCategory(String category) {
+    if (poiCategory == category) return;
+    poiCategory = category;
+    notifyListeners();
+  }
+
+  void togglePoiVisibility() {
+    _poiVisible = !_poiVisible;
+    notifyListeners();
+  }
+
   bool _isLocating = false;
   bool get isLocating => _isLocating;
   double? _mainGateLatFromData;
@@ -175,11 +218,17 @@ class MapProvider extends ChangeNotifier {
   bool get isStartingFromGate => !userIsOnCampus;
 
   double get routeStartLat => userIsOnCampus
-      ? (userPosition?.latitude ?? _mainGateLatFromData ?? OauBounds.fallbackLat)
+      ? (userPosition?.latitude ??
+          _mainGateLatFromData ??
+          OauBounds.fallbackLat)
       : (_mainGateLatFromData ?? OauBounds.fallbackLat);
   double get routeStartLng => userIsOnCampus
-      ? (userPosition?.longitude ?? _mainGateLngFromData ?? OauBounds.fallbackLng)
+      ? (userPosition?.longitude ??
+          _mainGateLngFromData ??
+          OauBounds.fallbackLng)
       : (_mainGateLngFromData ?? OauBounds.fallbackLng);
+
+  StreamSubscription<Position>? _positionSubscription;
 
   Future<void> initLocation() async {
     _isLocating = true;
@@ -189,8 +238,9 @@ class MapProvider extends ChangeNotifier {
     _isLocating = false;
     notifyListeners();
 
-    // Listen to continuous updates
-    LocationService.instance.getPositionStream().listen((pos) {
+    await _positionSubscription?.cancel();
+    _positionSubscription =
+        LocationService.instance.getPositionStream().listen((pos) {
       userPosition = pos;
       _checkStepAdvance(pos);
       _checkOffRoute(pos);
@@ -267,6 +317,13 @@ class MapProvider extends ChangeNotifier {
       return;
     }
 
+    // Supersede any in-flight request so the last *requested* profile wins
+    // rather than whichever HTTP response happens to arrive first.
+    _routeCancelToken?.cancel('superseded');
+    final cancelToken = CancelToken();
+    _routeCancelToken = cancelToken;
+    final requestId = ++_routeRequestId;
+
     isLoadingRoute = true;
     routeError = null;
     routeIsNetworkError = false;
@@ -280,15 +337,21 @@ class MapProvider extends ChangeNotifier {
         toLng: selectedLandmark!.lng,
         accessToken: mapboxToken,
         profile: routeProfile,
+        cancelToken: cancelToken,
       );
+      if (requestId != _routeRequestId) return;
 
       activeRoute = result;
       routeDestination = selectedLandmark;
+    } on RouteCancelledException {
+      return;
     } on RoutingException catch (e) {
+      if (requestId != _routeRequestId) return;
       routeError = e.message;
       routeIsNetworkError = e.isNetworkError;
     }
 
+    if (requestId != _routeRequestId) return;
     isLoadingRoute = false;
     notifyListeners();
   }
@@ -303,6 +366,9 @@ class MapProvider extends ChangeNotifier {
   }
 
   void clearRoute() {
+    _routeRequestId++;
+    _routeCancelToken?.cancel('cleared');
+    _routeCancelToken = null;
     activeRoute = null;
     routeDestination = null;
     routeError = null;
@@ -324,17 +390,20 @@ class MapProvider extends ChangeNotifier {
 
   String get markedCoordinateLabel {
     if (_markedLat == null || _markedLng == null) return '';
-    final latStr = '${_markedLat!.abs().toStringAsFixed(5)}° ${_markedLat! >= 0 ? 'N' : 'S'}';
-    final lngStr = '${_markedLng!.abs().toStringAsFixed(5)}° ${_markedLng! >= 0 ? 'E' : 'W'}';
+    final latStr =
+        '${_markedLat!.abs().toStringAsFixed(5)}° ${_markedLat! >= 0 ? 'N' : 'S'}';
+    final lngStr =
+        '${_markedLng!.abs().toStringAsFixed(5)}° ${_markedLng! >= 0 ? 'E' : 'W'}';
     return '$latStr, $lngStr';
   }
 
   String markedLocationDistanceLabel(Position? userPos) {
     if (userPos == null || _markedLat == null || _markedLng == null) return '';
-    final d = const Distance().as(
-      LengthUnit.Meter,
-      LatLng(userPos.latitude, userPos.longitude),
-      LatLng(_markedLat!, _markedLng!),
+    final d = haversineMetres(
+      lat1: userPos.latitude,
+      lng1: userPos.longitude,
+      lat2: _markedLat!,
+      lng2: _markedLng!,
     );
     if (d < 1000) return '${d.round()} m away';
     return '${(d / 1000).toStringAsFixed(1)} km away';
@@ -380,8 +449,17 @@ class MapProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
+  void dispose() {
+    _routeRequestId++;
+    _routeCancelToken?.cancel('disposed');
+    _routeCancelToken = null;
+    _positionSubscription?.cancel();
+    _positionSubscription = null;
+    super.dispose();
+  }
+
   // Kept for any external callers; now a no-op since start is auto-detected.
   @Deprecated('Start point is now determined automatically')
-  void setUseCampusAsStart(bool value) {
-  }
+  void setUseCampusAsStart(bool value) {}
 }

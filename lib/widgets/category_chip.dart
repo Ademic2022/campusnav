@@ -52,25 +52,30 @@ class CategoryChip extends StatelessWidget {
     );
   }
 
+  /// Display name and emoji for each known category, keyed by category id.
+  static const Map<String, (String, String)> meta = {
+    'all': ('All', '🗺️'),
+    'hostel': ('Hostels', '🏠'),
+    'faculty': ('Faculties', '🏛️'),
+    'department': ('Depts', '📚'),
+    'lecture': ('Halls', '🎓'),
+    'admin': ('Admin', '🏢'),
+    'food': ('Food', '🍽️'),
+    'banks': ('Banks', '🏦'),
+    'health': ('Health', '🏥'),
+    'gate': ('Gates', '🚪'),
+    'sports': ('Sports', '⚽'),
+  };
+
+  /// Human readable name for a category, e.g. `bank` -> `Banks`.
+  static String labelFor(String category) =>
+      (meta[category] ?? (category, '📍')).$1;
+
   static List<CategoryChip> buildRow({
     required List<String> categories,
     required String selected,
     required void Function(String) onChanged,
   }) {
-    const meta = {
-      'all': ('All', '🗺️'),
-      'hostel': ('Hostels', '🏠'),
-      'faculty': ('Faculties', '🏛️'),
-      'department': ('Depts', '📚'),
-      'lecture': ('Halls', '🎓'),
-      'admin': ('Admin', '🏢'),
-      'food': ('Food', '🍽️'),
-      'banks': ('Banks', '🏦'),
-      'health': ('Health', '🏥'),
-      'gate': ('Gates', '🚪'),
-      'sports': ('Sports', '⚽'),
-    };
-
     return categories.map((cat) {
       final info = meta[cat] ?? (cat, '📍');
       return CategoryChip(

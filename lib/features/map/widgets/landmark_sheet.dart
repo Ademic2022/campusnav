@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/models/landmark.dart';
 import '../../../core/services/routing_service.dart';
+import '../../../core/services/storage_service.dart';
+import '../../saved/saved_provider.dart';
 import '../map_provider.dart';
 
 class LandmarkSheet extends StatefulWidget {
@@ -16,16 +20,20 @@ class LandmarkSheet extends StatefulWidget {
 class _LandmarkSheetState extends State<LandmarkSheet> {
   final _ctrl = DraggableScrollableController();
 
-  static const double _peek   = 0.165;
+  static const double _peek = 0.165;
   static const double _detail = 0.46;
-  static const double _full   = 0.88;
+  static const double _full = 0.88;
+
+  bool _isSaved = false;
 
   @override
   void initState() {
     super.initState();
     widget.mapProvider.addListener(_onProviderChange);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _ctrl.isAttached && _ctrl.size < _detail - 0.02) {
+      if (!mounted) return;
+      _refreshSavedState();
+      if (_ctrl.isAttached && _ctrl.size < _detail - 0.02) {
         _ctrl.animateTo(_detail,
             duration: const Duration(milliseconds: 380),
             curve: Curves.easeOutCubic);
@@ -33,9 +41,29 @@ class _LandmarkSheetState extends State<LandmarkSheet> {
     });
   }
 
+  void _refreshSavedState() {
+    final landmark = widget.mapProvider.selectedLandmark;
+    if (landmark == null) return;
+    final saved = StorageService.instance.isSaved(landmark.id);
+    if (saved != _isSaved && mounted) {
+      setState(() => _isSaved = saved);
+    }
+  }
+
+  Future<void> _toggleSave(MapProvider mp, Landmark landmark) async {
+    HapticFeedback.lightImpact();
+    await StorageService.instance.toggle(landmark);
+    if (!mounted) return;
+    setState(() => _isSaved = StorageService.instance.isSaved(landmark.id));
+    context.read<SavedProvider>().load();
+  }
+
   void _onProviderChange() {
-    if (!mounted || !_ctrl.isAttached) return;
-    if (widget.mapProvider.selectedLandmark != null && _ctrl.size < _detail - 0.02) {
+    if (!mounted) return;
+    _refreshSavedState();
+    if (!_ctrl.isAttached) return;
+    if (widget.mapProvider.selectedLandmark != null &&
+        _ctrl.size < _detail - 0.02) {
       _ctrl.animateTo(_detail,
           duration: const Duration(milliseconds: 380),
           curve: Curves.easeOutCubic);
@@ -72,50 +100,80 @@ class _LandmarkSheetState extends State<LandmarkSheet> {
         decoration: const BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black54, blurRadius: 20, offset: Offset(0, -2))
+          ],
         ),
         child: ListView(
           controller: scrollController,
           padding: EdgeInsets.only(bottom: bottomPad + 16),
           children: [
-            Center(child: Padding(
+            Center(
+                child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Container(
-                width: 36, height: 4,
+                width: 36,
+                height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.surfaceHigh,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             )),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 12, 0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 52, height: 52,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
                       color: catColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Center(child: Text(
+                    child: Center(
+                        child: Text(
                       AppColors.categoryEmoji(landmark.category),
                       style: const TextStyle(fontSize: 26),
                     )),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: Column(
+                  Expanded(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(landmark.name, style: AppTextStyles.headlineMedium),
                       const SizedBox(height: 2),
                       Text(landmark.description,
                           style: AppTextStyles.bodySmall,
-                          maxLines: 2, overflow: TextOverflow.ellipsis),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
                     ],
                   )),
+                  GestureDetector(
+                    onTap: () => _toggleSave(mp, landmark),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: _isSaved
+                            ? AppColors.accent.withValues(alpha: 0.15)
+                            : AppColors.surfaceHigh,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        _isSaved
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_outline_rounded,
+                        color: _isSaved
+                            ? AppColors.accent
+                            : AppColors.textSecondary,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.lightImpact();
@@ -134,61 +192,82 @@ class _LandmarkSheetState extends State<LandmarkSheet> {
                 ],
               ),
             ),
-
             if (mp.canRouteFromCurrentStart) ...[
               const SizedBox(height: 14),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(children: [
-                  InfoChip(icon: Icons.directions_walk, label: landmark.friendlyDistance(startLat, startLng)),
+                  InfoChip(
+                      icon: Icons.directions_walk,
+                      label: landmark.friendlyDistance(startLat, startLng)),
                   const SizedBox(width: 8),
-                  InfoChip(icon: Icons.access_time_rounded, label: '~${landmark.walkingMinutes(startLat, startLng)} min walk'),
+                  InfoChip(
+                      icon: Icons.access_time_rounded,
+                      label:
+                          '~${landmark.walkingMinutes(startLat, startLng)} min walk'),
                 ]),
               ),
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(children: [
-                  Icon(mp.isStartingFromGate ? Icons.door_front_door_rounded : Icons.my_location_rounded,
-                      size: 13, color: AppColors.textMuted),
+                  Icon(
+                      mp.isStartingFromGate
+                          ? Icons.door_front_door_rounded
+                          : Icons.my_location_rounded,
+                      size: 13,
+                      color: AppColors.textMuted),
                   const SizedBox(width: 5),
                   Text(
-                    mp.isStartingFromGate ? 'Starting from Main Gate' : 'Starting from your location',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                    mp.isStartingFromGate
+                        ? 'Starting from Main Gate'
+                        : 'Starting from your location',
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: AppColors.textMuted),
                   ),
                 ]),
               ),
             ],
-
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(children: [
-                Expanded(child: RouteProfileBtn(
-                  label: 'Walk', icon: Icons.directions_walk_rounded,
+                Expanded(
+                    child: RouteProfileBtn(
+                  label: 'Walk',
+                  icon: Icons.directions_walk_rounded,
                   isActive: mp.routeProfile == RouteProfile.walking,
-                  onTap: () { HapticFeedback.lightImpact(); mp.setRouteProfile(RouteProfile.walking); },
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    mp.setRouteProfile(RouteProfile.walking);
+                  },
                 )),
                 const SizedBox(width: 10),
-                Expanded(child: RouteProfileBtn(
-                  label: 'Drive', icon: Icons.directions_car_rounded,
+                Expanded(
+                    child: RouteProfileBtn(
+                  label: 'Drive',
+                  icon: Icons.directions_car_rounded,
                   isActive: mp.routeProfile == RouteProfile.driving,
-                  onTap: () { HapticFeedback.lightImpact(); mp.setRouteProfile(RouteProfile.driving); },
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    mp.setRouteProfile(RouteProfile.driving);
+                  },
                 )),
               ]),
             ),
             const SizedBox(height: 12),
-
             if (mp.routeError != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: RouteErrorCard(
                   message: mp.routeError!,
                   isNetworkError: mp.routeIsNetworkError,
-                  onRetry: () { HapticFeedback.lightImpact(); mp.fetchRoute(); },
+                  onRetry: () {
+                    HapticFeedback.lightImpact();
+                    mp.fetchRoute();
+                  },
                 ),
               ),
-
             if (mp.activeRoute != null) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -197,47 +276,72 @@ class _LandmarkSheetState extends State<LandmarkSheet> {
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(children: [
-                    const Icon(Icons.route_rounded, color: AppColors.primary, size: 20),
+                    const Icon(Icons.route_rounded,
+                        color: AppColors.primary, size: 20),
                     const SizedBox(width: 8),
-                    Text('${mp.activeRoute!.distanceLabel}  •  ${mp.activeRoute!.durationLabel}',
-                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.primary)),
+                    Text(
+                        '${mp.activeRoute!.distanceLabel}  •  ${mp.activeRoute!.durationLabel}',
+                        style: AppTextStyles.titleMedium
+                            .copyWith(color: AppColors.primary)),
                   ]),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(width: double.infinity, height: 52,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                         elevation: 0),
-                    onPressed: () { HapticFeedback.mediumImpact(); mp.startNavigation(); },
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      mp.startNavigation();
+                    },
                     icon: const Icon(Icons.navigation_rounded),
-                    label: Text('Start Navigation', style: AppTextStyles.labelLarge),
+                    label: Text('Start Navigation',
+                        style: AppTextStyles.labelLarge),
                   ),
                 ),
               ),
             ] else ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(width: double.infinity, height: 52,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                         elevation: 0),
-                    onPressed: mp.isLoadingRoute ? null : () { HapticFeedback.mediumImpact(); mp.fetchRoute(); },
+                    onPressed: mp.isLoadingRoute
+                        ? null
+                        : () {
+                            HapticFeedback.mediumImpact();
+                            mp.fetchRoute();
+                          },
                     icon: mp.isLoadingRoute
-                        ? const SizedBox(width: 18, height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
                         : const Icon(Icons.directions_rounded),
-                    label: Text(mp.isLoadingRoute ? 'Getting route...' : 'Get Directions',
+                    label: Text(
+                        mp.isLoadingRoute
+                            ? 'Getting route...'
+                            : 'Get Directions',
                         style: AppTextStyles.labelLarge),
                   ),
                 ),
@@ -359,7 +463,8 @@ class RouteErrorCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(message,
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.error)),
+                style:
+                    AppTextStyles.bodySmall.copyWith(color: AppColors.error)),
           ),
           const SizedBox(width: 8),
           GestureDetector(
@@ -372,7 +477,8 @@ class RouteErrorCard extends StatelessWidget {
               ),
               child: Text(
                 'Retry',
-                style: AppTextStyles.labelSmall.copyWith(color: AppColors.error),
+                style:
+                    AppTextStyles.labelSmall.copyWith(color: AppColors.error),
               ),
             ),
           ),

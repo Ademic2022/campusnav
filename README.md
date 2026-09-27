@@ -40,11 +40,35 @@ A comprehensive Flutter application designed to help students, staff, and visito
    ```
 
 3. **Configure Mapbox Token**
-   Configure your Mapbox public/secret tokens according to the standard Mapbox Maps SDK setup guidelines for iOS (`.netrc`) and Android (`gradle.properties`). You must supply your token inside the app to fetch routes properly.
+   ```bash
+   cp .env.example .env
+   ```
+   Then set your public token in `.env`:
+   ```
+   MAPBOX_PUBLIC_TOKEN=pk.your_mapbox_public_token_here
+   ```
+   Create a *public* token (`pk.…`) at
+   [account.mapbox.com/access-tokens](https://account.mapbox.com/access-tokens/).
+   Dart, iOS and Android all read this single value, so there is nothing else
+   to configure. `.env` is gitignored — never commit a real token.
+
+   iOS also needs the Mapbox **downloads token** for the native SDK's
+   `mbx` dependencies, following the
+   [standard Mapbox iOS setup](https://docs.mapbox.com/ios/guides/install/).
+   Android additionally needs `MAPBOX_DOWNLOADS_TOKEN` in
+   `android/gradle.properties` if the SDK build requires it.
+
+   Without a token the app shows a "Setup required" screen rather than
+   crashing or rendering a blank map.
 
 4. **Run the App**
    ```bash
    flutter run
+   ```
+
+5. **Run the tests**
+   ```bash
+   flutter test
    ```
 
 ## 📱 Screenshots

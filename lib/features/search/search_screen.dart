@@ -145,6 +145,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       final landmark = provider.results[i];
                       final userPos = mapProvider.userPosition;
                       return LandmarkCard(
+                        key: ValueKey('search-${landmark.id}'),
                         landmark: landmark,
                         userLat: userPos?.latitude,
                         userLng: userPos?.longitude,

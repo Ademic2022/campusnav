@@ -19,20 +19,24 @@ class NearbyScreen extends StatefulWidget {
 
 class _NearbyScreenState extends State<NearbyScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final pos = context.read<MapProvider>().userPosition;
-      if (pos != null) {
-        context.read<NearbyProvider>().load(pos.latitude, pos.longitude);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final mapProvider = context.read<MapProvider>();
+    final mapProvider = context.watch<MapProvider>();
     final savedProvider = context.read<SavedProvider>();
+    final userPos = mapProvider.userPosition;
+
+    // Re-evaluated on every GPS update. The load is deferred to a post-frame
+    // callback because it notifies listeners, which is illegal during build.
+    if (userPos != null) {
+      final nearby = context.read<NearbyProvider>();
+      if (nearby.needsReloadFor(userPos.latitude, userPos.longitude)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          context
+              .read<NearbyProvider>()
+              .ensureLoaded(userPos.latitude, userPos.longitude);
+        });
+      }
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -40,7 +44,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Row(
@@ -51,14 +54,17 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Nearby Places', style: AppTextStyles.headlineLarge),
-                      Text('OAU Campus', style: AppTextStyles.bodySmall),
+                      Text(
+                        mapProvider.userIsOnCampus
+                            ? 'OAU Campus'
+                            : 'Outside campus — showing nearest places',
+                        style: AppTextStyles.bodySmall,
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
-
-            // ── Category filter chips ──
             Consumer<NearbyProvider>(
               builder: (context, provider, _) {
                 return SizedBox(
@@ -71,75 +77,110 @@ class _NearbyScreenState extends State<NearbyScreen> {
                         categories: NearbyProvider.categories,
                         selected: provider.selectedCategory,
                         onChanged: provider.onCategoryChanged,
-                      ).map((chip) => Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: chip,
-                          )),
+                      ).map(
+                        (chip) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: chip,
+                        ),
+                      ),
                     ],
                   ),
                 );
               },
             ),
-
             const Divider(height: 1, color: AppColors.divider),
-
-            // ── Results ──
             Expanded(
               child: Consumer<NearbyProvider>(
                 builder: (context, provider, _) {
+                  if (userPos == null) {
+                    return const _NearbyMessage(
+                      icon: '🛰️',
+                      title: 'Locating you…',
+                      message: 'Waiting for a GPS fix to find nearby places.',
+                    );
+                  }
+
                   if (provider.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.primary, strokeWidth: 2),
+                        color: AppColors.primary,
+                        strokeWidth: 2,
+                      ),
                     );
                   }
 
                   if (provider.nearby.isEmpty) {
-                    return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('📍', style: TextStyle(fontSize: 48)),
-                          const SizedBox(height: 16),
-                          Text('No places found', style: AppTextStyles.headlineMedium),
-                          const SizedBox(height: 8),
-                          Text(
-                            'GPS location needed for nearby results',
-                            style: AppTextStyles.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                    return const _NearbyMessage(
+                      icon: '📍',
+                      title: 'No places found',
+                      message: 'Try a different category to see more places.',
+                    );
                   }
 
-                  final userPos = mapProvider.userPosition;
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: provider.nearby.length,
-                    itemBuilder: (context, i) {
-                      final landmark = provider.nearby[i];
-                      return LandmarkCard(
-                        landmark: landmark,
-                        userLat: userPos?.latitude,
-                        userLng: userPos?.longitude,
-                        onSaveToggled: () => savedProvider.load(),
-                        onNavigate: () {
-                          mapProvider.selectLandmark(landmark);
-                          context.pop();
-                        },
-                        onTap: () {
-                          mapProvider.selectLandmark(landmark);
-                          context.pop();
-                        },
-                      );
-                    },
+                  return RefreshIndicator(
+                    color: AppColors.primary,
+                    onRefresh: () =>
+                        provider.load(userPos.latitude, userPos.longitude),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: provider.nearby.length,
+                      itemBuilder: (context, i) {
+                        final landmark = provider.nearby[i];
+                        return LandmarkCard(
+                          key: ValueKey('nearby-${landmark.id}'),
+                          landmark: landmark,
+                          userLat: userPos.latitude,
+                          userLng: userPos.longitude,
+                          onSaveToggled: () => savedProvider.load(),
+                          onNavigate: () {
+                            mapProvider.selectLandmark(landmark);
+                            context.pop();
+                          },
+                          onTap: () {
+                            mapProvider.selectLandmark(landmark);
+                            context.pop();
+                          },
+                        );
+                      },
+                    ),
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NearbyMessage extends StatelessWidget {
+  const _NearbyMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final String icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 48)),
+            const SizedBox(height: 16),
+            Text(title, style: AppTextStyles.headlineMedium),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: AppTextStyles.bodyMedium,
+              textAlign: TextAlign.center,
             ),
           ],
         ),

@@ -12,10 +12,10 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- Mapbox Access Token -->
+        <!-- Mapbox Access Token, injected from .env by build.gradle.kts -->
         <meta-data
             android:name="com.mapbox.token"
-            android:value="pk.YOUR_MAPBOX_PUBLIC_TOKEN_HERE" />
+            android:value="${MAPBOX_ACCESS_TOKEN}" />
 
         <activity
             android:name=".MainActivity"
