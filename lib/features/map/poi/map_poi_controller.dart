@@ -309,9 +309,17 @@ class MapPoiController {
     }
   }
 
-  void dispose() {
+  /// Forgets the installed source and layers after the map reloaded its style,
+  /// which discards them natively. The same [MapboxMap] instance is still
+  /// passed to [ensureAttached] afterwards, so identity alone cannot detect
+  /// this; without this the next update targets a source that no longer exists.
+  void invalidateAttachment() {
     _map = null;
     _poiSource = null;
     _attached = false;
+  }
+
+  void dispose() {
+    invalidateAttachment();
   }
 }

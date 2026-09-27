@@ -187,18 +187,10 @@ class MapProvider extends ChangeNotifier {
 
   /// Active category filter for map POIs. 'all' means no filtering.
   String poiCategory = 'all';
-  bool _poiVisible = true;
-
-  bool get poiVisible => _poiVisible;
 
   void setPoiCategory(String category) {
     if (poiCategory == category) return;
     poiCategory = category;
-    notifyListeners();
-  }
-
-  void togglePoiVisibility() {
-    _poiVisible = !_poiVisible;
     notifyListeners();
   }
 

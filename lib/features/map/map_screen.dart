@@ -88,17 +88,17 @@ class _MapScreenState extends State<MapScreen> {
     final key = [
       _landmarks.length,
       provider.poiCategory,
-      provider.poiVisible,
     ].join('-');
     if (_poiDataKey == key) return;
     _poiDataKey = key;
 
-    // An empty filter with poiVisible off means "draw nothing".
-    final effective = provider.poiVisible ? categories : <String>{'__none__'};
-
     _poi.ensureAttached(map).then((_) {
-      return _poi.updateData(_landmarks, categories: effective);
-    }).catchError((Object _) {});
+      return _poi.updateData(_landmarks, categories: categories);
+    }).catchError((Object error) {
+      // Previously swallowed, which hid a stale-attachment bug where the
+      // source no longer existed and the layer silently stayed empty.
+      debugPrint('POI sync failed: $error');
+    });
   }
 
   void _syncPoiHighlight() {
@@ -175,7 +175,10 @@ class _MapScreenState extends State<MapScreen> {
     await _pointAnnotationManager!.setIconIgnorePlacement(true);
     await _applyLocationPuck(_mapboxMap!);
 
-    // Loading a new style discards custom sources and layers.
+    // Loading a new style discards custom sources and layers, so the
+    // controller's attachment is stale even though the MapboxMap is the same
+    // instance. Drop it so the next sync reinstalls against the new style.
+    _poi.invalidateAttachment();
     _poiDataKey = null;
     _syncPoiData();
     _syncPoiHighlight();
@@ -671,20 +674,6 @@ class _MapScreenState extends State<MapScreen> {
                     top: 0,
                     right: 16,
                     child: SafeArea(child: LocatingIndicator()),
-                  ),
-                if (!mapProvider.isNavigating)
-                  Positioned(
-                    right: 16,
-                    bottom: MediaQuery.of(context).padding.bottom + 108,
-                    child: SafeArea(
-                      top: false,
-                      child: MapFab(
-                        icon: mapProvider.poiVisible
-                            ? Icons.pin_drop_rounded
-                            : Icons.pin_drop_outlined,
-                        onTap: mapProvider.togglePoiVisibility,
-                      ),
-                    ),
                   ),
               ],
             ),

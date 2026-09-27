@@ -19,7 +19,6 @@ class SearchSheet extends StatelessWidget {
   /// Label shown next to the category row so it is obvious the selection is
   /// also filtering what is drawn on the map.
   String _categorySummary(MapProvider mapProvider) {
-    if (!mapProvider.poiVisible) return 'Map pins hidden';
     final category = mapProvider.poiCategory;
     if (category == 'all') return 'All pins';
     return '${CategoryChip.labelFor(category)} pins';
@@ -116,8 +115,8 @@ class SearchSheet extends StatelessWidget {
                       style: AppTextStyles.labelMedium
                           .copyWith(color: AppColors.textSecondary)),
                   const SizedBox(width: 12),
-                  // Flexible so a long summary (e.g. "Map pins hidden")
-                  // ellipsizes instead of overflowing the row.
+                  // Flexible so a long category label (e.g. "Lecture Hall
+                  // pins") ellipsizes instead of overflowing the row.
                   Expanded(
                     child: Text(
                       _categorySummary(mapProvider),

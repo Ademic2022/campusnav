@@ -96,7 +96,7 @@ void main() {
     test('a non-matching filter yields an empty collection', () {
       final json = decode(buildPoiGeoJson(
         [moremi, canteen],
-        categories: {'__none__'},
+        categories: {'sports'},
       ));
       expect(json['features'], isEmpty);
     });

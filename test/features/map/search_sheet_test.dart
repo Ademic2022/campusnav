@@ -200,24 +200,4 @@ void main() {
     expect(mapProvider.poiCategory, 'all',
         reason: 'the search field is navigation, not a filter');
   });
-
-  testWidgets('tapping a category leaves pin visibility alone', (tester) async {
-    await pumpSheet(tester);
-    await openCategoryRow(tester);
-
-    await tapCategory(tester, 'Hostels');
-
-    expect(mapProvider.poiVisible, isTrue);
-  });
-
-  testWidgets('the hidden-pins state is reported in the summary',
-      (tester) async {
-    await pumpSheet(tester);
-    await openCategoryRow(tester);
-
-    mapProvider.togglePoiVisibility();
-    await tester.pumpAndSettle();
-
-    expect(find.text('Map pins hidden'), findsOneWidget);
-  });
 }
