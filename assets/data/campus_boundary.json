@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OAU campus",
+        "source": "convex hull of assets/data/landmarks.json",
+        "note": "PLACEHOLDER - hull of 156 landmarks, buffered 90 m outward. OAUTHC teaching hospital excluded (off-site). Replace with a hand-traced perimeter.",
+        "excludedOffSite": [
+          "OAUTHC (Teaching Hospital)",
+          "OAUTHC Pharmacy"
+        ],
+        "landmarkCount": 156,
+        "bufferMetres": 90,
+        "simplify": "unsimplified"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              4.508262,
+              7.515087
+            ],
+            [
+              4.522574,
+              7.496247
+            ],
+            [
+              4.537996,
+              7.519017
+            ],
+            [
+              4.532356,
+              7.526758
+            ],
+            [
+              4.5172,
+              7.528863
+            ],
+            [
+              4.51181,
+              7.523258
+            ],
+            [
+              4.508262,
+              7.515087
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

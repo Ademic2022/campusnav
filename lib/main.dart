@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'core/models/saved_location.dart';
+import 'core/services/campus_boundary_service.dart';
 import 'core/services/storage_service.dart';
 import 'app.dart';
 
@@ -46,6 +47,11 @@ Future<void> main() async {
 
   // Set Mapbox access token
   MapboxOptions.setAccessToken(mapboxToken);
+
+  // Load the campus fence before the first frame so the map can draw it and
+  // the geofence can classify the opening GPS fix. Failing to load is
+  // non-fatal: the app falls back to "cannot tell" and keeps working.
+  await CampusBoundary.instance.load();
 
   final showOnboarding = !StorageService.instance.hasSeenOnboarding;
 

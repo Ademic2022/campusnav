@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:oau_navigator/core/constants/oau_bounds.dart';
+import 'package:oau_navigator/core/services/campus_boundary_service.dart';
 import 'package:oau_navigator/core/services/landmark_service.dart';
 
 void main() {
@@ -19,15 +19,42 @@ void main() {
       expect(ids.length, all.length);
     });
 
-    test('every landmark sits inside the campus bounds', () async {
+    test('every landmark sits inside the campus fence', () async {
+      // The OAUTHC teaching hospital complex is the one deliberate exception:
+      // it is affiliated with OAU but stands ~4.5 km away on its own site, so
+      // the campus fence excludes it. Those landmarks are still published.
+      const offSite = {'OAUTHC (Teaching Hospital)', 'OAUTHC Pharmacy'};
+      final boundary = CampusBoundary.instance;
+      await boundary.load();
+      expect(boundary.isLoaded, isTrue,
+          reason: 'campus_boundary.json must load for this test to mean '
+              'anything');
+
       final all = await service.getAll();
       for (final l in all) {
+        if (offSite.contains(l.name)) continue;
         expect(
-          OauBounds.isOnCampus(l.lat, l.lng),
+          boundary.contains(l.lat, l.lng),
           isTrue,
-          reason: '${l.name} is outside OauBounds',
+          reason: '${l.name} is outside the campus fence',
         );
       }
+    });
+
+    test('the off-site OAUTHC landmarks are the only ones excluded', () async {
+      const offSite = {'OAUTHC (Teaching Hospital)', 'OAUTHC Pharmacy'};
+      final boundary = CampusBoundary.instance;
+      await boundary.load();
+
+      final all = await service.getAll();
+      final outside =
+          all.where((l) => !boundary.contains(l.lat, l.lng)).toList();
+
+      expect(
+        outside.map((l) => l.name).toSet(),
+        offSite,
+        reason: 'only the off-site hospital may fall outside the fence',
+      );
     });
 
     test('is sorted by name', () async {

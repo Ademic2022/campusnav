@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
@@ -8,10 +10,13 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/oau_bounds.dart';
 import '../../core/models/landmark.dart';
 import '../../core/services/landmark_service.dart';
+import '../../core/services/location_service.dart';
 import '../../core/services/routing_service.dart';
+import 'boundary/map_boundary_controller.dart';
 import 'poi/map_poi_controller.dart';
 
 import 'map_provider.dart';
+import 'widgets/campus_banner.dart';
 import 'widgets/landmark_sheet.dart';
 import 'widgets/locating_indicator.dart';
 import 'widgets/map_fab.dart';
@@ -32,6 +37,10 @@ class _MapScreenState extends State<MapScreen> {
   PolylineAnnotationManager? _polylineManager;
   PointAnnotationManager? _pointAnnotationManager;
   final MapPoiController _poi = MapPoiController();
+  final MapBoundaryController _boundary = MapBoundaryController();
+  StreamSubscription<CampusTransitionEvent>? _transitionSubscription;
+  CampusTransitionEvent? _transition;
+  Timer? _transitionTimer;
   RouteResult? _activeRoute;
   String? _activeMarkerKey;
   String? _lastNavPositionKey;
@@ -53,6 +62,22 @@ class _MapScreenState extends State<MapScreen> {
       provider.addListener(_onProviderChange);
       provider.initLocation();
       _loadLandmarks();
+      _listenForCampusTransitions();
+    });
+  }
+
+  /// Shows a short banner when the device crosses the campus fence.
+  void _listenForCampusTransitions() {
+    _transitionSubscription?.cancel();
+    _transitionSubscription = LocationService.instance.transitions.listen((
+      event,
+    ) {
+      if (!mounted) return;
+      _transitionTimer?.cancel();
+      setState(() => _transition = event);
+      _transitionTimer = Timer(const Duration(seconds: 4), () {
+        if (mounted) setState(() => _transition = null);
+      });
     });
   }
 
@@ -108,12 +133,25 @@ class _MapScreenState extends State<MapScreen> {
     _poi.setSelected(selected).catchError((Object _) {});
   }
 
+  /// Draws the campus fence. Separate from the POI sync because the boundary
+  /// never changes with the category filter, only with the style.
+  void _syncBoundary() {
+    final map = _mapboxMap;
+    if (map == null) return;
+    _boundary.ensureAttached(map).catchError((Object error) {
+      debugPrint('Boundary sync failed: $error');
+    });
+  }
+
   @override
   void dispose() {
     try {
       context.read<MapProvider>().removeListener(_onProviderChange);
     } catch (_) {}
+    _transitionSubscription?.cancel();
+    _transitionTimer?.cancel();
     _poi.dispose();
+    _boundary.dispose();
     super.dispose();
   }
 
@@ -147,6 +185,7 @@ class _MapScreenState extends State<MapScreen> {
 
     _syncPoiData();
     _syncPoiHighlight();
+    _syncBoundary();
   }
 
   Future<void> _applyLocationPuck(MapboxMap map) async {
@@ -179,9 +218,11 @@ class _MapScreenState extends State<MapScreen> {
     // controller's attachment is stale even though the MapboxMap is the same
     // instance. Drop it so the next sync reinstalls against the new style.
     _poi.invalidateAttachment();
+    _boundary.invalidateAttachment();
     _poiDataKey = null;
     _syncPoiData();
     _syncPoiHighlight();
+    _syncBoundary();
   }
 
   Future<void> _flyToUserLocation() async {
@@ -674,6 +715,16 @@ class _MapScreenState extends State<MapScreen> {
                     top: 0,
                     right: 16,
                     child: SafeArea(child: LocatingIndicator()),
+                  ),
+                if (_transition != null)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      bottom: false,
+                      child: CampusBanner(event: _transition!),
+                    ),
                   ),
               ],
             ),

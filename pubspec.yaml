@@ -86,5 +86,6 @@ flutter:
 
   assets:
     - assets/data/landmarks.json
+    - assets/data/campus_boundary.json
     - assets/images/
     - .env
