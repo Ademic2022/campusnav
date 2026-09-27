@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:oau_navigator/core/models/landmark.dart';
 import 'package:oau_navigator/core/services/routing_service.dart';
 import 'package:oau_navigator/features/map/map_provider.dart';
 
@@ -131,6 +132,84 @@ void main() {
       p.clearMarkedLocation();
       expect(p.hasMarkedLocation, isFalse);
       expect(p.markedCoordinateLabel, '');
+    });
+  });
+
+  group('marked location naming', () {
+    // A landmark sitting on the campus, plus a point far from any landmark.
+    const hostels = [
+      Landmark(
+        id: 1,
+        name: 'Mbiological Hostel',
+        category: 'hostel',
+        lat: 7.5174,
+        lng: 4.5228,
+        description: '',
+        icon: 'hostel',
+      ),
+    ];
+
+    test('names the mark after a landmark it sits on', () {
+      final p = MapProvider()
+        ..setMarkedLocation(7.5174, 4.5228, nearest: hostels);
+      expect(p.markedLocationTitle, 'Mbiological Hostel');
+      expect(p.markedLandmark?.name, 'Mbiological Hostel');
+      expect(p.markedLandmarkDistanceMetres, lessThan(1));
+    });
+
+    test('names a far mark after the nearest landmark anyway', () {
+      // ~1.1 km south of the only landmark in this list. It is still the
+      // closest thing to the pin, so the name shows and the distance
+      // discloses how loose the match is.
+      final p = MapProvider()
+        ..setMarkedLocation(7.5074, 4.5228, nearest: hostels);
+      expect(p.markedLandmark?.name, 'Mbiological Hostel');
+      expect(p.markedLocationTitle, 'Mbiological Hostel');
+      expect(p.markedLandmarkDistanceMetres, greaterThan(1000));
+    });
+
+    test('picks the closest of several nearby landmarks', () {
+      const all = [
+        ...hostels,
+        Landmark(
+          id: 2,
+          name: 'Mbiological Hostel Annex',
+          category: 'hostel',
+          lat: 7.5175,
+          lng: 4.5228,
+          description: '',
+          icon: 'hostel',
+        ),
+      ];
+      final p = MapProvider()
+        ..setMarkedLocation(7.51747, 4.5228, nearest: all);
+      expect(p.markedLocationTitle, 'Mbiological Hostel Annex');
+    });
+
+    test('names a mark no matter how far the nearest landmark is', () {
+      // Landmarks are ~700 m apart, so there is no distance at which naming
+      // should stop. Every one of these resolves.
+      for (final lat in [7.5192, 7.5250, 7.5100, 7.5000]) {
+        final p = MapProvider()
+          ..setMarkedLocation(lat, 4.5228, nearest: hostels);
+        expect(p.markedLandmark?.name, 'Mbiological Hostel',
+            reason: 'lat $lat should still resolve to the only landmark');
+        expect(p.markedLocationTitle, isNot(contains('°')),
+            reason: 'lat $lat should show a name, not bare coordinates');
+      }
+    });
+
+    test('no landmarks supplied means no invented name', () {
+      final p = MapProvider()..setMarkedLocation(7.5174, 4.5228);
+      expect(p.markedLandmark, isNull);
+      expect(p.markedLocationTitle, contains('7.51740° N'));
+    });
+
+    test('clearing the mark drops the resolved name too', () {
+      final p = MapProvider()
+        ..setMarkedLocation(7.5174, 4.5228, nearest: hostels)
+        ..clearMarkedLocation();
+      expect(p.markedLandmark, isNull);
     });
   });
 

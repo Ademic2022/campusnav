@@ -375,10 +375,35 @@ class MapProvider extends ChangeNotifier {
 
   double? _markedLat;
   double? _markedLng;
+  Landmark? _markedLandmark;
 
   double? get markedLat => _markedLat;
   double? get markedLng => _markedLng;
   bool get hasMarkedLocation => _markedLat != null && _markedLng != null;
+
+  /// The nearest bundled landmark to the mark.
+  ///
+  /// Unconditional: any mark inside the fence resolves to its closest
+  /// landmark. The landmarks are 706 m apart at the median, so a radius gate
+  /// left ~86% of campus unnamed, which is the same useless "Marked Location"
+  /// title this replaced. Distance is reported alongside the name instead, so
+  /// a far guess is visible rather than hidden.
+  Landmark? get markedLandmark => _markedLandmark;
+
+  /// How far the mark sits from the landmark it snapped to, in metres.
+  double get markedLandmarkDistanceMetres {
+    final lm = _markedLandmark;
+    if (lm == null || _markedLat == null || _markedLng == null) return 0;
+    return lm.distanceTo(_markedLat!, _markedLng!);
+  }
+
+  /// Title for the marked location. Falls back to the coordinates only when
+  /// there are no landmarks to compare against at all.
+  String get markedLocationTitle {
+    final lm = _markedLandmark;
+    if (lm == null) return markedCoordinateLabel;
+    return lm.name;
+  }
 
   String get markedCoordinateLabel {
     if (_markedLat == null || _markedLng == null) return '';
@@ -401,10 +426,43 @@ class MapProvider extends ChangeNotifier {
     return '${(d / 1000).toStringAsFixed(1)} km away';
   }
 
-  void setMarkedLocation(double lat, double lng) {
+  /// Closest landmark to a point, or null when [all] is empty.
+  ///
+  /// Unconditional on purpose. Landmarks sit 706 m apart at the median, so an
+  /// earlier 60 m cutoff only named 14% of campus and left the rest showing
+  /// bare coordinates. Every point inside the fence is within 1 km of some
+  /// landmark, so the nearest match is always the right one to show; the
+  /// distance is displayed next to the name so a loose guess is visible.
+  ///
+  /// Callers pass the landmarks they already hold rather than this re-reading
+  /// the asset: the map has them loaded by the time a long-press lands, and
+  /// the sheet reads the result synchronously during build.
+  static Landmark? nearestLandmarkTo(
+    List<Landmark> all,
+    double lat,
+    double lng,
+  ) {
+    Landmark? best;
+    var bestDistance = double.infinity;
+    for (final lm in all) {
+      final d = lm.distanceTo(lat, lng);
+      if (d < bestDistance) {
+        bestDistance = d;
+        best = lm;
+      }
+    }
+    return best;
+  }
+
+  void setMarkedLocation(
+    double lat,
+    double lng, {
+    List<Landmark> nearest = const [],
+  }) {
     if (isNavigating) return;
     _markedLat = lat;
     _markedLng = lng;
+    _markedLandmark = nearestLandmarkTo(nearest, lat, lng);
     selectedLandmark = null;
     isLandmarkSheetVisible = false;
     activeRoute = null;
@@ -416,6 +474,7 @@ class MapProvider extends ChangeNotifier {
 
   void clearMarkedLocation() {
     _markedLat = null;
+    _markedLandmark = null;
     _markedLng = null;
     notifyListeners();
   }

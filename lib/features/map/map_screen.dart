@@ -284,7 +284,11 @@ class _MapScreenState extends State<MapScreen> {
     final provider = context.read<MapProvider>();
     if (provider.isNavigating) return;
     final coord = ctx.point.coordinates;
-    provider.setMarkedLocation(coord.lat.toDouble(), coord.lng.toDouble());
+    provider.setMarkedLocation(
+      coord.lat.toDouble(),
+      coord.lng.toDouble(),
+      nearest: _landmarks,
+    );
     _mapboxMap?.flyTo(
       CameraOptions(center: ctx.point, zoom: 17.5),
       MapAnimationOptions(duration: 600),

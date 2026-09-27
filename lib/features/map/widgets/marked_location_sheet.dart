@@ -116,8 +116,17 @@ class _MarkedLocationSheetState extends State<MarkedLocationSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Marked Location', style: AppTextStyles.headlineMedium),
+                        Text(
+                          mp.markedLocationTitle,
+                          style: AppTextStyles.headlineMedium,
+                        ),
                         const SizedBox(height: 2),
+                        if (mp.markedLandmark != null)
+                          Text(
+                            _nearbyLabel(mp),
+                            style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary),
+                          ),
                         if (distLabel.isNotEmpty)
                           Text(distLabel,
                               style: AppTextStyles.bodySmall.copyWith(
@@ -230,5 +239,16 @@ class _MarkedLocationSheetState extends State<MarkedLocationSheet> {
         ),
       ),
     );
+  }
+
+  /// Subtitle under the title. The name is always the nearest landmark, but
+  /// how near varies wildly (landmarks are ~700 m apart), so the wording
+  /// changes with distance instead of claiming a precision it does not have.
+  static String _nearbyLabel(MapProvider mp) {
+    final d = mp.markedLandmarkDistanceMetres;
+    if (d < 25) return 'Marked location · on this spot';
+    if (d < 100) return 'Marked location · ${d.round()} m from ${mp.markedLandmark!.name}';
+    if (d < 1000) return 'Marked location · nearest is ${mp.markedLandmark!.name} (${d.round()} m)';
+    return 'Marked location · nearest is ${mp.markedLandmark!.name} (${(d / 1000).toStringAsFixed(1)} km)';
   }
 }
